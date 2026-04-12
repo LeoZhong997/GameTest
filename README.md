@@ -1,4 +1,4 @@
-# 放置军团 - 游戏复刻项目
+# 军团冲击 (Legion Rush)
 
 基于《放置军团》(Gubulin) 的完整复刻 + 玩法优化项目。
 
@@ -8,7 +8,7 @@
 
 ## 技术栈
 
-- **游戏引擎**：Cocos Creator 3.x
+- **游戏引擎**：Cocos Creator 3.8.8（2D 模板）
 - **开发语言**：TypeScript
 - **目标平台**：微信小游戏 / iOS / Android（一套代码多端发布）
 
@@ -39,13 +39,15 @@
 GameTest/
 ├── README.md              # 项目说明（本文件）
 ├── GAME_DESIGN.md         # 完整游戏设计文档
-└── game/                  # Cocos Creator 项目（待创建）
+└── LegionRush/            # Cocos Creator 3.8.8 项目
     ├── assets/
     │   ├── scenes/        # 场景
     │   ├── scripts/       # TypeScript 代码
     │   ├── resources/     # 配置表、图片、音频
     │   └── prefabs/       # 预制体
-    └── settings/          # 项目设置
+    ├── settings/          # 项目设置
+    ├── package.json
+    └── tsconfig.json
 ```
 
 ## 开发阶段

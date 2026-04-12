@@ -1,15 +1,17 @@
-# 《放置军团》游戏资料整理 & 复刻计划
+# 军团冲击 (Legion Rush) - 游戏设计文档
+
+> 基于《放置军团》(Gubulin) 核心玩法的复刻 + 优化升级项目
 
 ## 一、游戏基本信息
 
-- **游戏名称**：放置军团（Gubulin）
-- **开发商**：上海信行软件有限公司
+- **游戏名称**：军团冲击（Legion Rush）
+- **原作参考**：放置军团（Gubulin）- 上海信行软件有限公司
 - **游戏类型**：放置类模拟经营 + 即时战略（RTS）+ 策略（SLG）手游
 - **核心卖点**：100v100，胜负30秒，"恶人"主角
-- **上线平台**：Apple App Store、TapTap、好游快爆
-- **ISBN**：978-7-498-07059-3
-- **备案号**：沪ICP备14045943号-9
-- **官网**：https://m.gubulin.com/
+- **游戏引擎**：Cocos Creator 3.8.8（2D）
+- **开发语言**：TypeScript
+- **目标平台**：微信小游戏 / iOS / Android
+- **原作官网**：https://m.gubulin.com/
 
 ---
 
@@ -261,7 +263,8 @@
 ## 九、技术方案（已确认）
 
 - **目标平台**：微信小游戏 + iOS + Android（一套代码多端发布）
-- **游戏引擎**：Cocos Creator 3.x（TypeScript）
+- **游戏引擎**：Cocos Creator 3.8.8（2D TypeScript）
+- **项目路径**：`LegionRush/`
 - **复刻范围**：完整复刻全部系统
 - **优化方向**：新增功能
 
@@ -285,7 +288,7 @@
 
 ### 10.1 项目目录结构
 ```
-game/
+LegionRush/                   # Cocos Creator 3.8.8 项目根目录
 ├── assets/
 │   ├── scenes/           # 场景文件
 │   │   ├── Login.scene
@@ -373,7 +376,7 @@ game/
 **目标**：跑通100v100自动战斗
 
 1. **项目初始化**
-   - 创建 Cocos Creator 3.x 项目
+   - ~~创建 Cocos Creator 3.x 项目~~（已完成：Cocos Creator 3.8.8，2D模板，项目名 LegionRush）
    - 搭建目录结构和核心框架（EventBus、对象池、配置管理）
    - 集成 TypeScript 严格模式
 
@@ -766,7 +769,7 @@ game/
 
 ## 附注：信息来源
 
-由于帮助页面是动态加载的（JavaScript渲染），无法直接从官网手册获取内容。以上游戏资料来源于：
+以上游戏资料来源于：
 - TapTap 社区攻略（2024阵型攻略、2025新手攻略、2023全面攻略）
 - 官网基础信息（m.gubulin.com）
 - 玩家社区讨论
