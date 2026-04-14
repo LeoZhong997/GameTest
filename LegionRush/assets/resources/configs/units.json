@@ -1,0 +1,56 @@
+{
+    "cavalry": {
+        "id": "cavalry",
+        "name": "骑兵",
+        "role": "cavalry",
+        "description": "高机动近战，突袭后排",
+        "baseStats": { "hp": 1200, "atk": 180, "def": 80, "spd": 3.5, "range": 1.2, "atkSpd": 0.8, "critRate": 0.1, "critDmg": 1.5 },
+        "growths": { "hp": 120, "atk": 18, "def": 8, "spd": 0.05 },
+        "skills": ["charge", "war_cry"]
+    },
+    "ranged": {
+        "id": "ranged",
+        "name": "远程",
+        "role": "ranged",
+        "description": "范围伤害，核心输出",
+        "baseStats": { "hp": 600, "atk": 220, "def": 30, "spd": 1.5, "range": 5.0, "atkSpd": 0.6, "critRate": 0.15, "critDmg": 2.0 },
+        "growths": { "hp": 60, "atk": 22, "def": 3, "spd": 0.02 },
+        "skills": ["cannon_blast", "scatter_shot"]
+    },
+    "warrior": {
+        "id": "warrior",
+        "name": "战士",
+        "role": "damage",
+        "description": "近战输出，人数越多越强",
+        "baseStats": { "hp": 800, "atk": 120, "def": 50, "spd": 2.5, "range": 1.0, "atkSpd": 1.0, "critRate": 0.05, "critDmg": 1.5 },
+        "growths": { "hp": 80, "atk": 12, "def": 5, "spd": 0.03 },
+        "skills": ["clone", "furious_strike"]
+    },
+    "support": {
+        "id": "support",
+        "name": "辅助",
+        "role": "support",
+        "description": "削弱敌军，提供控场",
+        "baseStats": { "hp": 700, "atk": 80, "def": 40, "spd": 1.8, "range": 4.0, "atkSpd": 0.5, "critRate": 0.05, "critDmg": 1.5 },
+        "growths": { "hp": 70, "atk": 8, "def": 4, "spd": 0.02 },
+        "skills": ["hex", "mystery_box"]
+    },
+    "mage": {
+        "id": "mage",
+        "name": "法师",
+        "role": "mage",
+        "description": "远程法术输出，搭配人海更强",
+        "baseStats": { "hp": 1000, "atk": 200, "def": 60, "spd": 1.5, "range": 6.0, "atkSpd": 0.4, "critRate": 0.1, "critDmg": 1.8 },
+        "growths": { "hp": 100, "atk": 20, "def": 6, "spd": 0.02 },
+        "skills": ["soul_reap"]
+    },
+    "tank": {
+        "id": "tank",
+        "name": "坦克",
+        "role": "tank",
+        "description": "前排肉盾，硬度与输出兼备",
+        "baseStats": { "hp": 1800, "atk": 150, "def": 150, "spd": 2.0, "range": 1.5, "atkSpd": 0.7, "critRate": 0.08, "critDmg": 1.5 },
+        "growths": { "hp": 180, "atk": 15, "def": 15, "spd": 0.03 },
+        "skills": ["demon_slash", "iron_body"]
+    }
+}

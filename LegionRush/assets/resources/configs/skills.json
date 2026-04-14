@@ -1,0 +1,123 @@
+{
+    "charge": {
+        "id": "charge",
+        "name": "冲锋",
+        "description": "向前方冲锋，对路径上的敌人造成伤害并击退",
+        "type": "charge",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 50, "ratio": 1.5, "range": 100, "duration": 0 }
+        ],
+        "cooldown": 8, "castTime": 0.3, "range": 3.0, "unlockRating": "B"
+    },
+    "war_cry": {
+        "id": "war_cry",
+        "name": "战吼",
+        "description": "发出战吼，提升周围友军攻击力20%",
+        "type": "buff",
+        "effects": [
+            { "type": "buff", "targetType": "ally_nearest", "value": 20, "ratio": 0, "range": 150, "duration": 5 }
+        ],
+        "cooldown": 12, "castTime": 0.5, "range": 3.0, "unlockRating": "B"
+    },
+    "cannon_blast": {
+        "id": "cannon_blast",
+        "name": "炮击",
+        "description": "发射炮弹，对目标区域造成大范围伤害",
+        "type": "aoe",
+        "effects": [
+            { "type": "aoe", "targetType": "enemy_range", "value": 80, "ratio": 1.2, "range": 120, "duration": 0 }
+        ],
+        "cooldown": 6, "castTime": 0.4, "range": 5.0, "unlockRating": "B"
+    },
+    "scatter_shot": {
+        "id": "scatter_shot",
+        "name": "散弹",
+        "description": "发射散弹，对前方扇形区域造成伤害",
+        "type": "aoe",
+        "effects": [
+            { "type": "aoe", "targetType": "enemy_range", "value": 40, "ratio": 0.8, "range": 100, "duration": 0 }
+        ],
+        "cooldown": 4, "castTime": 0.2, "range": 4.0, "unlockRating": "B"
+    },
+    "clone": {
+        "id": "clone",
+        "name": "分身",
+        "description": "召唤自己的分身参加战斗",
+        "type": "summon",
+        "effects": [
+            { "type": "summon", "targetType": "self", "value": 0, "ratio": 0, "range": 0, "duration": 0, "summonId": "goblin_warrior", "summonCount": 2 }
+        ],
+        "cooldown": 15, "castTime": 0.5, "range": 0, "unlockRating": "B"
+    },
+    "furious_strike": {
+        "id": "furious_strike",
+        "name": "狂暴打击",
+        "description": "全力一击，对敌人造成大量伤害",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 30, "ratio": 2.0, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 5, "castTime": 0.3, "range": 1.5, "unlockRating": "B"
+    },
+    "hex": {
+        "id": "hex",
+        "name": "妖术",
+        "description": "对敌人施放妖术，降低攻速和移速",
+        "type": "debuff",
+        "effects": [
+            { "type": "debuff", "targetType": "enemy_nearest", "value": -30, "ratio": 0, "range": 0, "duration": 4 },
+            { "type": "control", "targetType": "enemy_nearest", "value": 30, "ratio": 0, "range": 0, "duration": 3, "controlType": "slow" }
+        ],
+        "cooldown": 10, "castTime": 0.3, "range": 4.0, "unlockRating": "B"
+    },
+    "mystery_box": {
+        "id": "mystery_box",
+        "name": "神秘盒子",
+        "description": "召唤一个神秘盒子吸引敌人攻击",
+        "type": "summon",
+        "effects": [
+            { "type": "summon", "targetType": "self", "value": 0, "ratio": 0, "range": 0, "duration": 8, "summonId": "mystery_box", "summonCount": 1 }
+        ],
+        "cooldown": 15, "castTime": 0.5, "range": 0, "unlockRating": "B"
+    },
+    "shadow_control": {
+        "id": "shadow_control",
+        "name": "暗影控制",
+        "description": "全图暗影之力，眩晕所有敌人2秒",
+        "type": "control",
+        "effects": [
+            { "type": "control", "targetType": "enemy_all", "value": 0, "ratio": 0, "range": 0, "duration": 2, "controlType": "stun" }
+        ],
+        "cooldown": 20, "castTime": 0.5, "range": 99, "unlockRating": "B"
+    },
+    "soul_reap": {
+        "id": "soul_reap",
+        "name": "灵魂收割",
+        "description": "释放暗影波，对范围内敌人造成伤害",
+        "type": "aoe",
+        "effects": [
+            { "type": "aoe", "targetType": "enemy_range", "value": 40, "ratio": 0.5, "range": 200, "duration": 0 }
+        ],
+        "cooldown": 12, "castTime": 0.5, "range": 6.0, "unlockRating": "B"
+    },
+    "demon_slash": {
+        "id": "demon_slash",
+        "name": "魔刃斩",
+        "description": "挥舞魔剑，对前方敌人造成大量伤害",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 60, "ratio": 1.8, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 4, "castTime": 0.3, "range": 2.0, "unlockRating": "B"
+    },
+    "iron_body": {
+        "id": "iron_body",
+        "name": "铁壁",
+        "description": "强化自身防御力50%",
+        "type": "buff",
+        "effects": [
+            { "type": "buff", "targetType": "self", "value": 50, "ratio": 0, "range": 0, "duration": 6 }
+        ],
+        "cooldown": 15, "castTime": 0.2, "range": 0, "unlockRating": "B"
+    }
+}
