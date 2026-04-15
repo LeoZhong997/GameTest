@@ -4,30 +4,19 @@
 
 /** 种族 */
 export enum Race {
-    GOBLIN = 'goblin',
-    DEMON = 'demon',
     HUMAN = 'human',
-    UNDEAD = 'undead',
-    NEUTRAL = 'neutral'
+    BEAST = 'beast',
+    SPIRIT = 'spirit',
+    DEMON = 'demon',
 }
 
-/** 稀有度 */
-export enum Rarity {
-    NORMAL = 'normal',
-    RARE = 'rare',
-    LEGENDARY = 'legendary'
-}
-
-/** 角色定位 */
+/** 角色定位（5种） */
 export enum Role {
     TANK = 'tank',
-    DAMAGE = 'damage',
-    CONTROL = 'control',
-    ASSASSIN = 'assassin',
-    SUPPORT = 'support',
-    CAVALRY = 'cavalry',
+    MELEE = 'melee',
     RANGED = 'ranged',
-    MAGE = 'mage'
+    SUPPORT = 'support',
+    ASSASSIN = 'assassin',
 }
 
 /** 品质等级 */
@@ -76,15 +65,11 @@ export interface UnitConfig {
     id: string;
     name: string;
     race: Race;
-    rarity: Rarity;
     role: Role;
     description: string;
     baseStats: UnitStats;
     growths: StatGrowths;
     skills: string[];
-    unlockRating: Rating;
-    passiveAPlus: string;
-    ultimate?: string;
 }
 
 /** 玩家拥有的兵种实例数据 */
