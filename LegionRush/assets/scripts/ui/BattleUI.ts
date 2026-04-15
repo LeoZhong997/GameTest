@@ -42,8 +42,14 @@ export class BattleUI extends Component {
     private panelGfx: Graphics | null = null;
     private btnGfx: Graphics | null = null;
     private btnStartNode: Node | null = null;
+    private btnPauseLabel: Label | null = null;
+    private btnSpeedLabel: Label | null = null;
+    private pauseOverlay: Node | null = null;
+    private pauseTextLabel: Label | null = null;
 
     private _bm: BattleManager = BattleManager.instance;
+    private _speedOptions: number[] = [1, 2, 3, 4];
+    private _speedIndex: number = 0;
 
     onLoad() {
         // 自动绑定子节点
@@ -373,21 +379,120 @@ export class BattleUI extends Component {
         // SpeedLabel
         if (this.speedLabel) {
             this.speedLabel.node.removeFromParent();
-            const sut = this.speedLabel.node.getComponent(UITransform)!;
-            sut.setContentSize(50, 20);
-            sut.setAnchorPoint(0.5, 0.5);
-            this.speedLabel.fontSize = 14;
-            this.speedLabel.isBold = true;
-            this.speedLabel.color = Color.WHITE;
-            this.speedLabel.node.setPosition(SW / 2 - 60, -35, 0);
-            topBar.addChild(this.speedLabel.node);
+            this.speedLabel.node.active = false; // 不再使用静态 label，用按钮替代
         }
 
         // TopBarBg 渲染在最底层：先移到最后再 insertChild(0)
         topBg.removeFromParent();
         topBar.insertChild(topBg, 0);
 
+        // === 右下角控制区: 暂停 + 倍速 ===
+        const ctrlY = -35;
+        const ctrlRightX = SW / 2 - 20;
+
+        // 倍速按钮
+        const speedBtn = this.createCtrlBtn(`${this._speedOptions[this._speedIndex]}x`, 50, 28, 6);
+        speedBtn.setPosition(ctrlRightX - 50, ctrlY, 0);
+        speedBtn.on(Node.EventType.TOUCH_END, this.onSpeedToggle, this);
+        this.btnSpeedLabel = speedBtn.getChildByName('CtrlBtnText')?.getComponent(Label) ?? null;
+        topBar.addChild(speedBtn);
+
+        // 暂停按钮
+        const pauseBtn = this.createCtrlBtn('⏸', 36, 36, 18);
+        pauseBtn.setPosition(ctrlRightX, ctrlY, 0);
+        pauseBtn.on(Node.EventType.TOUCH_END, this.onPauseToggle, this);
+        this.btnPauseLabel = pauseBtn.getChildByName('CtrlBtnText')?.getComponent(Label) ?? null;
+        topBar.addChild(pauseBtn);
+
+        // 暂停遮罩 + "已暂停" 提示（初始隐藏）
+        this.pauseOverlay = new Node('PauseOverlay');
+        const poUt = this.pauseOverlay.addComponent(UITransform);
+        poUt.setContentSize(SW, SH);
+        poUt.setAnchorPoint(0.5, 0.5);
+        this.pauseOverlay.setPosition(0, -TB_H / 2, 0);
+        const poGfx = this.pauseOverlay.addComponent(Graphics);
+        poGfx.fillColor = new Color(0, 0, 0, 100);
+        poGfx.rect(-SW / 2, -SH / 2, SW, SH);
+        poGfx.fill();
+
+        const pauseTxtNode = new Node('PauseText');
+        const ptut = pauseTxtNode.addComponent(UITransform);
+        ptut.setContentSize(200, 50);
+        ptut.setAnchorPoint(0.5, 0.5);
+        this.pauseTextLabel = pauseTxtNode.addComponent(Label);
+        this.pauseTextLabel.string = '已暂停';
+        this.pauseTextLabel.fontSize = 32;
+        this.pauseTextLabel.isBold = true;
+        this.pauseTextLabel.color = GOLD;
+        this.pauseTextLabel.enableOutline = true;
+        this.pauseTextLabel.outlineColor = new Color(0, 0, 0, 180);
+        this.pauseTextLabel.outlineWidth = 3;
+        this.pauseTextLabel.horizontalAlign = Label.HorizontalAlign.CENTER;
+        this.pauseOverlay.addChild(pauseTxtNode);
+
+        this.pauseOverlay.active = false;
+        topBar.addChild(this.pauseOverlay);
+
         this.node.addChild(topBar);
+    }
+
+    /** 创建控制按钮（深色背景 + 白色文字） */
+    private createCtrlBtn(text: string, w: number, h: number, r: number): Node {
+        const node = new Node('CtrlBtn');
+        const ut = node.addComponent(UITransform);
+        ut.setContentSize(w, h);
+        ut.setAnchorPoint(0.5, 0.5);
+
+        // 深色背景
+        const bg = new Node('CtrlBtnBg');
+        const bgut = bg.addComponent(UITransform);
+        bgut.setContentSize(w, h);
+        bgut.setAnchorPoint(0.5, 0.5);
+        const gfx = bg.addComponent(Graphics);
+        gfx.fillColor = new Color(26, 26, 46, 200);
+        gfx.roundRect(-w / 2, -h / 2, w, h, r);
+        gfx.fill();
+        gfx.strokeColor = new Color(255, 255, 255, 80);
+        gfx.lineWidth = 1;
+        gfx.roundRect(-w / 2, -h / 2, w, h, r);
+        gfx.stroke();
+        node.insertChild(bg, 0);
+
+        // 文字
+        const txtNode = new Node('CtrlBtnText');
+        const txtut = txtNode.addComponent(UITransform);
+        txtut.setContentSize(w, h);
+        txtut.setAnchorPoint(0.5, 0.5);
+        const label = txtNode.addComponent(Label);
+        label.string = text;
+        label.fontSize = 14;
+        label.isBold = true;
+        label.color = Color.WHITE;
+        label.horizontalAlign = Label.HorizontalAlign.CENTER;
+        label.verticalAlign = Label.VerticalAlign.CENTER;
+        node.addChild(txtNode);
+
+        return node;
+    }
+
+    private onPauseToggle(): void {
+        this._bm.togglePause();
+        const paused = this._bm.state === BattleState.PAUSED;
+        if (this.btnPauseLabel) {
+            this.btnPauseLabel.string = paused ? '▶' : '⏸';
+        }
+        if (this.pauseOverlay) {
+            this.pauseOverlay.active = paused;
+        }
+    }
+
+    private onSpeedToggle(): void {
+        this._speedIndex = (this._speedIndex + 1) % this._speedOptions.length;
+        const speed = this._speedOptions[this._speedIndex];
+        this._bm.setBattleSpeed(speed);
+        if (this.btnSpeedLabel) {
+            this.btnSpeedLabel.string = `${speed}x`;
+        }
     }
 
     private drawPanelBg(border: Color): void {
@@ -406,7 +511,19 @@ export class BattleUI extends Component {
     }
 
     update(dt: number) {
-        if (this._bm.state !== BattleState.RUNNING) return;
+        if (this._bm.state !== BattleState.RUNNING && this._bm.state !== BattleState.PAUSED) return;
+
+        // 暂停时只更新暂停状态显示
+        if (this._bm.state === BattleState.PAUSED) {
+            // 确保暂停 UI 同步
+            if (this.pauseOverlay && !this.pauseOverlay.active) {
+                this.pauseOverlay.active = true;
+            }
+            if (this.btnPauseLabel && this.btnPauseLabel.string !== '▶') {
+                this.btnPauseLabel.string = '▶';
+            }
+            return;
+        }
 
         if (this.timerLabel) {
             const remaining = Math.max(0, this._bm.timeLimit - this._bm.battleTime);
@@ -422,10 +539,6 @@ export class BattleUI extends Component {
         if (this.rightCountLabel) {
             const alive = this._bm.rightUnits.filter(u => u.isAlive).length;
             this.rightCountLabel.string = `${alive}/${this._bm.rightUnits.length}`;
-        }
-
-        if (this.speedLabel) {
-            this.speedLabel.string = `${this._bm.battleSpeed.toFixed(1)}x`;
         }
     }
 
@@ -486,6 +599,12 @@ export class BattleUI extends Component {
         if (this.overlay) this.overlay.active = false;
         if (this.resultPanel) this.resultPanel.active = false;
         if (this.btnStartNode) this.btnStartNode.active = false;
+        if (this.pauseOverlay) this.pauseOverlay.active = false;
+        // 重置倍速
+        this._speedIndex = 0;
+        this._bm.setBattleSpeed(1);
+        if (this.btnSpeedLabel) this.btnSpeedLabel.string = '1x';
+        if (this.btnPauseLabel) this.btnPauseLabel.string = '⏸';
         EventBus.instance.emit('battle:restart');
     }
 

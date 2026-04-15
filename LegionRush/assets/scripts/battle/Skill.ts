@@ -5,6 +5,7 @@
 
 import { BattleUnit } from './Unit';
 import { SkillConfig, SkillType, TargetType, SkillEffect, ControlType } from '../models/SkillData';
+import { EventBus } from '../core/EventBus';
 
 export class SkillExecutor {
     /**
@@ -76,6 +77,13 @@ export class SkillExecutor {
 
             const actual = target.takeDamage(finalDmg, caster);
             caster.damageDealt += actual;
+
+            EventBus.instance.emit('battle:skill_hit', {
+                caster: caster.uid,
+                target: target.uid,
+                damage: actual,
+                isCrit,
+            });
         }
     }
 
@@ -84,6 +92,12 @@ export class SkillExecutor {
         for (const target of targets) {
             const amount = effect.value + caster.atk * effect.ratio;
             target.heal(amount);
+
+            EventBus.instance.emit('battle:heal', {
+                caster: caster.uid,
+                target: target.uid,
+                amount,
+            });
         }
     }
 

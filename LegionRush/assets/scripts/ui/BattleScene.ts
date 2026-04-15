@@ -11,6 +11,7 @@ import { UnitConfig, Quality } from '../models/UnitData';
 import { SkillConfig } from '../models/SkillData';
 import { EventBus } from '../core/EventBus';
 import { UnitView, UnitShape, drawShape } from './UnitView';
+import { BattleEffectManager } from './BattleEffectManager';
 import { FormationType } from '../battle/Formation';
 
 const { ccclass } = _decorator;
@@ -29,6 +30,7 @@ export class BattleScene extends Component {
     private uiRoot: Node = null!;
     private _bm: BattleManager = BattleManager.instance;
     private _unitViews: Map<string, UnitView> = new Map();
+    private _effectMgr: BattleEffectManager | null = null;
     private _unitConfigs: Map<string, UnitConfig> = new Map();
     private _skillConfigs: Map<string, SkillConfig> = new Map();
     private _running: boolean = false;
@@ -39,6 +41,9 @@ export class BattleScene extends Component {
 
         if (!this.battleField) console.error('[BattleScene] 未找到 BattleField 子节点');
         if (!this.uiRoot) console.error('[BattleScene] 未找到 UIRoot 子节点');
+
+        // 特效管理器挂载在 BattleField 上
+        this._effectMgr = this.battleField.addComponent(BattleEffectManager);
 
         EventBus.instance.on('battle:start', this.onBattleStart, this);
         EventBus.instance.on('battle:end', this.onBattleEnd, this);
@@ -155,6 +160,11 @@ export class BattleScene extends Component {
             const view = this.createUnitNode(unit);
             this._unitViews.set(unit.uid, view);
         }
+
+        // 同步给特效管理器
+        if (this._effectMgr) {
+            this._effectMgr.setUnitViews(this._unitViews);
+        }
     }
 
     private getUnitStyle(role: string): { size: number; shape: UnitShape } {
@@ -244,6 +254,7 @@ export class BattleScene extends Component {
     }
 
     private clearUnitViews(): void {
+        if (this._effectMgr) this._effectMgr.clearEffects();
         this._unitViews.forEach(view => {
             if (view && view.node) view.node.destroy();
         });

@@ -3,7 +3,7 @@
  * 由 BattleScene 纯代码创建，设置引用后 init
  */
 
-import { _decorator, Component, Label, Color, Node, Graphics, UITransform } from 'cc';
+import { _decorator, Component, Label, Color, Node, Graphics, UITransform, UIOpacity, tween, Vec3 } from 'cc';
 import { BattleUnit, TeamSide, UnitState } from '../battle/Unit';
 
 const { ccclass } = _decorator;
@@ -79,9 +79,16 @@ export class UnitView extends Component {
     private _hpBarHeight: number = 10;
     private _bodySize: number = 32;
     private _lastColor: Color = new Color(0, 0, 0, 0);
+    private _dying: boolean = false;
+    private _flashing: boolean = false;
+    private _opacity: UIOpacity | null = null;
 
     init(unit: BattleUnit): void {
         this._unit = unit;
+        this._dying = false;
+
+        // 添加 UIOpacity（用于死亡动画）
+        this._opacity = this.node.getComponent(UIOpacity) || this.node.addComponent(UIOpacity);
 
         // 记录身体尺寸（Graphics 重绘用）
         const transform = this.node.getComponent(UITransform);
@@ -124,9 +131,12 @@ export class UnitView extends Component {
             this.hpBarFill.fill();
         }
 
-        // 死亡
+        // 死亡动画
         if (!unit.isAlive) {
-            this.node.active = false;
+            if (!this._dying) {
+                this._dying = true;
+                this.playDeathAnimation();
+            }
             return;
         }
 
@@ -154,6 +164,48 @@ export class UnitView extends Component {
                 this.bodyGraphics.fill();
                 this._lastColor = targetColor;
             }
+        }
+    }
+
+    /** 受击闪烁：短暂变白后恢复 */
+    flashHit(): void {
+        if (this._flashing || !this.bodyGraphics || !this._unit) return;
+        this._flashing = true;
+
+        const white = new Color(255, 255, 255, 255);
+        this.bodyGraphics.clear();
+        this.bodyGraphics.fillColor = white;
+        drawShape(this.bodyGraphics, this.shapeType, this._bodySize);
+        this.bodyGraphics.fill();
+        this._lastColor = white;
+
+        // 100ms 后恢复原色
+        setTimeout(() => {
+            this._flashing = false;
+            if (!this._unit || !this.bodyGraphics) return;
+            const restore = (this._unit.isStunned || this._unit.isFrozen)
+                ? new Color(200, 200, 255, 200)
+                : (TEAM_COLORS[this._unit.team] || Color.WHITE);
+            this.bodyGraphics.clear();
+            this.bodyGraphics.fillColor = restore;
+            drawShape(this.bodyGraphics, this.shapeType, this._bodySize);
+            this.bodyGraphics.fill();
+            this._lastColor = restore;
+        }, 100);
+    }
+
+    /** 死亡动画：缩小 + 淡出 */
+    private playDeathAnimation(): void {
+        if (this._opacity) {
+            tween(this.node)
+                .to(0.4, { scale: new Vec3(0.3, 0.3, 1) }, { easing: 'sineIn' })
+                .start();
+            tween(this._opacity)
+                .to(0.4, { opacity: 0 })
+                .call(() => { this.node.active = false; })
+                .start();
+        } else {
+            this.node.active = false;
         }
     }
 
