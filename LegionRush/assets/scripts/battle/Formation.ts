@@ -21,24 +21,25 @@ export class Formation {
     static readonly FIELD_WIDTH = 960;
     static readonly FIELD_HEIGHT = 640;
 
-    /** 十字阵格子：5 个活跃位置 */
+    /** 阵格子：6 个位置（十字5格 + 前排上方刺客位） */
     private static readonly CROSS_CELLS: GridCell[] = [
         { row: 2, col: 1, role: 'tank' },       // 前排中央
+        { row: 2, col: 0, role: 'assassin' },    // 前排上方
         { row: 1, col: 0, role: 'cavalry' },     // 中排上
         { row: 0, col: 1, role: 'ranged' },      // 后排中央
         { row: 1, col: 1, role: 'mage' },        // 中排中央
         { row: 1, col: 2, role: 'support' },     // 中排下
     ];
 
-    /** 角色 → 格子映射（damage 归入 tank 格） */
+    /** 角色 → 格子映射 */
     private static readonly ROLE_MAP: Record<string, string> = {
         'tank': 'tank',
         'cavalry': 'cavalry',
         'ranged': 'ranged',
         'mage': 'mage',
         'support': 'support',
+        'assassin': 'assassin',
         'damage': 'tank',
-        'assassin': 'cavalry',
         'control': 'mage',
     };
 
@@ -48,6 +49,38 @@ export class Formation {
 
     /** 格子内散布半径 */
     private static readonly SPREAD = 18;
+
+    /**
+     * 根据格子坐标获取位置（玩家自由布阵用）
+     * 网格行列直接映射到战场：row→上下(y)，col→前后(x)
+     * @param row  行 (0=上, 1=中, 2=下)
+     * @param col  列 (0=后排/左, 1=中排, 2=前排/右)
+     * @param count  单位数量 (最多 5)
+     * @param isLeftTeam 是否为左方
+     */
+    static getPositionsForCell(row: number, col: number, count: number, isLeftTeam: boolean): Vec2[] {
+        const halfW = this.FIELD_WIDTH * 0.35;
+        // col → x 方向（前后/左右）：col 0=后排(远离敌人), col 2=前排(靠近中央)
+        const xOffset = (col - 1) * this.CELL_W;
+        // row → y 方向（上下）：row 0=上(+y), row 2=下(-y)
+        const yOffset = (1 - row) * this.CELL_H;
+
+        const cx = -halfW + xOffset;
+        const cy = yOffset;
+
+        const n = Math.min(5, count);
+        const offsets = this.getCellOffsets(n);
+
+        const positions: Vec2[] = [];
+        for (let i = 0; i < n; i++) {
+            let x = cx + offsets[i].x;
+            let y = cy + offsets[i].y;
+            if (!isLeftTeam) x = -x;
+            positions.push(new Vec2(x, y));
+        }
+
+        return positions;
+    }
 
     /**
      * 根据角色获取该兵种单位的初始位置
@@ -60,12 +93,13 @@ export class Formation {
         const cell = this.CROSS_CELLS.find(c => c.role === mappedRole) || this.CROSS_CELLS[0];
 
         // 格子中心坐标（左方半场）
-        const halfW = this.FIELD_WIDTH * 0.35;      // 336 — 左半场中心 x，拉开双方距离
-        const colOffset = (cell.col - 1) * this.CELL_H;  // y 方向（上下）
-        const rowOffset = (cell.row - 1) * this.CELL_W;  // x 方向（前后）
+        // col → x（前后），row → y（上下）
+        const halfW = this.FIELD_WIDTH * 0.35;
+        const xOffset = (cell.col - 1) * this.CELL_W;
+        const yOffset = (1 - cell.row) * this.CELL_H;
 
-        const cx = -halfW + rowOffset;
-        const cy = colOffset;
+        const cx = -halfW + xOffset;
+        const cy = yOffset;
 
         // 在格子内散布单位
         const n = Math.min(5, count);

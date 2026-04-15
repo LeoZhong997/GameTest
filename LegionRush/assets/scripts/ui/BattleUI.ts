@@ -69,7 +69,11 @@ export class BattleUI extends Component {
         this.setupTopBar();
         this.setupStartButton();
 
+        // 开战按钮初始隐藏，等布阵确认后再显示
+        if (this.btnStartNode) this.btnStartNode.active = false;
+
         EventBus.instance.on('battle:end', this.onBattleEnd, this);
+        EventBus.instance.on('battle:deploy', this.onDeployConfirmed, this);
     }
 
     /** 构建结算面板的视觉效果 */
@@ -427,6 +431,12 @@ export class BattleUI extends Component {
 
     onDestroy() {
         EventBus.instance.off('battle:end', this.onBattleEnd, this);
+        EventBus.instance.off('battle:deploy', this.onDeployConfirmed, this);
+    }
+
+    /** 布阵确认后，显示开战按钮 */
+    private onDeployConfirmed(): void {
+        if (this.btnStartNode) this.btnStartNode.active = true;
     }
 
     private onBattleEnd(report: BattleReport): void {
@@ -475,7 +485,7 @@ export class BattleUI extends Component {
     onRestart(): void {
         if (this.overlay) this.overlay.active = false;
         if (this.resultPanel) this.resultPanel.active = false;
-        if (this.btnStartNode) this.btnStartNode.active = true;
+        if (this.btnStartNode) this.btnStartNode.active = false;
         EventBus.instance.emit('battle:restart');
     }
 

@@ -20,7 +20,7 @@ const HP_COLORS = {
     LOW: new Color(255, 50, 50, 255),     // 亮红
 };
 
-export type UnitShape = 'rect' | 'circle' | 'triangle' | 'pentagon' | 'hexagon';
+export type UnitShape = 'rect' | 'circle' | 'triangle' | 'pentagon' | 'hexagon' | 'diamond';
 
 /** 绘制正多边形（三角形=3, 五边形=5, 六边形=6） */
 function drawRegularPolygon(gfx: Graphics, sides: number, radius: number): void {
@@ -52,6 +52,13 @@ export function drawShape(gfx: Graphics, shape: UnitShape, size: number): void {
             break;
         case 'hexagon':
             drawRegularPolygon(gfx, 6, r);
+            break;
+        case 'diamond':
+            gfx.moveTo(0, r);
+            gfx.lineTo(r, 0);
+            gfx.lineTo(0, -r);
+            gfx.lineTo(-r, 0);
+            gfx.close();
             break;
         default:
             gfx.rect(-r, -r, size, size);

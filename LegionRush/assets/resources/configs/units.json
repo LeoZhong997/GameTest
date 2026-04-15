@@ -17,13 +17,13 @@
         "growths": { "hp": 60, "atk": 22, "def": 3, "spd": 0.02 },
         "skills": ["cannon_blast", "scatter_shot"]
     },
-    "warrior": {
-        "id": "warrior",
-        "name": "战士",
-        "role": "damage",
-        "description": "近战输出，人数越多越强",
-        "baseStats": { "hp": 800, "atk": 120, "def": 50, "spd": 2.5, "range": 1.0, "atkSpd": 1.0, "critRate": 0.05, "critDmg": 1.5 },
-        "growths": { "hp": 80, "atk": 12, "def": 5, "spd": 0.03 },
+    "assassin": {
+        "id": "assassin",
+        "name": "刺客",
+        "role": "assassin",
+        "description": "高爆发近战，突袭关键目标",
+        "baseStats": { "hp": 600, "atk": 250, "def": 30, "spd": 4.0, "range": 1.2, "atkSpd": 1.2, "critRate": 0.25, "critDmg": 2.5 },
+        "growths": { "hp": 60, "atk": 25, "def": 3, "spd": 0.05 },
         "skills": ["clone", "furious_strike"]
     },
     "support": {

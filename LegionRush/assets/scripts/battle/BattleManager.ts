@@ -31,7 +31,7 @@ export enum BattleResult {
 export interface BattleConfig {
     leftFormation: FormationType;
     rightFormation: FormationType;
-    leftUnits: { config: UnitConfig; level: number; quality: Quality; count: number }[];
+    leftUnits: { config: UnitConfig; level: number; quality: Quality; count: number; gridRow: number; gridCol: number }[];
     rightUnits: { config: UnitConfig; level: number; quality: Quality; count: number }[];
     timeLimit: number;
 }
@@ -91,10 +91,10 @@ export class BattleManager {
         this.reset();
         this._timeLimit = config.timeLimit || 30;
 
-        // 生成左方单位（每兵种最多 5 个）
+        // 生成左方单位（每兵种最多 5 个，使用玩家布阵的格子坐标）
         for (const group of config.leftUnits) {
             const effectiveCount = Math.min(5, group.count);
-            const positions = Formation.getPositionsForRole(group.config.role, effectiveCount, true);
+            const positions = Formation.getPositionsForCell(group.gridRow, group.gridCol, effectiveCount, true);
             for (let i = 0; i < effectiveCount; i++) {
                 const unit = new BattleUnit(group.config, TeamSide.LEFT, group.level, group.quality);
                 unit.position.set(positions[i]);
