@@ -906,6 +906,17 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "Pc74R",
+      "x": 894,
+      "y": 16,
+      "name": "Deployment - 布阵界面",
+      "width": 960,
+      "height": 640,
+      "fill": "#1a1a2e",
+      "layout": "none"
     }
   ]
 }
