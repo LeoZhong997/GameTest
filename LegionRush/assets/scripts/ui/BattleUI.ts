@@ -386,30 +386,31 @@ export class BattleUI extends Component {
         topBg.removeFromParent();
         topBar.insertChild(topBg, 0);
 
-        // === 右下角控制区: 暂停 + 倍速 ===
-        const ctrlY = -35;
-        const ctrlRightX = SW / 2 - 20;
+        // === TimerBox 两侧控制按钮: 暂停(左) + 倍速(右) ===
+        const timerBoxEdgeL = -65;   // TimerBox 左边缘
+        const timerBoxEdgeR = 65;    // TimerBox 右边缘
+        const btnGap = 10;           // 按钮与 TimerBox 的间距
 
-        // 倍速按钮
-        const speedBtn = this.createCtrlBtn(`${this._speedOptions[this._speedIndex]}x`, 50, 28, 6);
-        speedBtn.setPosition(ctrlRightX - 50, ctrlY, 0);
-        speedBtn.on(Node.EventType.TOUCH_END, this.onSpeedToggle, this);
-        this.btnSpeedLabel = speedBtn.getChildByName('CtrlBtnText')?.getComponent(Label) ?? null;
-        topBar.addChild(speedBtn);
-
-        // 暂停按钮
-        const pauseBtn = this.createCtrlBtn('⏸', 36, 36, 18);
-        pauseBtn.setPosition(ctrlRightX, ctrlY, 0);
+        // 暂停按钮（TimerBox 左侧）
+        const pauseBtn = this.createCtrlBtn('⏸', 40, 40, 20);
+        pauseBtn.setPosition(timerBoxEdgeL - btnGap - 20, 0, 0);
         pauseBtn.on(Node.EventType.TOUCH_END, this.onPauseToggle, this);
         this.btnPauseLabel = pauseBtn.getChildByName('CtrlBtnText')?.getComponent(Label) ?? null;
         topBar.addChild(pauseBtn);
+
+        // 倍速按钮（TimerBox 右侧）
+        const speedBtn = this.createCtrlBtn(`${this._speedOptions[this._speedIndex]}x`, 64, 34, 8);
+        speedBtn.setPosition(timerBoxEdgeR + btnGap + 32, 0, 0);
+        speedBtn.on(Node.EventType.TOUCH_END, this.onSpeedToggle, this);
+        this.btnSpeedLabel = speedBtn.getChildByName('CtrlBtnText')?.getComponent(Label) ?? null;
+        topBar.addChild(speedBtn);
 
         // 暂停遮罩 + "已暂停" 提示（初始隐藏）
         this.pauseOverlay = new Node('PauseOverlay');
         const poUt = this.pauseOverlay.addComponent(UITransform);
         poUt.setContentSize(SW, SH);
         poUt.setAnchorPoint(0.5, 0.5);
-        this.pauseOverlay.setPosition(0, -TB_H / 2, 0);
+        this.pauseOverlay.setPosition(0, 0, 0);
         const poGfx = this.pauseOverlay.addComponent(Graphics);
         poGfx.fillColor = new Color(0, 0, 0, 100);
         poGfx.rect(-SW / 2, -SH / 2, SW, SH);
@@ -431,7 +432,8 @@ export class BattleUI extends Component {
         this.pauseOverlay.addChild(pauseTxtNode);
 
         this.pauseOverlay.active = false;
-        topBar.addChild(this.pauseOverlay);
+        // 暂停蒙版挂到 UIRoot 而非 topBar，保证全屏覆盖
+        this.node.addChild(this.pauseOverlay);
 
         this.node.addChild(topBar);
     }
@@ -465,7 +467,7 @@ export class BattleUI extends Component {
         txtut.setAnchorPoint(0.5, 0.5);
         const label = txtNode.addComponent(Label);
         label.string = text;
-        label.fontSize = 14;
+        label.fontSize = 18;
         label.isBold = true;
         label.color = Color.WHITE;
         label.horizontalAlign = Label.HorizontalAlign.CENTER;
