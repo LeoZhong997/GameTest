@@ -1,56 +1,202 @@
 {
-    "cavalry": {
-        "id": "cavalry",
-        "name": "骑兵",
-        "role": "cavalry",
-        "description": "高机动近战，突袭后排",
-        "baseStats": { "hp": 1200, "atk": 180, "def": 80, "spd": 3.5, "range": 1.2, "atkSpd": 0.8, "critRate": 0.1, "critDmg": 1.5 },
-        "growths": { "hp": 120, "atk": 18, "def": 8, "spd": 0.05 },
-        "skills": ["charge", "war_cry"]
+    "iron_guard": {
+        "id": "iron_guard",
+        "name": "铁卫",
+        "race": "human",
+        "role": "tank",
+        "description": "人族重甲铁壁，钢铁意志不动如山",
+        "baseStats": { "hp": 2200, "atk": 70, "def": 200, "spd": 1.2, "range": 0.5, "atkSpd": 0.8, "critRate": 0.05, "critDmg": 1.5 },
+        "growths": { "hp": 176, "atk": 7, "def": 20, "spd": 0.02 },
+        "skills": ["iron_guard_lv1", "iron_guard_lv2", "iron_guard_lv3"]
     },
-    "ranged": {
-        "id": "ranged",
-        "name": "远程",
-        "role": "ranged",
-        "description": "范围伤害，核心输出",
-        "baseStats": { "hp": 600, "atk": 220, "def": 30, "spd": 1.5, "range": 5.0, "atkSpd": 0.6, "critRate": 0.15, "critDmg": 2.0 },
-        "growths": { "hp": 60, "atk": 22, "def": 3, "spd": 0.02 },
-        "skills": ["cannon_blast", "scatter_shot"]
-    },
-    "assassin": {
-        "id": "assassin",
-        "name": "刺客",
-        "role": "assassin",
-        "description": "高爆发近战，突袭关键目标",
-        "baseStats": { "hp": 600, "atk": 250, "def": 30, "spd": 4.0, "range": 1.2, "atkSpd": 1.2, "critRate": 0.25, "critDmg": 2.5 },
-        "growths": { "hp": 60, "atk": 25, "def": 3, "spd": 0.05 },
-        "skills": ["clone", "furious_strike"]
-    },
-    "support": {
-        "id": "support",
-        "name": "辅助",
-        "role": "support",
-        "description": "削弱敌军，提供控场",
-        "baseStats": { "hp": 700, "atk": 80, "def": 40, "spd": 1.8, "range": 4.0, "atkSpd": 0.5, "critRate": 0.05, "critDmg": 1.5 },
-        "growths": { "hp": 70, "atk": 8, "def": 4, "spd": 0.02 },
-        "skills": ["hex", "mystery_box"]
+    "swordsman": {
+        "id": "swordsman",
+        "name": "剑客",
+        "race": "human",
+        "role": "melee",
+        "description": "人族剑术精锐，拔刀必见血",
+        "baseStats": { "hp": 1500, "atk": 130, "def": 100, "spd": 1.8, "range": 0.8, "atkSpd": 1.0, "critRate": 0.10, "critDmg": 1.6 },
+        "growths": { "hp": 120, "atk": 13, "def": 10, "spd": 0.02 },
+        "skills": ["swordsman_lv1", "swordsman_lv2", "swordsman_lv3"]
     },
     "mage": {
         "id": "mage",
-        "name": "法师",
-        "role": "mage",
-        "description": "远程法术输出，搭配人海更强",
-        "baseStats": { "hp": 1000, "atk": 200, "def": 60, "spd": 1.5, "range": 6.0, "atkSpd": 0.4, "critRate": 0.1, "critDmg": 1.8 },
-        "growths": { "hp": 100, "atk": 20, "def": 6, "spd": 0.02 },
-        "skills": ["soul_reap"]
+        "name": "魔导",
+        "race": "human",
+        "role": "ranged",
+        "description": "人族魔法师，将公式转化为毁灭",
+        "baseStats": { "hp": 1100, "atk": 140, "def": 70, "spd": 1.4, "range": 5.0, "atkSpd": 0.7, "critRate": 0.08, "critDmg": 1.5 },
+        "growths": { "hp": 88, "atk": 14, "def": 7, "spd": 0.02 },
+        "skills": ["mage_lv1", "mage_lv2", "mage_lv3"]
     },
-    "tank": {
-        "id": "tank",
-        "name": "坦克",
+    "apothecary": {
+        "id": "apothecary",
+        "name": "药师",
+        "race": "human",
+        "role": "support",
+        "description": "人族战场医师，药到病除",
+        "baseStats": { "hp": 1200, "atk": 50, "def": 80, "spd": 1.5, "range": 4.0, "atkSpd": 0.6, "critRate": 0.05, "critDmg": 1.5 },
+        "growths": { "hp": 96, "atk": 5, "def": 8, "spd": 0.02 },
+        "skills": ["apothecary_lv1", "apothecary_lv2", "apothecary_lv3"]
+    },
+    "shadow_blade": {
+        "id": "shadow_blade",
+        "name": "影刃",
+        "race": "human",
+        "role": "assassin",
+        "description": "人族暗影刺客，刃到喉咙时你才看到影子",
+        "baseStats": { "hp": 1000, "atk": 160, "def": 60, "spd": 2.2, "range": 0.5, "atkSpd": 1.1, "critRate": 0.15, "critDmg": 1.8 },
+        "growths": { "hp": 80, "atk": 16, "def": 6, "spd": 0.02 },
+        "skills": ["shadow_blade_lv1", "shadow_blade_lv2", "shadow_blade_lv3"]
+    },
+    "bone_golem": {
+        "id": "bone_golem",
+        "name": "山骸",
+        "race": "beast",
         "role": "tank",
-        "description": "前排肉盾，硬度与输出兼备",
-        "baseStats": { "hp": 1800, "atk": 150, "def": 150, "spd": 2.0, "range": 1.5, "atkSpd": 0.7, "critRate": 0.08, "critDmg": 1.5 },
-        "growths": { "hp": 180, "atk": 15, "def": 15, "spd": 0.03 },
-        "skills": ["demon_slash", "iron_body"]
+        "description": "兽族亡骸巨兽，死不透的堡垒",
+        "baseStats": { "hp": 2600, "atk": 85, "def": 180, "spd": 1.0, "range": 0.5, "atkSpd": 0.7, "critRate": 0.05, "critDmg": 1.5 },
+        "growths": { "hp": 208, "atk": 9, "def": 18, "spd": 0.02 },
+        "skills": ["bone_golem_lv1", "bone_golem_lv2", "bone_golem_lv3"]
+    },
+    "berserker": {
+        "id": "berserker",
+        "name": "狂战",
+        "race": "beast",
+        "role": "melee",
+        "description": "兽族狂战士，越疼越猛",
+        "baseStats": { "hp": 1700, "atk": 145, "def": 90, "spd": 1.7, "range": 0.8, "atkSpd": 1.0, "critRate": 0.08, "critDmg": 1.5 },
+        "growths": { "hp": 136, "atk": 15, "def": 9, "spd": 0.02 },
+        "skills": ["berserker_lv1", "berserker_lv2", "berserker_lv3"]
+    },
+    "thunder_shaman": {
+        "id": "thunder_shaman",
+        "name": "雷萨",
+        "race": "beast",
+        "role": "ranged",
+        "description": "兽族唤雷萨满，以先祖闪电惩戒敌人",
+        "baseStats": { "hp": 1200, "atk": 130, "def": 65, "spd": 1.4, "range": 4.5, "atkSpd": 0.7, "critRate": 0.08, "critDmg": 1.5 },
+        "growths": { "hp": 96, "atk": 13, "def": 7, "spd": 0.02 },
+        "skills": ["thunder_shaman_lv1", "thunder_shaman_lv2", "thunder_shaman_lv3"]
+    },
+    "witch_doctor": {
+        "id": "witch_doctor",
+        "name": "巫医",
+        "race": "beast",
+        "role": "support",
+        "description": "兽族巫医，骨头和草药皆可救人杀人",
+        "baseStats": { "hp": 1250, "atk": 55, "def": 75, "spd": 1.5, "range": 4.0, "atkSpd": 0.6, "critRate": 0.05, "critDmg": 1.5 },
+        "growths": { "hp": 100, "atk": 6, "def": 8, "spd": 0.02 },
+        "skills": ["witch_doctor_lv1", "witch_doctor_lv2", "witch_doctor_lv3"]
+    },
+    "blood_moon": {
+        "id": "blood_moon",
+        "name": "血月",
+        "race": "beast",
+        "role": "assassin",
+        "description": "兽族血月猎手，血月升起时开始计数",
+        "baseStats": { "hp": 1050, "atk": 170, "def": 55, "spd": 2.2, "range": 0.5, "atkSpd": 1.1, "critRate": 0.12, "critDmg": 1.7 },
+        "growths": { "hp": 84, "atk": 17, "def": 6, "spd": 0.02 },
+        "skills": ["blood_moon_lv1", "blood_moon_lv2", "blood_moon_lv3"]
+    },
+    "treant": {
+        "id": "treant",
+        "name": "树精",
+        "race": "spirit",
+        "role": "tank",
+        "description": "灵族古树卫士，沉睡百年只为今日",
+        "baseStats": { "hp": 2400, "atk": 75, "def": 170, "spd": 1.1, "range": 0.5, "atkSpd": 0.7, "critRate": 0.05, "critDmg": 1.5 },
+        "growths": { "hp": 192, "atk": 8, "def": 17, "spd": 0.02 },
+        "skills": ["treant_lv1", "treant_lv2", "treant_lv3"]
+    },
+    "blade_dancer": {
+        "id": "blade_dancer",
+        "name": "剑灵",
+        "race": "spirit",
+        "role": "melee",
+        "description": "灵族剑舞者，剑在手中灵在心中",
+        "baseStats": { "hp": 1400, "atk": 135, "def": 85, "spd": 2.0, "range": 0.8, "atkSpd": 1.2, "critRate": 0.10, "critDmg": 1.6 },
+        "growths": { "hp": 112, "atk": 14, "def": 9, "spd": 0.02 },
+        "skills": ["blade_dancer_lv1", "blade_dancer_lv2", "blade_dancer_lv3"]
+    },
+    "wind_archer": {
+        "id": "wind_archer",
+        "name": "风灵",
+        "race": "spirit",
+        "role": "ranged",
+        "description": "灵族风语射手，风告诉它目标的位置",
+        "baseStats": { "hp": 1050, "atk": 145, "def": 60, "spd": 1.6, "range": 6.0, "atkSpd": 0.8, "critRate": 0.10, "critDmg": 1.6 },
+        "growths": { "hp": 84, "atk": 15, "def": 6, "spd": 0.02 },
+        "skills": ["wind_archer_lv1", "wind_archer_lv2", "wind_archer_lv3"]
+    },
+    "moon_singer": {
+        "id": "moon_singer",
+        "name": "月歌",
+        "race": "spirit",
+        "role": "support",
+        "description": "灵族月歌祭司，月光下没有治不好的伤",
+        "baseStats": { "hp": 1150, "atk": 50, "def": 70, "spd": 1.5, "range": 5.0, "atkSpd": 0.6, "critRate": 0.05, "critDmg": 1.5 },
+        "growths": { "hp": 92, "atk": 5, "def": 7, "spd": 0.02 },
+        "skills": ["moon_singer_lv1", "moon_singer_lv2", "moon_singer_lv3"]
+    },
+    "faceless": {
+        "id": "faceless",
+        "name": "无面",
+        "race": "spirit",
+        "role": "assassin",
+        "description": "灵族无面者，可以是任何人",
+        "baseStats": { "hp": 950, "atk": 155, "def": 50, "spd": 2.3, "range": 0.5, "atkSpd": 1.2, "critRate": 0.12, "critDmg": 1.7 },
+        "growths": { "hp": 76, "atk": 16, "def": 5, "spd": 0.02 },
+        "skills": ["faceless_lv1", "faceless_lv2", "faceless_lv3"]
+    },
+    "demon_golem": {
+        "id": "demon_golem",
+        "name": "魔像",
+        "race": "demon",
+        "role": "tank",
+        "description": "魔族深渊巨魔，凝视即吞噬",
+        "baseStats": { "hp": 2500, "atk": 90, "def": 190, "spd": 1.0, "range": 0.5, "atkSpd": 0.7, "critRate": 0.05, "critDmg": 1.5 },
+        "growths": { "hp": 200, "atk": 9, "def": 19, "spd": 0.02 },
+        "skills": ["demon_golem_lv1", "demon_golem_lv2", "demon_golem_lv3"]
+    },
+    "demon_blade": {
+        "id": "demon_blade",
+        "name": "剑魔",
+        "race": "demon",
+        "role": "melee",
+        "description": "魔族魔剑士，剑是牢笼也是翅膀",
+        "baseStats": { "hp": 1550, "atk": 150, "def": 95, "spd": 1.7, "range": 0.8, "atkSpd": 1.0, "critRate": 0.08, "critDmg": 1.5 },
+        "growths": { "hp": 124, "atk": 15, "def": 10, "spd": 0.02 },
+        "skills": ["demon_blade_lv1", "demon_blade_lv2", "demon_blade_lv3"]
+    },
+    "shadow_demon": {
+        "id": "shadow_demon",
+        "name": "影魔",
+        "race": "demon",
+        "role": "ranged",
+        "description": "魔族虚空之眼，凝视你的灵魂",
+        "baseStats": { "hp": 1100, "atk": 135, "def": 60, "spd": 1.4, "range": 5.5, "atkSpd": 0.7, "critRate": 0.08, "critDmg": 1.5 },
+        "growths": { "hp": 88, "atk": 14, "def": 6, "spd": 0.02 },
+        "skills": ["shadow_demon_lv1", "shadow_demon_lv2", "shadow_demon_lv3"]
+    },
+    "warlock": {
+        "id": "warlock",
+        "name": "咒师",
+        "race": "demon",
+        "role": "support",
+        "description": "魔族咒术师，将痛苦从友军转移到敌人",
+        "baseStats": { "hp": 1150, "atk": 60, "def": 65, "spd": 1.5, "range": 4.0, "atkSpd": 0.6, "critRate": 0.05, "critDmg": 1.5 },
+        "growths": { "hp": 92, "atk": 6, "def": 7, "spd": 0.02 },
+        "skills": ["warlock_lv1", "warlock_lv2", "warlock_lv3"]
+    },
+    "nightmare": {
+        "id": "nightmare",
+        "name": "梦魇",
+        "race": "demon",
+        "role": "assassin",
+        "description": "魔族梦魇刺客，你醒来只记得那个噩梦",
+        "baseStats": { "hp": 1000, "atk": 165, "def": 55, "spd": 2.3, "range": 0.5, "atkSpd": 1.1, "critRate": 0.15, "critDmg": 1.8 },
+        "growths": { "hp": 80, "atk": 17, "def": 6, "spd": 0.02 },
+        "skills": ["nightmare_lv1", "nightmare_lv2", "nightmare_lv3"]
     }
 }

@@ -32,7 +32,7 @@ export interface BattleConfig {
     leftFormation: FormationType;
     rightFormation: FormationType;
     leftUnits: { config: UnitConfig; level: number; quality: Quality; count: number; gridRow: number; gridCol: number }[];
-    rightUnits: { config: UnitConfig; level: number; quality: Quality; count: number }[];
+    rightUnits: { config: UnitConfig; level: number; quality: Quality; count: number; gridRow: number; gridCol: number }[];
     timeLimit: number;
 }
 
@@ -110,10 +110,10 @@ export class BattleManager {
             }
         }
 
-        // 生成右方单位（每兵种最多 5 个）
+        // 生成右方单位（每兵种最多 5 个，使用十字阵格子坐标）
         for (const group of config.rightUnits) {
             const effectiveCount = Math.min(5, group.count);
-            const positions = Formation.getPositionsForRole(group.config.role, effectiveCount, false);
+            const positions = Formation.getPositionsForCell(group.gridRow, group.gridCol, effectiveCount, false);
             for (let i = 0; i < effectiveCount; i++) {
                 const unit = new BattleUnit(group.config, TeamSide.RIGHT, group.level, group.quality);
                 unit.position.set(positions[i]);

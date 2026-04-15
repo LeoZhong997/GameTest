@@ -20,6 +20,7 @@ export enum TargetType {
     ENEMY_NEAREST = 'enemy_nearest',
     ENEMY_ALL = 'enemy_all',
     ENEMY_RANGE = 'enemy_range',
+    ENEMY_LOWEST_HP = 'enemy_lowest_hp',
     ALLY_NEAREST = 'ally_nearest',
     ALLY_ALL = 'ally_all',
     ALLY_LOWEST_HP = 'ally_lowest_hp',
@@ -58,8 +59,8 @@ export interface SkillConfig {
     cooldown: number;        // 冷却时间（秒）
     castTime: number;        // 施法时间（秒）
     range: number;           // 施法距离
-    unlockRating: string;
-    initialCd: number;       // 战斗开始时的初始 CD（秒）
+    unlockRating?: string;
+    initialCd?: number;      // 战斗开始时的初始 CD（秒）
     energyCost: number;      // 能量消耗（0 = 免费）
     maxUses: number;         // 最大使用次数（0 = 无限）
 }

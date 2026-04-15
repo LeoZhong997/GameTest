@@ -62,6 +62,8 @@ export class SkillExecutor {
                 return candidates;
             case TargetType.ALLY_LOWEST_HP:
                 return this.getLowestHp(candidates, 1);
+            case TargetType.ENEMY_LOWEST_HP:
+                return this.getLowestHp(candidates, 1);
             default:
                 return [];
         }

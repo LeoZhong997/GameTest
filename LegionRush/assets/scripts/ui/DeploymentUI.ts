@@ -22,12 +22,11 @@ const SAVE_KEY = 'legionrush_deploy';
 
 /** 默认十字阵 */
 const DEFAULT_DEPLOY: { row: number; col: number; configId: string; count: number }[] = [
-    { row: 0, col: 1, configId: 'ranged', count: 3 },
-    { row: 1, col: 0, configId: 'cavalry', count: 3 },
-    { row: 1, col: 1, configId: 'mage', count: 3 },
-    { row: 1, col: 2, configId: 'support', count: 3 },
-    { row: 2, col: 0, configId: 'assassin', count: 3 },
-    { row: 2, col: 1, configId: 'tank', count: 3 },
+    { row: 0, col: 1, configId: 'mage', count: 3 },
+    { row: 1, col: 0, configId: 'swordsman', count: 3 },
+    { row: 1, col: 1, configId: 'iron_guard', count: 3 },
+    { row: 1, col: 2, configId: 'apothecary', count: 3 },
+    { row: 2, col: 1, configId: 'shadow_blade', count: 3 },
 ];
 
 /** 模块级缓存，同一次页面会话内重启可立即恢复 */
@@ -48,6 +47,17 @@ const GRAY        = new Color(100, 100, 100, 255);
 const PLACEHOLDER = new Color(255, 255, 255, 64);
 const SMALL_BTN_BG = new Color(255, 255, 255, 30);
 
+const RACE_NAMES: Record<string, string> = {
+    human: '人族', beast: '兽族', spirit: '灵族', demon: '魔族',
+};
+const RACE_COLORS: Record<string, Color> = {
+    human: new Color(80, 160, 255, 255),
+    beast: new Color(200, 120, 50, 255),
+    spirit: new Color(80, 200, 140, 255),
+    demon: new Color(180, 60, 180, 255),
+};
+const RACE_ORDER = ['human', 'beast', 'spirit', 'demon'];
+
 /** 全部 9 格开放 */
 const ALL_CELLS: { row: number; col: number }[] = [];
 for (let r = 0; r < 3; r++) {
@@ -59,9 +69,8 @@ for (let r = 0; r < 3; r++) {
 function getShape(role: string): UnitShape {
     switch (role) {
         case 'tank':     return 'rect';
-        case 'cavalry':  return 'triangle';
+        case 'melee':    return 'triangle';
         case 'ranged':   return 'circle';
-        case 'mage':     return 'pentagon';
         case 'support':  return 'hexagon';
         case 'assassin': return 'diamond';
         default:         return 'rect';
@@ -85,6 +94,8 @@ export class DeploymentUI extends Component {
     private _cardNodes: Map<string, Node> = new Map();
     private _cardGfx: Map<string, Graphics> = new Map();
     private _selectedId: string | null = null;
+    private _selectedRace: string = 'human';
+    private _raceTabGfx: Map<string, Graphics> = new Map();
     private _container: Node | null = null;
 
     onLoad() {
@@ -167,6 +178,7 @@ export class DeploymentUI extends Component {
 
         this.buildTopBar(container);
         this.buildGrid(container);
+        this.buildRaceTabs(container);
         this.buildCardArea(container);
         this.buildButton(container);
     }
@@ -231,8 +243,56 @@ export class DeploymentUI extends Component {
         const caut = cardArea.addComponent(UITransform);
         caut.setContentSize(SW - 40, CARD_H + 20);
         caut.setAnchorPoint(0.5, 0.5);
-        cardArea.setPosition(0, -140, 0);
+        cardArea.setPosition(0, -180, 0);
         parent.addChild(cardArea);
+    }
+
+    private buildRaceTabs(parent: Node): void {
+        const TAB_W = 90, TAB_H = 32;
+        const tabNode = new Node('RaceTabs');
+        const tut = tabNode.addComponent(UITransform);
+        tut.setContentSize(SW, TAB_H);
+        tut.setAnchorPoint(0.5, 0.5);
+        tabNode.setPosition(0, -95, 0);
+
+        const totalW = RACE_ORDER.length * TAB_W + (RACE_ORDER.length - 1) * 12;
+        const startX = -totalW / 2 + TAB_W / 2;
+
+        RACE_ORDER.forEach((race, i) => {
+            const tab = new Node(`Tab_${race}`);
+            const ut = tab.addComponent(UITransform);
+            ut.setContentSize(TAB_W, TAB_H);
+            ut.setAnchorPoint(0.5, 0.5);
+            tab.setPosition(startX + i * (TAB_W + 12), 0, 0);
+
+            const bg = new Node('Bg');
+            const bgut = bg.addComponent(UITransform);
+            bgut.setContentSize(TAB_W, TAB_H);
+            bgut.setAnchorPoint(0.5, 0.5);
+            bg.setPosition(0, 0, 0);
+            const g = bg.addComponent(Graphics);
+            g.fillColor = CARD_BG;
+            g.roundRect(-TAB_W / 2, -TAB_H / 2, TAB_W, TAB_H, 6);
+            g.fill();
+            g.strokeColor = CARD_BORDER;
+            g.lineWidth = 1;
+            g.roundRect(-TAB_W / 2, -TAB_H / 2, TAB_W, TAB_H, 6);
+            g.stroke();
+            tab.insertChild(bg, 0);
+            this._raceTabGfx.set(race, g);
+
+            // Race color dot
+            const dot = this.drawCircle(tab, 10, RACE_COLORS[race] || BLUE, -30, 0);
+
+            // Race name
+            this.addLabel(tab, RACE_NAMES[race] || race, 14, Color.WHITE, 8, 0, 60, true);
+
+            tab.on(Node.EventType.TOUCH_END, () => this.onRaceTabTap(race), this);
+            tabNode.addChild(tab);
+        });
+
+        parent.addChild(tabNode);
+        this.refreshRaceTabs();
     }
 
     private buildButton(parent: Node): void {
@@ -341,7 +401,7 @@ export class DeploymentUI extends Component {
         this._cardNodes.clear();
         this._cardGfx.clear();
 
-        const configs = Array.from(this._configs.values());
+        const configs = Array.from(this._configs.values()).filter(c => c.race === this._selectedRace);
         const totalW = configs.length * CARD_W + (configs.length - 1) * 10;
         const startX = -totalW / 2 + CARD_W / 2;
 
@@ -369,6 +429,18 @@ export class DeploymentUI extends Component {
             card.insertChild(bgNode, 0);
             this._cardGfx.set(cfg.id, bg);
 
+            // Race color strip at top
+            const stripNode = new Node('RaceStrip');
+            const strput = stripNode.addComponent(UITransform);
+            strput.setContentSize(CARD_W - 4, 4);
+            strput.setAnchorPoint(0.5, 0.5);
+            stripNode.setPosition(0, CARD_H / 2 - 4, 0);
+            const strg = stripNode.addComponent(Graphics);
+            strg.fillColor = RACE_COLORS[cfg.race] || BLUE;
+            strg.rect(-(CARD_W - 4) / 2, -2, CARD_W - 4, 4);
+            strg.fill();
+            card.addChild(stripNode);
+
             // Unit shape icon
             const shape = getShape(cfg.role);
             const shapeNode = new Node('Shape');
@@ -377,7 +449,7 @@ export class DeploymentUI extends Component {
             sut.setAnchorPoint(0.5, 0.5);
             shapeNode.setPosition(0, 15, 0);
             const sg = shapeNode.addComponent(Graphics);
-            sg.fillColor = BLUE;
+            sg.fillColor = RACE_COLORS[cfg.race] || BLUE;
             drawShape(sg, shape, 28);
             sg.fill();
             card.addChild(shapeNode);
@@ -397,6 +469,29 @@ export class DeploymentUI extends Component {
     }
 
     // ---- Interaction ----
+
+    private onRaceTabTap(race: string): void {
+        this._selectedRace = race;
+        this._selectedId = null;
+        this.refreshRaceTabs();
+        this.drawCards();
+        this.refreshCardCounts();
+    }
+
+    private refreshRaceTabs(): void {
+        for (const [race, gfx] of this._raceTabGfx) {
+            const active = race === this._selectedRace;
+            const tab = gfx.node!.parent!;
+            gfx.clear();
+            gfx.fillColor = active ? new Color(30, 80, 140, 255) : CARD_BG;
+            gfx.roundRect(-45, -16, 90, 32, 6);
+            gfx.fill();
+            gfx.strokeColor = active ? SEL_BORDER : CARD_BORDER;
+            gfx.lineWidth = active ? 2 : 1;
+            gfx.roundRect(-45, -16, 90, 32, 6);
+            gfx.stroke();
+        }
+    }
 
     private onCardTap(configId: string): void {
         // 如果已选中同一个，取消选中
@@ -436,6 +531,14 @@ export class DeploymentUI extends Component {
                 cell.configId = null;
                 cell.count = 0;
             } else {
+                // 检查是否已有 5 种不同兵种（当前选中兵种不算在内）
+                const deployedIds = new Set(this._cells.filter(c => c.configId && c.configId !== this._selectedId).map(c => c.configId));
+                if (!deployedIds.has(this._selectedId) && deployedIds.size >= 5) {
+                    this.showToast('最多上阵 5 种兵种');
+                    this._selectedId = null;
+                    this.refreshCardSelection();
+                    return;
+                }
                 // 放置选中兵种，继承默认数量
                 cell.configId = this._selectedId;
                 cell.count = cell.count || 3;
@@ -504,7 +607,7 @@ export class DeploymentUI extends Component {
                     snut.setAnchorPoint(0.5, 0.5);
                     sn.setPosition(0, 10, 0);
                     const sg = sn.addComponent(Graphics);
-                    sg.fillColor = BLUE;
+                    sg.fillColor = RACE_COLORS[cfg.race] || BLUE;
                     drawShape(sg, shape, 24);
                     sg.fill();
                     node.addChild(sn);
@@ -619,7 +722,7 @@ export class DeploymentUI extends Component {
                     const sg = shapeNode.getComponent(Graphics);
                     if (sg) {
                         sg.clear();
-                        sg.fillColor = remaining > 0 ? BLUE : GRAY;
+                        sg.fillColor = remaining > 0 ? (RACE_COLORS[cfg.race] || BLUE) : GRAY;
                         drawShape(sg, getShape(cfg.role), 28);
                         sg.fill();
                     }
@@ -629,6 +732,33 @@ export class DeploymentUI extends Component {
     }
 
     // ---- Confirm ----
+
+    private showToast(msg: string): void {
+        const existing = this._container?.getChildByName('Toast');
+        if (existing) existing.destroy();
+
+        const toast = new Node('Toast');
+        const tut = toast.addComponent(UITransform);
+        tut.setContentSize(300, 40);
+        tut.setAnchorPoint(0.5, 0.5);
+        toast.setPosition(0, 20, 0);
+
+        const bg = new Node('Bg');
+        const bgut = bg.addComponent(UITransform);
+        bgut.setContentSize(300, 40);
+        bgut.setAnchorPoint(0.5, 0.5);
+        bg.setPosition(0, 0, 0);
+        const g = bg.addComponent(Graphics);
+        g.fillColor = new Color(0, 0, 0, 200);
+        g.roundRect(-150, -20, 300, 40, 8);
+        g.fill();
+        toast.insertChild(bg, 0);
+
+        const lbl = this.addLabel(toast, msg, 16, GOLD, 0, 0, 300, true);
+
+        this._container!.addChild(toast);
+        setTimeout(() => { if (toast.isValid) toast.destroy(); }, 1500);
+    }
 
     private onConfirm(): void {
         const placed = this._cells.filter(c => c.configId && c.count > 0);

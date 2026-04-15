@@ -1,135 +1,612 @@
 {
-    "charge": {
-        "id": "charge",
-        "name": "冲锋",
-        "description": "向前方冲锋，对路径上的敌人造成伤害并击退",
-        "type": "charge",
-        "effects": [
-            { "type": "damage", "targetType": "enemy_nearest", "value": 50, "ratio": 1.5, "range": 100, "duration": 0 }
-        ],
-        "cooldown": 8, "castTime": 0.3, "range": 3.0, "unlockRating": "B",
-        "initialCd": 2.0, "energyCost": 0, "maxUses": 1
-    },
-    "war_cry": {
-        "id": "war_cry",
-        "name": "战吼",
-        "description": "发出战吼，提升周围友军攻击力20%",
+    "iron_guard_lv1": {
+        "id": "iron_guard_lv1",
+        "name": "不动如山",
+        "description": "嘲讽周围敌人，自身减伤30%，持续4秒",
         "type": "buff",
         "effects": [
-            { "type": "buff", "targetType": "ally_nearest", "value": 20, "ratio": 0, "range": 150, "duration": 5 }
+            { "type": "buff", "targetType": "self", "value": 30, "ratio": 0, "range": 0, "duration": 4 }
         ],
-        "cooldown": 12, "castTime": 0.5, "range": 3.0, "unlockRating": "B",
-        "initialCd": 8.0, "energyCost": 5, "maxUses": 0
+        "cooldown": 12, "castTime": 0.3, "range": 0, "energyCost": 3, "maxUses": 0
     },
-    "cannon_blast": {
-        "id": "cannon_blast",
-        "name": "炮击",
-        "description": "发射炮弹，对目标区域造成大范围伤害",
-        "type": "aoe",
-        "effects": [
-            { "type": "aoe", "targetType": "enemy_range", "value": 80, "ratio": 1.2, "range": 120, "duration": 0 }
-        ],
-        "cooldown": 6, "castTime": 0.4, "range": 5.0, "unlockRating": "B",
-        "initialCd": 4.0, "energyCost": 8, "maxUses": 0
-    },
-    "scatter_shot": {
-        "id": "scatter_shot",
-        "name": "散弹",
-        "description": "发射散弹，对前方扇形区域造成伤害",
-        "type": "aoe",
-        "effects": [
-            { "type": "aoe", "targetType": "enemy_range", "value": 40, "ratio": 0.8, "range": 100, "duration": 0 }
-        ],
-        "cooldown": 4, "castTime": 0.2, "range": 4.0, "unlockRating": "B",
-        "initialCd": 3.0, "energyCost": 3, "maxUses": 0
-    },
-    "clone": {
-        "id": "clone",
-        "name": "分身",
-        "description": "召唤自己的分身参加战斗",
-        "type": "summon",
-        "effects": [
-            { "type": "summon", "targetType": "self", "value": 0, "ratio": 0, "range": 0, "duration": 0, "summonId": "goblin_warrior", "summonCount": 2 }
-        ],
-        "cooldown": 15, "castTime": 0.5, "range": 0, "unlockRating": "B",
-        "initialCd": 10.0, "energyCost": 10, "maxUses": 0
-    },
-    "furious_strike": {
-        "id": "furious_strike",
-        "name": "狂暴打击",
-        "description": "全力一击，对敌人造成大量伤害",
-        "type": "damage",
-        "effects": [
-            { "type": "damage", "targetType": "enemy_nearest", "value": 30, "ratio": 2.0, "range": 0, "duration": 0 }
-        ],
-        "cooldown": 5, "castTime": 0.3, "range": 1.5, "unlockRating": "B",
-        "initialCd": 3.0, "energyCost": 3, "maxUses": 0
-    },
-    "hex": {
-        "id": "hex",
-        "name": "妖术",
-        "description": "对敌人施放妖术，降低攻速和移速",
-        "type": "debuff",
-        "effects": [
-            { "type": "debuff", "targetType": "enemy_nearest", "value": -30, "ratio": 0, "range": 0, "duration": 4 },
-            { "type": "control", "targetType": "enemy_nearest", "value": 30, "ratio": 0, "range": 0, "duration": 3, "controlType": "slow" }
-        ],
-        "cooldown": 10, "castTime": 0.3, "range": 4.0, "unlockRating": "B",
-        "initialCd": 6.0, "energyCost": 5, "maxUses": 0
-    },
-    "mystery_box": {
-        "id": "mystery_box",
-        "name": "神秘盒子",
-        "description": "召唤一个神秘盒子吸引敌人攻击",
-        "type": "summon",
-        "effects": [
-            { "type": "summon", "targetType": "self", "value": 0, "ratio": 0, "range": 0, "duration": 8, "summonId": "mystery_box", "summonCount": 1 }
-        ],
-        "cooldown": 15, "castTime": 0.5, "range": 0, "unlockRating": "B",
-        "initialCd": 8.0, "energyCost": 8, "maxUses": 0
-    },
-    "shadow_control": {
-        "id": "shadow_control",
-        "name": "暗影控制",
-        "description": "全图暗影之力，眩晕所有敌人2秒",
-        "type": "control",
-        "effects": [
-            { "type": "control", "targetType": "enemy_all", "value": 0, "ratio": 0, "range": 0, "duration": 2, "controlType": "stun" }
-        ],
-        "cooldown": 20, "castTime": 0.5, "range": 99, "unlockRating": "B",
-        "initialCd": 12.0, "energyCost": 10, "maxUses": 2
-    },
-    "soul_reap": {
-        "id": "soul_reap",
-        "name": "灵魂收割",
-        "description": "释放暗影波，对范围内敌人造成伤害",
-        "type": "aoe",
-        "effects": [
-            { "type": "aoe", "targetType": "enemy_range", "value": 40, "ratio": 0.5, "range": 200, "duration": 0 }
-        ],
-        "cooldown": 12, "castTime": 0.5, "range": 6.0, "unlockRating": "B",
-        "initialCd": 8.0, "energyCost": 5, "maxUses": 0
-    },
-    "demon_slash": {
-        "id": "demon_slash",
-        "name": "魔刃斩",
-        "description": "挥舞魔剑，对前方敌人造成大量伤害",
-        "type": "damage",
-        "effects": [
-            { "type": "damage", "targetType": "enemy_nearest", "value": 60, "ratio": 1.8, "range": 0, "duration": 0 }
-        ],
-        "cooldown": 4, "castTime": 0.3, "range": 2.0, "unlockRating": "B",
-        "initialCd": 4.0, "energyCost": 3, "maxUses": 0
-    },
-    "iron_body": {
-        "id": "iron_body",
-        "name": "铁壁",
-        "description": "强化自身防御力50%",
+    "iron_guard_lv2": {
+        "id": "iron_guard_lv2",
+        "name": "钢铁意志",
+        "description": "受击时防御不断叠加，获得50%额外防御，持续6秒",
         "type": "buff",
         "effects": [
             { "type": "buff", "targetType": "self", "value": 50, "ratio": 0, "range": 0, "duration": 6 }
         ],
-        "cooldown": 15, "castTime": 0.2, "range": 0, "unlockRating": "B",
-        "initialCd": 10.0, "energyCost": 0, "maxUses": 1
+        "cooldown": 15, "castTime": 0.2, "range": 0, "energyCost": 5, "maxUses": 1
+    },
+    "iron_guard_lv3": {
+        "id": "iron_guard_lv3",
+        "name": "最后壁垒",
+        "description": "首次濒死时无敌3秒并恢复20%生命",
+        "type": "buff",
+        "effects": [
+            { "type": "heal", "targetType": "self", "value": 440, "ratio": 0, "range": 0, "duration": 0 },
+            { "type": "buff", "targetType": "self", "value": 100, "ratio": 0, "range": 0, "duration": 3 }
+        ],
+        "cooldown": 30, "castTime": 0, "range": 0, "energyCost": 0, "maxUses": 1
+    },
+    "swordsman_lv1": {
+        "id": "swordsman_lv1",
+        "name": "拔刀斩",
+        "description": "快速拔剑斩击，造成150%攻击力伤害",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 0, "ratio": 1.5, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 6, "castTime": 0.3, "range": 1.5, "energyCost": 3, "maxUses": 0
+    },
+    "swordsman_lv2": {
+        "id": "swordsman_lv2",
+        "name": "剑气",
+        "description": "斩击剑气波及周围敌人，造成50%攻击力伤害",
+        "type": "aoe",
+        "effects": [
+            { "type": "aoe", "targetType": "enemy_range", "value": 0, "ratio": 0.5, "range": 80, "duration": 0 }
+        ],
+        "cooldown": 8, "castTime": 0.3, "range": 1.5, "energyCost": 4, "maxUses": 0
+    },
+    "swordsman_lv3": {
+        "id": "swordsman_lv3",
+        "name": "一剑封喉",
+        "description": "对生命值低的目标造成致命一击，250%攻击力伤害",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 0, "ratio": 2.5, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 12, "castTime": 0.4, "range": 1.5, "energyCost": 6, "maxUses": 0
+    },
+    "mage_lv1": {
+        "id": "mage_lv1",
+        "name": "火球术",
+        "description": "发射火球，造成140%攻击力法术伤害",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 0, "ratio": 1.4, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 5, "castTime": 0.4, "range": 5.0, "energyCost": 3, "maxUses": 0
+    },
+    "mage_lv2": {
+        "id": "mage_lv2",
+        "name": "炎爆",
+        "description": "增强火球，造成180%攻击力伤害并点燃目标",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 0, "ratio": 1.8, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 8, "castTime": 0.4, "range": 5.0, "energyCost": 5, "maxUses": 0
+    },
+    "mage_lv3": {
+        "id": "mage_lv3",
+        "name": "陨石",
+        "description": "在目标区域落下陨石，造成120%攻击力范围伤害",
+        "type": "aoe",
+        "effects": [
+            { "type": "aoe", "targetType": "enemy_range", "value": 0, "ratio": 1.2, "range": 120, "duration": 0 }
+        ],
+        "cooldown": 12, "castTime": 0.6, "range": 5.0, "energyCost": 7, "maxUses": 0
+    },
+    "apothecary_lv1": {
+        "id": "apothecary_lv1",
+        "name": "疗伤药",
+        "description": "治疗一个友军，恢复150%攻击力的生命值",
+        "type": "heal",
+        "effects": [
+            { "type": "heal", "targetType": "ally_lowest_hp", "value": 0, "ratio": 1.5, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 6, "castTime": 0.3, "range": 4.0, "energyCost": 3, "maxUses": 0
+    },
+    "apothecary_lv2": {
+        "id": "apothecary_lv2",
+        "name": "兴奋剂",
+        "description": "治疗目标并使其获得30%攻速和移速加成",
+        "type": "heal",
+        "effects": [
+            { "type": "heal", "targetType": "ally_lowest_hp", "value": 0, "ratio": 1.5, "range": 0, "duration": 0 },
+            { "type": "buff", "targetType": "ally_lowest_hp", "value": 30, "ratio": 0, "range": 0, "duration": 3 }
+        ],
+        "cooldown": 8, "castTime": 0.3, "range": 4.0, "energyCost": 4, "maxUses": 0
+    },
+    "apothecary_lv3": {
+        "id": "apothecary_lv3",
+        "name": "起死回生",
+        "description": "对濒死友军使用，恢复30%最大生命值，每场一次",
+        "type": "heal",
+        "effects": [
+            { "type": "heal", "targetType": "ally_lowest_hp", "value": 360, "ratio": 0, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 20, "castTime": 0.5, "range": 4.0, "energyCost": 6, "maxUses": 1
+    },
+    "shadow_blade_lv1": {
+        "id": "shadow_blade_lv1",
+        "name": "背刺",
+        "description": "从背后攻击造成220%攻击力伤害",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_lowest_hp", "value": 0, "ratio": 2.2, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 8, "castTime": 0.2, "range": 1.5, "energyCost": 4, "maxUses": 0
+    },
+    "shadow_blade_lv2": {
+        "id": "shadow_blade_lv2",
+        "name": "潜行",
+        "description": "进入隐身状态，闪避率大幅提升，持续5秒",
+        "type": "buff",
+        "effects": [
+            { "type": "buff", "targetType": "self", "value": 50, "ratio": 0, "range": 0, "duration": 5 }
+        ],
+        "cooldown": 12, "castTime": 0.2, "range": 0, "energyCost": 3, "maxUses": 0
+    },
+    "shadow_blade_lv3": {
+        "id": "shadow_blade_lv3",
+        "name": "处决",
+        "description": "对生命值低于30%的目标造成300%攻击力的致命一击",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_lowest_hp", "value": 0, "ratio": 3.0, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 10, "castTime": 0.3, "range": 1.5, "energyCost": 6, "maxUses": 0
+    },
+    "bone_golem_lv1": {
+        "id": "bone_golem_lv1",
+        "name": "骨甲",
+        "description": "获得相当于最大生命20%的护盾，持续5秒",
+        "type": "buff",
+        "effects": [
+            { "type": "buff", "targetType": "self", "value": 50, "ratio": 0, "range": 0, "duration": 5 }
+        ],
+        "cooldown": 10, "castTime": 0.3, "range": 0, "energyCost": 4, "maxUses": 0
+    },
+    "bone_golem_lv2": {
+        "id": "bone_golem_lv2",
+        "name": "反噬",
+        "description": "护盾破碎时对周围敌人造成范围伤害",
+        "type": "aoe",
+        "effects": [
+            { "type": "aoe", "targetType": "enemy_range", "value": 130, "ratio": 0, "range": 80, "duration": 0 }
+        ],
+        "cooldown": 12, "castTime": 0.3, "range": 1.5, "energyCost": 4, "maxUses": 0
+    },
+    "bone_golem_lv3": {
+        "id": "bone_golem_lv3",
+        "name": "不倒",
+        "description": "护盾期间防御不断叠加，最高50%，持续10秒",
+        "type": "buff",
+        "effects": [
+            { "type": "buff", "targetType": "self", "value": 50, "ratio": 0, "range": 0, "duration": 10 }
+        ],
+        "cooldown": 18, "castTime": 0.2, "range": 0, "energyCost": 6, "maxUses": 1
+    },
+    "berserker_lv1": {
+        "id": "berserker_lv1",
+        "name": "血怒",
+        "description": "每损失1%生命，攻击力+1%，持续6秒",
+        "type": "buff",
+        "effects": [
+            { "type": "buff", "targetType": "self", "value": 30, "ratio": 0, "range": 0, "duration": 6 }
+        ],
+        "cooldown": 10, "castTime": 0.2, "range": 0, "energyCost": 3, "maxUses": 0
+    },
+    "berserker_lv2": {
+        "id": "berserker_lv2",
+        "name": "战吼",
+        "description": "发出战吼恐惧周围敌人1秒",
+        "type": "control",
+        "effects": [
+            { "type": "control", "targetType": "enemy_range", "value": 0, "ratio": 0, "range": 80, "duration": 1, "controlType": "fear" }
+        ],
+        "cooldown": 12, "castTime": 0.3, "range": 1.5, "energyCost": 4, "maxUses": 0
+    },
+    "berserker_lv3": {
+        "id": "berserker_lv3",
+        "name": "不死",
+        "description": "生命低于20%时攻击吸血50%，持续到战斗结束",
+        "type": "buff",
+        "effects": [
+            { "type": "buff", "targetType": "self", "value": 50, "ratio": 0, "range": 0, "duration": 30 }
+        ],
+        "cooldown": 20, "castTime": 0.2, "range": 0, "energyCost": 6, "maxUses": 1
+    },
+    "thunder_shaman_lv1": {
+        "id": "thunder_shaman_lv1",
+        "name": "雷击",
+        "description": "闪电轰击目标，造成150%攻击力伤害并眩晕0.5秒",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 0, "ratio": 1.5, "range": 0, "duration": 0 },
+            { "type": "control", "targetType": "enemy_nearest", "value": 0, "ratio": 0, "range": 0, "duration": 0.5, "controlType": "stun" }
+        ],
+        "cooldown": 7, "castTime": 0.3, "range": 4.5, "energyCost": 4, "maxUses": 0
+    },
+    "thunder_shaman_lv2": {
+        "id": "thunder_shaman_lv2",
+        "name": "弹射",
+        "description": "闪电弹射到附近敌人，造成100%攻击力范围伤害",
+        "type": "aoe",
+        "effects": [
+            { "type": "aoe", "targetType": "enemy_range", "value": 0, "ratio": 1.0, "range": 100, "duration": 0 }
+        ],
+        "cooldown": 8, "castTime": 0.3, "range": 4.5, "energyCost": 5, "maxUses": 0
+    },
+    "thunder_shaman_lv3": {
+        "id": "thunder_shaman_lv3",
+        "name": "雷云",
+        "description": "召唤雷云，对范围内敌人造成80%攻击力伤害",
+        "type": "aoe",
+        "effects": [
+            { "type": "aoe", "targetType": "enemy_range", "value": 0, "ratio": 0.8, "range": 120, "duration": 3 }
+        ],
+        "cooldown": 12, "castTime": 0.5, "range": 4.5, "energyCost": 7, "maxUses": 0
+    },
+    "witch_doctor_lv1": {
+        "id": "witch_doctor_lv1",
+        "name": "治疗图腾",
+        "description": "插下图腾，周围友军持续恢复生命",
+        "type": "heal",
+        "effects": [
+            { "type": "heal", "targetType": "ally_all", "value": 0, "ratio": 0.8, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 8, "castTime": 0.4, "range": 3.0, "energyCost": 4, "maxUses": 0
+    },
+    "witch_doctor_lv2": {
+        "id": "witch_doctor_lv2",
+        "name": "诅咒图腾",
+        "description": "图腾对范围内敌人造成持续伤害",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_range", "value": 0, "ratio": 0.6, "range": 100, "duration": 0 }
+        ],
+        "cooldown": 10, "castTime": 0.4, "range": 3.0, "energyCost": 4, "maxUses": 0
+    },
+    "witch_doctor_lv3": {
+        "id": "witch_doctor_lv3",
+        "name": "灵魂图腾",
+        "description": "为范围内友军提供护盾，持续5秒",
+        "type": "buff",
+        "effects": [
+            { "type": "buff", "targetType": "ally_all", "value": 40, "ratio": 0, "range": 0, "duration": 5 }
+        ],
+        "cooldown": 15, "castTime": 0.5, "range": 3.0, "energyCost": 6, "maxUses": 0
+    },
+    "blood_moon_lv1": {
+        "id": "blood_moon_lv1",
+        "name": "血印",
+        "description": "标记目标，攻击该目标时暴击率+20%",
+        "type": "buff",
+        "effects": [
+            { "type": "buff", "targetType": "self", "value": 20, "ratio": 0, "range": 0, "duration": 6 }
+        ],
+        "cooldown": 8, "castTime": 0.2, "range": 0, "energyCost": 3, "maxUses": 0
+    },
+    "blood_moon_lv2": {
+        "id": "blood_moon_lv2",
+        "name": "猎杀",
+        "description": "标记猎杀目标，移速大幅提升",
+        "type": "buff",
+        "effects": [
+            { "type": "buff", "targetType": "self", "value": 30, "ratio": 0, "range": 0, "duration": 4 }
+        ],
+        "cooldown": 10, "castTime": 0.2, "range": 0, "energyCost": 3, "maxUses": 0
+    },
+    "blood_moon_lv3": {
+        "id": "blood_moon_lv3",
+        "name": "血月斩",
+        "description": "对标记目标造成250%攻击力的斩杀伤害",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_lowest_hp", "value": 0, "ratio": 2.5, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 8, "castTime": 0.3, "range": 1.5, "energyCost": 6, "maxUses": 0
+    },
+    "treant_lv1": {
+        "id": "treant_lv1",
+        "name": "扎根",
+        "description": "原地扎根，获得50%减伤，持续6秒",
+        "type": "buff",
+        "effects": [
+            { "type": "buff", "targetType": "self", "value": 50, "ratio": 0, "range": 0, "duration": 6 }
+        ],
+        "cooldown": 12, "castTime": 0.3, "range": 0, "energyCost": 3, "maxUses": 0
+    },
+    "treant_lv2": {
+        "id": "treant_lv2",
+        "name": "愈合",
+        "description": "扎根期间持续恢复生命",
+        "type": "heal",
+        "effects": [
+            { "type": "heal", "targetType": "self", "value": 240, "ratio": 0, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 10, "castTime": 0.3, "range": 0, "energyCost": 3, "maxUses": 0
+    },
+    "treant_lv3": {
+        "id": "treant_lv3",
+        "name": "树怒",
+        "description": "扎根结束后藤蔓缠绕周围敌人3秒",
+        "type": "control",
+        "effects": [
+            { "type": "control", "targetType": "enemy_range", "value": 0, "ratio": 0, "range": 80, "duration": 3, "controlType": "stun" }
+        ],
+        "cooldown": 15, "castTime": 0.4, "range": 1.5, "energyCost": 5, "maxUses": 0
+    },
+    "blade_dancer_lv1": {
+        "id": "blade_dancer_lv1",
+        "name": "剑舞",
+        "description": "旋转攻击周围敌人，每击50%攻击力伤害",
+        "type": "aoe",
+        "effects": [
+            { "type": "aoe", "targetType": "enemy_range", "value": 0, "ratio": 0.5, "range": 80, "duration": 0 }
+        ],
+        "cooldown": 6, "castTime": 0.4, "range": 1.5, "energyCost": 4, "maxUses": 0
+    },
+    "blade_dancer_lv2": {
+        "id": "blade_dancer_lv2",
+        "name": "灵步",
+        "description": "剑舞期间闪避提升，防御+30%",
+        "type": "buff",
+        "effects": [
+            { "type": "buff", "targetType": "self", "value": 30, "ratio": 0, "range": 0, "duration": 3 }
+        ],
+        "cooldown": 8, "castTime": 0.2, "range": 0, "energyCost": 3, "maxUses": 0
+    },
+    "blade_dancer_lv3": {
+        "id": "blade_dancer_lv3",
+        "name": "终章",
+        "description": "剑舞结束时对生命最低的敌人造成200%攻击力斩杀",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_lowest_hp", "value": 0, "ratio": 2.0, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 10, "castTime": 0.3, "range": 1.5, "energyCost": 6, "maxUses": 0
+    },
+    "wind_archer_lv1": {
+        "id": "wind_archer_lv1",
+        "name": "风箭",
+        "description": "箭矢自动追踪目标，造成120%攻击力伤害",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 0, "ratio": 1.2, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 5, "castTime": 0.3, "range": 6.0, "energyCost": 3, "maxUses": 0
+    },
+    "wind_archer_lv2": {
+        "id": "wind_archer_lv2",
+        "name": "连风",
+        "description": "增强风箭，造成150%攻击力伤害",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 0, "ratio": 1.5, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 6, "castTime": 0.3, "range": 6.0, "energyCost": 4, "maxUses": 0
+    },
+    "wind_archer_lv3": {
+        "id": "wind_archer_lv3",
+        "name": "风眼",
+        "description": "每三箭造成范围80%攻击力伤害并击退",
+        "type": "aoe",
+        "effects": [
+            { "type": "aoe", "targetType": "enemy_range", "value": 0, "ratio": 0.8, "range": 100, "duration": 0 }
+        ],
+        "cooldown": 10, "castTime": 0.4, "range": 6.0, "energyCost": 5, "maxUses": 0
+    },
+    "moon_singer_lv1": {
+        "id": "moon_singer_lv1",
+        "name": "月光",
+        "description": "治疗友军130%攻击力生命值并添加护盾",
+        "type": "heal",
+        "effects": [
+            { "type": "heal", "targetType": "ally_lowest_hp", "value": 0, "ratio": 1.3, "range": 0, "duration": 0 },
+            { "type": "buff", "targetType": "ally_lowest_hp", "value": 20, "ratio": 0, "range": 0, "duration": 3 }
+        ],
+        "cooldown": 6, "castTime": 0.3, "range": 5.0, "energyCost": 3, "maxUses": 0
+    },
+    "moon_singer_lv2": {
+        "id": "moon_singer_lv2",
+        "name": "月诗",
+        "description": "月光弹射治疗多个受伤友军",
+        "type": "heal",
+        "effects": [
+            { "type": "heal", "targetType": "ally_all", "value": 0, "ratio": 0.8, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 8, "castTime": 0.4, "range": 5.0, "energyCost": 5, "maxUses": 0
+    },
+    "moon_singer_lv3": {
+        "id": "moon_singer_lv3",
+        "name": "月祈",
+        "description": "强力治疗，恢复200%攻击力生命值",
+        "type": "heal",
+        "effects": [
+            { "type": "heal", "targetType": "ally_lowest_hp", "value": 0, "ratio": 2.0, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 12, "castTime": 0.3, "range": 5.0, "energyCost": 5, "maxUses": 0
+    },
+    "faceless_lv1": {
+        "id": "faceless_lv1",
+        "name": "伪装",
+        "description": "伪装成敌方单位，持续5秒，不会被主动攻击",
+        "type": "buff",
+        "effects": [
+            { "type": "buff", "targetType": "self", "value": 80, "ratio": 0, "range": 0, "duration": 5 }
+        ],
+        "cooldown": 12, "castTime": 0.2, "range": 0, "energyCost": 3, "maxUses": 0
+    },
+    "faceless_lv2": {
+        "id": "faceless_lv2",
+        "name": "背刺",
+        "description": "伪装下首次攻击造成250%攻击力伤害",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_lowest_hp", "value": 0, "ratio": 2.5, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 8, "castTime": 0.2, "range": 1.5, "energyCost": 5, "maxUses": 0
+    },
+    "faceless_lv3": {
+        "id": "faceless_lv3",
+        "name": "无面",
+        "description": "击杀后立即刷新伪装冷却，造成300%攻击力伤害",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_lowest_hp", "value": 0, "ratio": 3.0, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 10, "castTime": 0.3, "range": 1.5, "energyCost": 6, "maxUses": 0
+    },
+    "demon_golem_lv1": {
+        "id": "demon_golem_lv1",
+        "name": "魔像凝视",
+        "description": "恐惧面前扇形范围内的敌人1.5秒",
+        "type": "control",
+        "effects": [
+            { "type": "control", "targetType": "enemy_range", "value": 0, "ratio": 0, "range": 80, "duration": 1.5, "controlType": "fear" }
+        ],
+        "cooldown": 10, "castTime": 0.3, "range": 1.5, "energyCost": 4, "maxUses": 0
+    },
+    "demon_golem_lv2": {
+        "id": "demon_golem_lv2",
+        "name": "触手",
+        "description": "被恐惧的敌人被触手缠绕，持续受到伤害",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_range", "value": 0, "ratio": 0.8, "range": 80, "duration": 3 }
+        ],
+        "cooldown": 10, "castTime": 0.3, "range": 1.5, "energyCost": 4, "maxUses": 0
+    },
+    "demon_golem_lv3": {
+        "id": "demon_golem_lv3",
+        "name": "吞噬",
+        "description": "吞噬敌人恢复20%最大生命值",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 0, "ratio": 1.5, "range": 0, "duration": 0 },
+            { "type": "heal", "targetType": "self", "value": 500, "ratio": 0, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 15, "castTime": 0.5, "range": 1.5, "energyCost": 6, "maxUses": 1
+    },
+    "demon_blade_lv1": {
+        "id": "demon_blade_lv1",
+        "name": "魔刃",
+        "description": "攻击附带暗影伤害，造成130%攻击力伤害",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 0, "ratio": 1.3, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 5, "castTime": 0.3, "range": 1.5, "energyCost": 3, "maxUses": 0
+    },
+    "demon_blade_lv2": {
+        "id": "demon_blade_lv2",
+        "name": "诅咒刃",
+        "description": "魔刃命中后降低目标治疗效果",
+        "type": "debuff",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 0, "ratio": 1.3, "range": 0, "duration": 0 },
+            { "type": "debuff", "targetType": "enemy_nearest", "value": -30, "ratio": 0, "range": 0, "duration": 3 }
+        ],
+        "cooldown": 8, "castTime": 0.3, "range": 1.5, "energyCost": 4, "maxUses": 0
+    },
+    "demon_blade_lv3": {
+        "id": "demon_blade_lv3",
+        "name": "魔化",
+        "description": "生命低于30%时魔刃威力大增，溅射周围敌人",
+        "type": "aoe",
+        "effects": [
+            { "type": "aoe", "targetType": "enemy_range", "value": 0, "ratio": 1.8, "range": 80, "duration": 0 }
+        ],
+        "cooldown": 12, "castTime": 0.4, "range": 1.5, "energyCost": 6, "maxUses": 0
+    },
+    "shadow_demon_lv1": {
+        "id": "shadow_demon_lv1",
+        "name": "暗影凝视",
+        "description": "对目标造成持续暗影伤害并减速50%",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 0, "ratio": 0.8, "range": 0, "duration": 3 },
+            { "type": "control", "targetType": "enemy_nearest", "value": 50, "ratio": 0, "range": 0, "duration": 3, "controlType": "slow" }
+        ],
+        "cooldown": 8, "castTime": 0.4, "range": 5.5, "energyCost": 4, "maxUses": 0
+    },
+    "shadow_demon_lv2": {
+        "id": "shadow_demon_lv2",
+        "name": "暗影回响",
+        "description": "凝视结束后对目标周围敌人造成范围伤害",
+        "type": "aoe",
+        "effects": [
+            { "type": "aoe", "targetType": "enemy_range", "value": 0, "ratio": 1.0, "range": 100, "duration": 0 }
+        ],
+        "cooldown": 10, "castTime": 0.4, "range": 5.5, "energyCost": 5, "maxUses": 0
+    },
+    "shadow_demon_lv3": {
+        "id": "shadow_demon_lv3",
+        "name": "灵魂收割",
+        "description": "击杀目标后永久提升5%攻击力，最多叠加5次",
+        "type": "buff",
+        "effects": [
+            { "type": "buff", "targetType": "self", "value": 5, "ratio": 0, "range": 0, "duration": 30 }
+        ],
+        "cooldown": 15, "castTime": 0.2, "range": 0, "energyCost": 3, "maxUses": 5
+    },
+    "warlock_lv1": {
+        "id": "warlock_lv1",
+        "name": "痛苦转移",
+        "description": "将友军的负面效果转移到敌人身上",
+        "type": "debuff",
+        "effects": [
+            { "type": "debuff", "targetType": "enemy_nearest", "value": -30, "ratio": 0, "range": 0, "duration": 4 }
+        ],
+        "cooldown": 8, "castTime": 0.3, "range": 4.0, "energyCost": 3, "maxUses": 0
+    },
+    "warlock_lv2": {
+        "id": "warlock_lv2",
+        "name": "诅咒链接",
+        "description": "链接友军和敌人，敌人承担友军受到的部分伤害",
+        "type": "debuff",
+        "effects": [
+            { "type": "debuff", "targetType": "enemy_nearest", "value": -30, "ratio": 0, "range": 0, "duration": 4 },
+            { "type": "buff", "targetType": "ally_nearest", "value": 20, "ratio": 0, "range": 0, "duration": 4 }
+        ],
+        "cooldown": 10, "castTime": 0.4, "range": 4.0, "energyCost": 5, "maxUses": 0
+    },
+    "warlock_lv3": {
+        "id": "warlock_lv3",
+        "name": "灵魂榨取",
+        "description": "对敌人造成伤害并将其转化为治疗友军",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 0, "ratio": 1.0, "range": 0, "duration": 0 },
+            { "type": "heal", "targetType": "ally_lowest_hp", "value": 0, "ratio": 0.3, "range": 0, "duration": 0 }
+        ],
+        "cooldown": 8, "castTime": 0.3, "range": 4.0, "energyCost": 5, "maxUses": 0
+    },
+    "nightmare_lv1": {
+        "id": "nightmare_lv1",
+        "name": "入梦",
+        "description": "隐身接近，破隐一击造成200%攻击力伤害并恐惧1秒",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_lowest_hp", "value": 0, "ratio": 2.0, "range": 0, "duration": 0 },
+            { "type": "control", "targetType": "enemy_lowest_hp", "value": 0, "ratio": 0, "range": 0, "duration": 1, "controlType": "fear" }
+        ],
+        "cooldown": 8, "castTime": 0.2, "range": 5.0, "energyCost": 5, "maxUses": 0
+    },
+    "nightmare_lv2": {
+        "id": "nightmare_lv2",
+        "name": "噩梦",
+        "description": "噩梦缠绕目标，持续造成伤害",
+        "type": "damage",
+        "effects": [
+            { "type": "damage", "targetType": "enemy_nearest", "value": 0, "ratio": 0.5, "range": 0, "duration": 3 }
+        ],
+        "cooldown": 10, "castTime": 0.3, "range": 1.5, "energyCost": 4, "maxUses": 0
+    },
+    "nightmare_lv3": {
+        "id": "nightmare_lv3",
+        "name": "永眠",
+        "description": "击杀后恐惧周围所有敌人2秒",
+        "type": "control",
+        "effects": [
+            { "type": "control", "targetType": "enemy_range", "value": 0, "ratio": 0, "range": 100, "duration": 2, "controlType": "fear" }
+        ],
+        "cooldown": 15, "castTime": 0.3, "range": 1.5, "energyCost": 7, "maxUses": 0
     }
 }

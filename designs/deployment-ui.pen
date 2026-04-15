@@ -23,97 +23,18 @@
             0,
             20
           ],
-          "justifyContent": "space_between",
+          "justifyContent": "center",
           "alignItems": "center",
           "children": [
             {
-              "type": "frame",
-              "id": "RRwIa",
-              "name": "BlueSide",
-              "gap": 10,
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "ellipse",
-                  "id": "I1zgs",
-                  "name": "blueIcon",
-                  "fill": "#4A90D9",
-                  "width": 28,
-                  "height": 28
-                },
-                {
-                  "type": "text",
-                  "id": "bxUYR",
-                  "name": "BlueLabel",
-                  "fill": "#A0C4FF",
-                  "content": "蓝方",
-                  "fontFamily": "Inter",
-                  "fontSize": 16,
-                  "fontWeight": "700"
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "9OhMf",
-              "name": "TimerBox",
-              "fill": "#1a1a2e",
-              "cornerRadius": 8,
-              "gap": 6,
-              "padding": [
-                4,
-                16
-              ],
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "text",
-                  "id": "74UeL",
-                  "name": "timerIcon",
-                  "fill": "#FFD700",
-                  "content": "⏱",
-                  "fontFamily": "Inter",
-                  "fontSize": 16,
-                  "fontWeight": "normal"
-                },
-                {
-                  "type": "text",
-                  "id": "ZNzl4",
-                  "name": "TimerText",
-                  "fill": "#FFD700",
-                  "content": "30.0s",
-                  "fontFamily": "Inter",
-                  "fontSize": 20,
-                  "fontWeight": "700"
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "l0lTc",
-              "name": "RedSide",
-              "gap": 10,
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "text",
-                  "id": "aGv6x",
-                  "name": "RedLabel",
-                  "fill": "#FFB0B0",
-                  "content": "红方",
-                  "fontFamily": "Inter",
-                  "fontSize": 16,
-                  "fontWeight": "700"
-                },
-                {
-                  "type": "ellipse",
-                  "id": "3CRXw",
-                  "name": "redIcon",
-                  "fill": "#D94A4A",
-                  "width": 28,
-                  "height": 28
-                }
-              ]
+              "type": "text",
+              "id": "r4kxD",
+              "name": "tt",
+              "fill": "#FFD700",
+              "content": "选 兵 布 阵",
+              "fontFamily": "Inter",
+              "fontSize": 24,
+              "fontWeight": "bold"
             }
           ]
         },
@@ -128,26 +49,6 @@
           "justifyContent": "center",
           "alignItems": "center",
           "children": [
-            {
-              "type": "frame",
-              "id": "DKV3K",
-              "name": "TitleWrap",
-              "width": "fill_container",
-              "justifyContent": "center",
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "text",
-                  "id": "o9cKH",
-                  "name": "TitleText",
-                  "fill": "#FFD700",
-                  "content": "选兵布阵",
-                  "fontFamily": "Inter",
-                  "fontSize": 24,
-                  "fontWeight": "700"
-                }
-              ]
-            },
             {
               "type": "frame",
               "id": "KCMy8",
@@ -234,7 +135,7 @@
                     {
                       "type": "frame",
                       "id": "BTwhL",
-                      "name": "C1_0_cavalry",
+                      "name": "C1_0_melee",
                       "width": 80,
                       "height": 80,
                       "fill": "#0f346080",
@@ -261,7 +162,7 @@
                           "id": "Wa2Xl",
                           "name": "rngLabel",
                           "fill": "#FFFFFF",
-                          "content": "骑兵",
+                          "content": "近战",
                           "fontFamily": "Inter",
                           "fontSize": 10,
                           "fontWeight": "normal"
@@ -271,7 +172,7 @@
                     {
                       "type": "frame",
                       "id": "gWWBw",
-                      "name": "C1_1_mage",
+                      "name": "C1_1_tank",
                       "width": 80,
                       "height": 80,
                       "fill": "#0f346080",
@@ -285,10 +186,9 @@
                       "alignItems": "center",
                       "children": [
                         {
-                          "type": "polygon",
-                          "polygonCount": 5,
-                          "id": "zAPXm",
-                          "name": "mageShape",
+                          "type": "rectangle",
+                          "cornerRadius": 2,
+                          "id": "8Ch4w",
                           "fill": "#4A90D9",
                           "width": 24,
                           "height": 24
@@ -298,7 +198,7 @@
                           "id": "g9rAh",
                           "name": "tankLabel",
                           "fill": "#FFFFFF",
-                          "content": "法师",
+                          "content": "坦克",
                           "fontFamily": "Inter",
                           "fontSize": 10,
                           "fontWeight": "normal"
@@ -505,7 +405,7 @@
                 {
                   "type": "frame",
                   "id": "2e7xl",
-                  "name": "Card_cavalry",
+                  "name": "Card_melee",
                   "width": 80,
                   "height": 100,
                   "fill": "#0f3460",
@@ -533,7 +433,7 @@
                       "id": "1mSBA",
                       "name": "cl2",
                       "fill": "#FFFFFF",
-                      "content": "骑兵",
+                      "content": "近战",
                       "fontFamily": "Inter",
                       "fontSize": 12,
                       "fontWeight": "600"
@@ -589,54 +489,6 @@
                       "type": "text",
                       "id": "JLyaa",
                       "name": "cc3",
-                      "fill": "#FFD700",
-                      "content": "×5",
-                      "fontFamily": "Inter",
-                      "fontSize": 10,
-                      "fontWeight": "normal"
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "s9g9J",
-                  "name": "Card_mage",
-                  "width": 80,
-                  "height": 100,
-                  "fill": "#0f3460",
-                  "cornerRadius": 8,
-                  "stroke": {
-                    "thickness": 1,
-                    "fill": "#4A90D9"
-                  },
-                  "layout": "vertical",
-                  "gap": 4,
-                  "justifyContent": "center",
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "polygon",
-                      "polygonCount": 5,
-                      "id": "VT5PU",
-                      "name": "cs4",
-                      "fill": "#4A90D9",
-                      "width": 28,
-                      "height": 28
-                    },
-                    {
-                      "type": "text",
-                      "id": "TUnwo",
-                      "name": "cl4",
-                      "fill": "#FFFFFF",
-                      "content": "法师",
-                      "fontFamily": "Inter",
-                      "fontSize": 12,
-                      "fontWeight": "600"
-                    },
-                    {
-                      "type": "text",
-                      "id": "5jDAG",
-                      "name": "cc4",
                       "fill": "#FFD700",
                       "content": "×5",
                       "fontFamily": "Inter",

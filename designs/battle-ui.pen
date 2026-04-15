@@ -73,7 +73,7 @@
           "name": "UnitLegend",
           "opacity": 0.7,
           "width": 200,
-          "height": 220,
+          "height": 190,
           "fill": "#0a0a1a",
           "cornerRadius": 8,
           "layout": "vertical",
@@ -136,7 +136,7 @@
                   "type": "text",
                   "id": "yxSSD",
                   "fill": "#AABBCC",
-                  "content": "骑兵 三角形",
+                  "content": "近战 三角形",
                   "fontFamily": "Inter",
                   "fontSize": 10,
                   "fontWeight": "normal"
@@ -163,32 +163,6 @@
                   "id": "8Ew5S",
                   "fill": "#AABBCC",
                   "content": "远程 圆形",
-                  "fontFamily": "Inter",
-                  "fontSize": 10,
-                  "fontWeight": "normal"
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "wWSMn",
-              "name": "row4",
-              "gap": 8,
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "polygon",
-                  "polygonCount": 5,
-                  "id": "3hIoy",
-                  "fill": "#7DD0FF",
-                  "width": 20,
-                  "height": 20
-                },
-                {
-                  "type": "text",
-                  "id": "y65lC",
-                  "fill": "#AABBCC",
-                  "content": "法师 五边形",
                   "fontFamily": "Inter",
                   "fontSize": 10,
                   "fontWeight": "normal"

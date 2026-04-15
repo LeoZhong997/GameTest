@@ -108,10 +108,27 @@ export class BattleScene extends Component {
             return { config: cfg!, level: 5, quality: Quality.BLUE, count: e.count, gridRow: e.gridRow, gridCol: e.gridCol };
         }).filter(u => u.config);
 
-        // 右方（AI）默认布阵：所有兵种各 3 个
-        const rightUnits: { config: UnitConfig; level: number; quality: Quality; count: number }[] = [];
-        for (const [, cfg] of this._unitConfigs) {
-            rightUnits.push({ config: cfg, level: 5, quality: Quality.BLUE, count: 3 });
+        // 右方（AI）：5 个角色各随机选一个种族，组成十字阵
+        const roles: string[] = ['tank', 'melee', 'ranged', 'support', 'assassin'];
+        const races: string[] = ['human', 'beast', 'spirit', 'demon'];
+        const allConfigs = Array.from(this._unitConfigs.values());
+        const crossPositions = [
+            { row: 0, col: 1 }, // 上
+            { row: 1, col: 0 }, // 左
+            { row: 1, col: 1 }, // 中
+            { row: 1, col: 2 }, // 右
+            { row: 2, col: 1 }, // 下
+        ];
+        const rightUnits: { config: UnitConfig; level: number; quality: Quality; count: number; gridRow: number; gridCol: number }[] = [];
+        for (let i = 0; i < roles.length; i++) {
+            const race = races[Math.floor(Math.random() * races.length)];
+            const cfg = allConfigs.find(c => c.role === roles[i] && c.race === race);
+            if (cfg) {
+                rightUnits.push({
+                    config: cfg, level: 5, quality: Quality.BLUE, count: 3,
+                    gridRow: crossPositions[i].row, gridCol: crossPositions[i].col,
+                });
+            }
         }
 
         const config: BattleConfig = {
@@ -179,9 +196,8 @@ export class BattleScene extends Component {
     private getUnitStyle(role: string): { size: number; shape: UnitShape } {
         switch (role) {
             case 'tank':     return { size: 28, shape: 'rect' };
-            case 'cavalry':  return { size: 28, shape: 'triangle' };
+            case 'melee':    return { size: 28, shape: 'triangle' };
             case 'ranged':   return { size: 28, shape: 'circle' };
-            case 'mage':     return { size: 28, shape: 'pentagon' };
             case 'support':  return { size: 28, shape: 'hexagon' };
             case 'assassin': return { size: 28, shape: 'diamond' };
             default:         return { size: 28, shape: 'rect' };
