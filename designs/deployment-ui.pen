@@ -167,17 +167,74 @@
                       "name": "C0_0",
                       "width": 80,
                       "height": 80,
-                      "fill": "#1a1a2e",
+                      "fill": "#0f346080",
                       "cornerRadius": 4,
                       "stroke": {
                         "thickness": 1,
-                        "fill": "#FFFFFF20"
+                        "fill": "#4A90D980"
                       }
                     },
                     {
                       "type": "frame",
                       "id": "9rYEk",
-                      "name": "C0_1_cavalry",
+                      "name": "C0_1_ranged",
+                      "width": 80,
+                      "height": 80,
+                      "fill": "#0f346080",
+                      "cornerRadius": 4,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#4A90D980"
+                      },
+                      "layout": "vertical",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "ellipse",
+                          "id": "YjNPW",
+                          "name": "rngShape",
+                          "fill": "#4A90D9",
+                          "width": 24,
+                          "height": 24
+                        },
+                        {
+                          "type": "text",
+                          "id": "VGk7s",
+                          "name": "cavLabel",
+                          "fill": "#FFFFFF",
+                          "content": "远程",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "YXO3v",
+                      "name": "C0_2",
+                      "width": 80,
+                      "height": 80,
+                      "fill": "#0f346080",
+                      "cornerRadius": 4,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#4A90D980"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ZuRjT",
+                  "name": "Row1",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "BTwhL",
+                      "name": "C1_0_cavalry",
                       "width": 80,
                       "height": 80,
                       "fill": "#0f346080",
@@ -193,7 +250,7 @@
                         {
                           "type": "polygon",
                           "polygonCount": 3,
-                          "id": "ygesy",
+                          "id": "8sx7a",
                           "name": "cavShape",
                           "fill": "#4A90D9",
                           "width": 24,
@@ -201,8 +258,8 @@
                         },
                         {
                           "type": "text",
-                          "id": "VGk7s",
-                          "name": "cavLabel",
+                          "id": "Wa2Xl",
+                          "name": "rngLabel",
                           "fill": "#FFFFFF",
                           "content": "骑兵",
                           "fontFamily": "Inter",
@@ -213,65 +270,8 @@
                     },
                     {
                       "type": "frame",
-                      "id": "YXO3v",
-                      "name": "C0_2",
-                      "width": 80,
-                      "height": 80,
-                      "fill": "#1a1a2e",
-                      "cornerRadius": 4,
-                      "stroke": {
-                        "thickness": 1,
-                        "fill": "#FFFFFF20"
-                      }
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "ZuRjT",
-                  "name": "Row1",
-                  "gap": 4,
-                  "children": [
-                    {
-                      "type": "frame",
-                      "id": "BTwhL",
-                      "name": "C1_0_ranged",
-                      "width": 80,
-                      "height": 80,
-                      "fill": "#0f346080",
-                      "cornerRadius": 4,
-                      "stroke": {
-                        "thickness": 1,
-                        "fill": "#4A90D980"
-                      },
-                      "layout": "vertical",
-                      "justifyContent": "center",
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "ellipse",
-                          "id": "VuCij",
-                          "name": "rngShape",
-                          "fill": "#4A90D9",
-                          "width": 24,
-                          "height": 24
-                        },
-                        {
-                          "type": "text",
-                          "id": "Wa2Xl",
-                          "name": "rngLabel",
-                          "fill": "#FFFFFF",
-                          "content": "远程",
-                          "fontFamily": "Inter",
-                          "fontSize": 10,
-                          "fontWeight": "normal"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
                       "id": "gWWBw",
-                      "name": "C1_1_tank",
+                      "name": "C1_1_mage",
                       "width": 80,
                       "height": 80,
                       "fill": "#0f346080",
@@ -285,10 +285,10 @@
                       "alignItems": "center",
                       "children": [
                         {
-                          "type": "rectangle",
-                          "cornerRadius": 2,
-                          "id": "u462Z",
-                          "name": "tankShape",
+                          "type": "polygon",
+                          "polygonCount": 5,
+                          "id": "zAPXm",
+                          "name": "mageShape",
                           "fill": "#4A90D9",
                           "width": 24,
                           "height": 24
@@ -298,7 +298,7 @@
                           "id": "g9rAh",
                           "name": "tankLabel",
                           "fill": "#FFFFFF",
-                          "content": "坦克",
+                          "content": "法师",
                           "fontFamily": "Inter",
                           "fontSize": 10,
                           "fontWeight": "normal"
@@ -308,7 +308,7 @@
                     {
                       "type": "frame",
                       "id": "jUba8",
-                      "name": "C1_2_mage",
+                      "name": "C1_2_support",
                       "width": 80,
                       "height": 80,
                       "fill": "#0f346080",
@@ -323,9 +323,9 @@
                       "children": [
                         {
                           "type": "polygon",
-                          "polygonCount": 5,
-                          "id": "3GmAn",
-                          "name": "mageShape",
+                          "polygonCount": 6,
+                          "id": "Elehp",
+                          "name": "supShape",
                           "fill": "#4A90D9",
                           "width": 24,
                           "height": 24
@@ -335,7 +335,7 @@
                           "id": "nfAoN",
                           "name": "mageLabel",
                           "fill": "#FFFFFF",
-                          "content": "法师",
+                          "content": "辅助",
                           "fontFamily": "Inter",
                           "fontSize": 10,
                           "fontWeight": "normal"
@@ -353,20 +353,7 @@
                     {
                       "type": "frame",
                       "id": "vkhxt",
-                      "name": "C2_0",
-                      "width": 80,
-                      "height": 80,
-                      "fill": "#1a1a2e",
-                      "cornerRadius": 4,
-                      "stroke": {
-                        "thickness": 1,
-                        "fill": "#FFFFFF20"
-                      }
-                    },
-                    {
-                      "type": "frame",
-                      "id": "waIY2",
-                      "name": "C2_1_support",
+                      "name": "C2_0_assassin",
                       "width": 80,
                       "height": 80,
                       "fill": "#0f346080",
@@ -380,10 +367,47 @@
                       "alignItems": "center",
                       "children": [
                         {
-                          "type": "polygon",
-                          "polygonCount": 6,
-                          "id": "iHinA",
-                          "name": "supShape",
+                          "type": "rectangle",
+                          "id": "2xHAf",
+                          "name": "asnShape",
+                          "rotation": 45,
+                          "fill": "#4A90D9",
+                          "width": 20,
+                          "height": 20
+                        },
+                        {
+                          "type": "text",
+                          "id": "H7LZI",
+                          "name": "asnLabel",
+                          "fill": "#FFFFFF",
+                          "content": "刺客",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "waIY2",
+                      "name": "C2_1_tank",
+                      "width": 80,
+                      "height": 80,
+                      "fill": "#0f346080",
+                      "cornerRadius": 4,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#4A90D980"
+                      },
+                      "layout": "vertical",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 2,
+                          "id": "9OLCK",
+                          "name": "tankShape",
                           "fill": "#4A90D9",
                           "width": 24,
                           "height": 24
@@ -393,7 +417,7 @@
                           "id": "rkvht",
                           "name": "supLabel",
                           "fill": "#FFFFFF",
-                          "content": "辅助",
+                          "content": "坦克",
                           "fontFamily": "Inter",
                           "fontSize": 10,
                           "fontWeight": "normal"
@@ -406,11 +430,11 @@
                       "name": "C2_2",
                       "width": 80,
                       "height": 80,
-                      "fill": "#1a1a2e",
+                      "fill": "#0f346080",
                       "cornerRadius": 4,
                       "stroke": {
                         "thickness": 1,
-                        "fill": "#FFFFFF20"
+                        "fill": "#4A90D980"
                       }
                     }
                   ]
@@ -672,7 +696,7 @@
                 {
                   "type": "frame",
                   "id": "mbPRM",
-                  "name": "Card_warrior",
+                  "name": "Card_assassin",
                   "width": 80,
                   "height": 100,
                   "fill": "#0f3460",
@@ -688,19 +712,19 @@
                   "children": [
                     {
                       "type": "rectangle",
-                      "cornerRadius": 2,
-                      "id": "9UrzV",
-                      "name": "cs6",
+                      "id": "lvdeF",
+                      "name": "asnCardShape",
+                      "rotation": 45,
                       "fill": "#4A90D9",
-                      "width": 28,
-                      "height": 28
+                      "width": 24,
+                      "height": 24
                     },
                     {
                       "type": "text",
                       "id": "Kd0Kz",
                       "name": "cl6",
                       "fill": "#FFFFFF",
-                      "content": "战士",
+                      "content": "刺客",
                       "fontFamily": "Inter",
                       "fontSize": 12,
                       "fontWeight": "600"

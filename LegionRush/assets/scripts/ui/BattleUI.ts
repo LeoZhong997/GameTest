@@ -6,18 +6,29 @@
 
 import { _decorator, Component, Node, Label, Button, Color, Graphics, UITransform, UIOpacity, tween, Vec3, Layout } from 'cc';
 import { BattleManager, BattleState, BattleResult, BattleReport } from '../battle/BattleManager';
+import { BattleUnit, TeamSide } from '../battle/Unit';
 import { EventBus } from '../core/EventBus';
 
 const { ccclass } = _decorator;
 
-// --- 设计参数 (匹配 battle-ui.pen) ---
-const PANEL_W = 400;
-const PANEL_H = 360;
+// --- 设计参数 ---
+const PANEL_W = 620;
+const PANEL_H = 540;
 const PANEL_R = 16;
-const DETAIL_W = 300;
-const BTN_W = 160;
-const BTN_H = 48;
+const DETAIL_W = 480;
+const BTN_W = 180;
+const BTN_H = 52;
 const BTN_R = 24;
+
+// --- 柱状图参数（双列并排） ---
+const COL_W = 270;          // 每列宽度
+const COL_BAR_W = 110;      // 柱子宽度
+const BAR_H = 14;
+const BAR_GAP = 3;
+const BAR_ROW_H = 40;
+const BAR_NAME_W = 46;
+const LEFT_COL_X = -295;    // 蓝方列起始 X
+const RIGHT_COL_X = 25;     // 红方列起始 X
 
 const BG_COLOR     = new Color(26, 26, 46, 242);       // #1a1a2e ~95% 不透明
 const GOLD         = new Color(255, 215, 0, 255);       // #FFD700
@@ -26,6 +37,20 @@ const DIVIDER_CLR  = new Color(255, 255, 255, 51);      // 20% 白色
 const DETAIL_CLR   = new Color(204, 204, 204, 255);     // #CCCCCC
 const BTN_TEXT_CLR = new Color(26, 26, 46, 255);        // 金色按钮上的深色文字
 const OVERLAY_CLR  = new Color(0, 0, 0, 153);           // 60% 黑色遮罩
+const DMG_COLOR    = new Color(255, 160, 50, 255);      // 伤害柱 - 橙色
+const TANK_COLOR   = new Color(80, 180, 220, 255);      // 承伤柱 - 青蓝
+const BAR_BG       = new Color(40, 40, 55, 255);        // 柱子背景槽
+const BLUE_HEADER  = new Color(120, 180, 255, 255);     // 蓝方统计标题
+const RED_HEADER   = new Color(255, 140, 140, 255);     // 红方统计标题
+
+/** 兵种聚合统计 */
+interface TypeStats {
+    name: string;
+    damageDealt: number;
+    damageTaken: number;
+    dmgPct: number;
+    tankPct: number;
+}
 
 @ccclass('BattleUI')
 export class BattleUI extends Component {
@@ -50,6 +75,7 @@ export class BattleUI extends Component {
     private _bm: BattleManager = BattleManager.instance;
     private _speedOptions: number[] = [1, 2, 3, 4];
     private _speedIndex: number = 0;
+    private _statsNodes: Node[] = [];
 
     onLoad() {
         // 自动绑定子节点
@@ -124,18 +150,18 @@ export class BattleUI extends Component {
         this.node.insertChild(this.overlay, rpIdx);
         this.overlay.active = false;
 
-        // --- 子节点 Y 坐标（手动居中） ---
-        const topY = PANEL_H / 2 - 40;                           // 140
-        const yLabel   = topY - 25;                               // 115
-        const yDivider = topY - 50 - 18 - 1;                      // 71
-        const yDetail  = topY - 50 - 18 - 2 - 18 - 40;           // 12
-        const yButton  = -(PANEL_H / 2 - 40 - 24);               // -116
+        // --- 子节点 Y 坐标 ---
+        const topY = PANEL_H / 2 - 30;                           // 220
+        const yLabel   = topY - 22;                               // 198
+        const yDivider = yLabel - 28;                             // 170
+        const yDetail  = yDivider - 10 - 28;                      // 132
+        const yButton  = -(PANEL_H / 2 - 30);                    // -220 (会被 onBattleEnd 动态调整)
 
         // --- ResultLabel 标题 ---
         if (this.resultLabel) {
             const lt = this.resultLabel.node.getComponent(UITransform)!;
             lt.setAnchorPoint(0.5, 0.5);
-            this.resultLabel.fontSize = 42;
+            this.resultLabel.fontSize = 40;
             this.resultLabel.isBold = true;
             this.resultLabel.color = GOLD;
             this.resultLabel.enableOutline = true;
@@ -156,7 +182,7 @@ export class BattleUI extends Component {
         dg.rect(-DETAIL_W / 2, -1, DETAIL_W, 2);
         dg.fill();
         divider.setPosition(0, yDivider, 0);
-        this.resultPanel.insertChild(divider, 1); // ResultLabel 和 ResultDetail 之间
+        this.resultPanel.insertChild(divider, 1);
 
         // --- ResultDetail 详情 ---
         if (this.resultDetailLabel) {
@@ -164,7 +190,7 @@ export class BattleUI extends Component {
             dlt.setContentSize(DETAIL_W, 100);
             dlt.setAnchorPoint(0.5, 0.5);
             this.resultDetailLabel.fontSize = 20;
-            this.resultDetailLabel.lineHeight = 32;
+            this.resultDetailLabel.lineHeight = 28;
             this.resultDetailLabel.color = DETAIL_CLR;
             this.resultDetailLabel.horizontalAlign = Label.HorizontalAlign.CENTER;
             this.resultDetailLabel.overflow = Label.Overflow.RESIZE_HEIGHT;
@@ -555,6 +581,9 @@ export class BattleUI extends Component {
     }
 
     private onBattleEnd(report: BattleReport): void {
+        // 清除上一次的统计节点
+        this.clearStats();
+
         // 遮罩淡入
         if (this.overlay) {
             this.overlay.active = true;
@@ -586,18 +615,73 @@ export class BattleUI extends Component {
             this.drawPanelBg(theme);
         }
 
-        // 详情文本
+        // 详情文本（MVP 为个人表现，下方统计为兵种合计）
         if (this.resultDetailLabel) {
-            let detail = `用时 ${report.duration.toFixed(1)}s\n`;
-            detail += `存活 ${report.leftSurvivors} vs ${report.rightSurvivors}\n`;
+            let detail = `用时 ${report.duration.toFixed(1)}s`;
+            detail += `  存活 ${report.leftSurvivors} vs ${report.rightSurvivors}`;
             if (report.mvp) {
-                detail += `MVP: ${report.mvp.config.name}\n伤害: ${report.mvp.damageDealt} 击杀: ${report.mvp.kills}`;
+                detail += `\nMVP: ${report.mvp.config.name}(${report.mvp.tag.split('#')[1]})`;
+                detail += `  击杀:${report.mvp.kills} 助攻:${report.mvp.assists}`;
+                detail += `  伤害:${report.mvp.damageDealt} 承伤:${report.mvp.damageTaken}`;
+                if (report.mvp.healingDone > 0) {
+                    detail += ` 治疗:${report.mvp.healingDone}`;
+                }
+            }
+            detail += `\n(下方统计为各兵种合计)`;
+            this.resultDetailLabel.string = detail;
+        }
+
+        // --- 双方兵种统计柱状图（左右并排） ---
+        const leftUnits = report.units.filter(u => u.team === TeamSide.LEFT);
+        const rightUnits = report.units.filter(u => u.team === TeamSide.RIGHT);
+        const blueStats = this.aggregateTeamStats(leftUnits);
+        const redStats = this.aggregateTeamStats(rightUnits);
+
+        // 详情文本（MVP 显示该兵种合计数据）
+        if (this.resultDetailLabel) {
+            let detail = `用时 ${report.duration.toFixed(1)}s`;
+            detail += `  存活 ${report.leftSurvivors} vs ${report.rightSurvivors}`;
+            if (report.mvp) {
+                const mvpType = blueStats.find(s => s.name === report.mvp!.config.name);
+                if (mvpType) {
+                    detail += `\nMVP兵种: ${mvpType.name}`;
+                    detail += `  伤害:${mvpType.damageDealt}(${mvpType.dmgPct}%)`;
+                    detail += `  承伤:${mvpType.damageTaken}(${mvpType.tankPct}%)`;
+                }
             }
             this.resultDetailLabel.string = detail;
+        }
+
+        // 分隔线2（MVP 下方）
+        const topY = PANEL_H / 2 - 30;
+        const yDivider2 = topY - 22 - 28 - 10 - 60 - 10;  // title + divider + detail(~60px) + gap
+        const div2 = new Node('StatsDivider');
+        const d2ut = div2.addComponent(UITransform);
+        d2ut.setContentSize(DETAIL_W, 2);
+        d2ut.setAnchorPoint(0.5, 0.5);
+        const d2g = div2.addComponent(Graphics);
+        d2g.fillColor = DIVIDER_CLR;
+        d2g.rect(-DETAIL_W / 2, -1, DETAIL_W, 2);
+        d2g.fill();
+        div2.setPosition(0, yDivider2, 0);
+        this.resultPanel.addChild(div2);
+        this._statsNodes.push(div2);
+
+        // 双列并排：蓝方左侧，红方右侧
+        const headerY = yDivider2 - 8 - 12;
+        const yNextBlue = this.createTeamBars(headerY, LEFT_COL_X, '蓝方统计', BLUE_HEADER, blueStats);
+        const yNextRed = this.createTeamBars(headerY, RIGHT_COL_X, '红方统计', RED_HEADER, redStats);
+        const yBottom = Math.min(yNextBlue, yNextRed);
+
+        // 动态调整按钮位置
+        if (this.btnRestart) {
+            const btnY = Math.min(yBottom - 16, -(PANEL_H / 2 - 36));
+            this.btnRestart.node.setPosition(0, btnY, 0);
         }
     }
 
     onRestart(): void {
+        this.clearStats();
         if (this.overlay) this.overlay.active = false;
         if (this.resultPanel) this.resultPanel.active = false;
         if (this.btnStartNode) this.btnStartNode.active = false;
@@ -662,5 +746,160 @@ export class BattleUI extends Component {
     private onStartBattle(): void {
         if (this.btnStartNode) this.btnStartNode.active = false;
         EventBus.instance.emit('battle:start_request');
+    }
+
+    // ========== 兵种统计柱状图 ==========
+
+    /** 清除统计节点 */
+    private clearStats(): void {
+        for (const n of this._statsNodes) {
+            n.removeFromParent();
+            n.destroy();
+        }
+        this._statsNodes = [];
+    }
+
+    /** 按兵种聚合同方数据 */
+    private aggregateTeamStats(units: BattleUnit[]): TypeStats[] {
+        const map = new Map<string, { name: string; dmg: number; tank: number }>();
+        for (const u of units) {
+            const e = map.get(u.configId);
+            if (e) {
+                e.dmg += u.damageDealt;
+                e.tank += u.damageTaken;
+            } else {
+                map.set(u.configId, { name: u.config.name, dmg: u.damageDealt, tank: u.damageTaken });
+            }
+        }
+        const totalDmg = [...map.values()].reduce((s, e) => s + e.dmg, 0);
+        const totalTank = [...map.values()].reduce((s, e) => s + e.tank, 0);
+        const result: TypeStats[] = [];
+        for (const e of map.values()) {
+            result.push({
+                name: e.name,
+                damageDealt: e.dmg,
+                damageTaken: e.tank,
+                dmgPct: totalDmg > 0 ? Math.round(e.dmg / totalDmg * 100) : 0,
+                tankPct: totalTank > 0 ? Math.round(e.tank / totalTank * 100) : 0,
+            });
+        }
+        result.sort((a, b) => b.damageDealt - a.damageDealt);
+        return result;
+    }
+
+    /** 创建一方兵种统计柱状图，返回最后一行下方的 Y 坐标 */
+    private createTeamBars(headerY: number, colX: number, headerText: string, headerColor: Color, stats: TypeStats[]): number {
+        // 标题（居中于列）
+        const hdr = new Node('StatsHdr');
+        const hudr = hdr.addComponent(UITransform);
+        hudr.setContentSize(COL_W, 24);
+        hudr.setAnchorPoint(0.5, 0.5);
+        hdr.setPosition(colX + COL_W / 2, headerY, 0);
+        const hlbl = hdr.addComponent(Label);
+        hlbl.string = headerText;
+        hlbl.fontSize = 18;
+        hlbl.isBold = true;
+        hlbl.color = headerColor;
+        hlbl.horizontalAlign = Label.HorizontalAlign.CENTER;
+        this.resultPanel.addChild(hdr);
+        this._statsNodes.push(hdr);
+
+        if (stats.length === 0) return headerY - 24;
+
+        // 计算缩放比例
+        const maxDmg = Math.max(1, ...stats.map(s => s.damageDealt));
+        const maxTank = Math.max(1, ...stats.map(s => s.damageTaken));
+
+        let y = headerY - 34;
+        for (const stat of stats) {
+            this.createBarRow(y, colX, stat, maxDmg, maxTank);
+            y -= BAR_ROW_H;
+        }
+        return y;
+    }
+
+    /** 创建一行柱状图（伤害+承伤） */
+    private createBarRow(y: number, colX: number, stat: TypeStats, maxDmg: number, maxTank: number): void {
+        const nameX = colX;
+        const barX = colX + BAR_NAME_W + 6;
+        const valX = barX + COL_BAR_W + 6;
+        const valW = COL_W - BAR_NAME_W - 6 - COL_BAR_W - 6;  // 自动计算剩余宽度给数值
+
+        // 兵种名
+        const nameNode = new Node('TypeName');
+        const nut = nameNode.addComponent(UITransform);
+        nut.setContentSize(BAR_NAME_W, BAR_ROW_H);
+        nut.setAnchorPoint(0, 0.5);
+        nameNode.setPosition(nameX, y, 0);
+        const nlbl = nameNode.addComponent(Label);
+        nlbl.string = stat.name.substring(0, 4);
+        nlbl.fontSize = 15;
+        nlbl.color = DETAIL_CLR;
+        nlbl.horizontalAlign = Label.HorizontalAlign.LEFT;
+        this.resultPanel.addChild(nameNode);
+        this._statsNodes.push(nameNode);
+
+        // 柱状图（伤害 + 承伤）
+        const barsNode = new Node('Bars');
+        const but = barsNode.addComponent(UITransform);
+        but.setContentSize(COL_BAR_W, BAR_ROW_H);
+        but.setAnchorPoint(0, 0.5);
+        barsNode.setPosition(barX, y, 0);
+        const gfx = barsNode.addComponent(Graphics);
+
+        // 伤害柱背景 + 填充（上半）
+        const dmgTopY = BAR_GAP / 2;
+        gfx.fillColor = BAR_BG;
+        gfx.rect(0, dmgTopY, COL_BAR_W, BAR_H);
+        gfx.fill();
+        const dmgW = COL_BAR_W * (stat.damageDealt / maxDmg);
+        if (dmgW > 0) {
+            gfx.fillColor = DMG_COLOR;
+            gfx.rect(0, dmgTopY, dmgW, BAR_H);
+            gfx.fill();
+        }
+
+        // 承伤柱背景 + 填充（下半）
+        const tankTopY = -(BAR_GAP / 2 + BAR_H);
+        gfx.fillColor = BAR_BG;
+        gfx.rect(0, tankTopY, COL_BAR_W, BAR_H);
+        gfx.fill();
+        const tankW = COL_BAR_W * (stat.damageTaken / maxTank);
+        if (tankW > 0) {
+            gfx.fillColor = TANK_COLOR;
+            gfx.rect(0, tankTopY, tankW, BAR_H);
+            gfx.fill();
+        }
+
+        this.resultPanel.addChild(barsNode);
+        this._statsNodes.push(barsNode);
+
+        // 伤害数值标签
+        const dmgValNode = new Node('DmgVal');
+        const dvut = dmgValNode.addComponent(UITransform);
+        dvut.setContentSize(valW, BAR_H + 2);
+        dvut.setAnchorPoint(0, 0.5);
+        dmgValNode.setPosition(valX, y + BAR_GAP / 2 + BAR_H / 2, 0);
+        const dvlbl = dmgValNode.addComponent(Label);
+        dvlbl.string = `${stat.damageDealt} (${stat.dmgPct}%)`;
+        dvlbl.fontSize = 13;
+        dvlbl.color = DMG_COLOR;
+        dvlbl.horizontalAlign = Label.HorizontalAlign.LEFT;
+        this.resultPanel.addChild(dmgValNode);
+        this._statsNodes.push(dmgValNode);
+
+        // 承伤数值标签
+        const tankValNode = new Node('TankVal');
+        const tvut = tankValNode.addComponent(UITransform);
+        tvut.setContentSize(valW, BAR_H + 2);
+        tvut.setAnchorPoint(0, 0.5);
+        tankValNode.setPosition(valX, y - (BAR_GAP / 2 + BAR_H / 2), 0);
+        const tvlbl = tankValNode.addComponent(Label);
+        tvlbl.string = `${stat.damageTaken} (${stat.tankPct}%)`;
+        tvlbl.fontSize = 13;
+        tvlbl.color = TANK_COLOR;
+        tvlbl.horizontalAlign = Label.HorizontalAlign.LEFT;
+        this.resultPanel.addChild(tankValNode);
+        this._statsNodes.push(tankValNode);
     }
 }

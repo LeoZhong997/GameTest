@@ -36,11 +36,7 @@ let _sessionDeploy: { configId: string; count: number; gridRow: number; gridCol:
 // --- Colors ---
 const BG          = new Color(26, 26, 46, 255);
 const TOPBAR_BG   = new Color(15, 52, 96, 230);
-const BOX_BG      = new Color(26, 26, 46, 255);
 const BLUE        = new Color(74, 144, 217, 255);
-const BLUE_NAME   = new Color(160, 196, 255, 255);
-const RED_NAME    = new Color(255, 176, 176, 255);
-const RED         = new Color(217, 74, 74, 255);
 const GOLD        = new Color(255, 215, 0, 255);
 const CELL_BG     = new Color(15, 52, 96, 128);
 const CELL_BORDER = new Color(74, 144, 217, 128);
@@ -170,7 +166,6 @@ export class DeploymentUI extends Component {
         this.drawRect(container, SW, SH, BG, 0, 0);
 
         this.buildTopBar(container);
-        this.buildTitle(container);
         this.buildGrid(container);
         this.buildCardArea(container);
         this.buildButton(container);
@@ -186,32 +181,10 @@ export class DeploymentUI extends Component {
 
         this.drawRect(topBar, SW, TB_H, TOPBAR_BG, 0, 0);
 
-        // Blue icon
-        const leftX = -SW / 2 + 50;
-        this.drawCircle(topBar, 28, BLUE, leftX, 0);
-        this.addLabel(topBar, '蓝方', 14, BLUE_NAME, leftX + 40, 0, 40);
-
-        // Timer box
-        const timerBox = new Node('TimerBox');
-        const tbut = timerBox.addComponent(UITransform);
-        tbut.setContentSize(130, 36);
-        tbut.setAnchorPoint(0.5, 0.5);
-        timerBox.setPosition(0, 0, 0);
-        this.drawRoundRect(timerBox, 130, 36, BOX_BG, 0, 0, 8);
-        this.addLabel(timerBox, '⏱', 16, GOLD, -20, 0, 20);
-        this.addLabel(timerBox, '--', 20, GOLD, 20, 0, 70, true);
-        topBar.addChild(timerBox);
-
-        // Red icon
-        const rightX = SW / 2 - 50;
-        this.addLabel(topBar, '红方', 14, RED_NAME, rightX - 40, 0, 40);
-        this.drawCircle(topBar, 28, RED, rightX, 0);
+        // 布阵阶段只显示标题
+        this.addLabel(topBar, '选 兵 布 阵', 24, GOLD, 0, 0, 200, true);
 
         parent.addChild(topBar);
-    }
-
-    private buildTitle(parent: Node): void {
-        this.addLabel(parent, '选兵布阵', 24, GOLD, 0, SH / 2 - 70, 200, true);
     }
 
     private buildGrid(parent: Node): void {

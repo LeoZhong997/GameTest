@@ -91,12 +91,13 @@ export class SkillExecutor {
     private static applyHeal(caster: BattleUnit, targets: BattleUnit[], effect: SkillEffect): void {
         for (const target of targets) {
             const amount = effect.value + caster.atk * effect.ratio;
-            target.heal(amount);
+            const actual = target.heal(amount);
+            caster.healingDone += actual;
 
             EventBus.instance.emit('battle:heal', {
                 caster: caster.uid,
                 target: target.uid,
-                amount,
+                amount: actual,
             });
         }
     }

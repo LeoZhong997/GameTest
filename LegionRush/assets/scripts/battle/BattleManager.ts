@@ -91,6 +91,12 @@ export class BattleManager {
         this.reset();
         this._timeLimit = config.timeLimit || 30;
 
+        // 注册助攻回调：通过 UID 查找单位并增加助攻计数
+        BattleUnit._onAssistCallback = (attackerUid: string) => {
+            const unit = this._allUnits.find(u => u.uid === attackerUid);
+            if (unit) unit.assists++;
+        };
+
         // 生成左方单位（每兵种最多 5 个，使用玩家布阵的格子坐标）
         for (const group of config.leftUnits) {
             const effectiveCount = Math.min(5, group.count);
@@ -211,10 +217,27 @@ export class BattleManager {
 
             if (skill.currentCd <= 0 && unit.canAct) {
                 const cfg = this._skillConfigs.get(skill.configId);
-                if (cfg) {
-                    this.castSkill(unit, cfg);
-                    skill.currentCd = cfg.cooldown;
+                if (!cfg) continue;
+
+                // 检查使用次数限制（maxUses > 0 表示有限制）
+                if (cfg.maxUses > 0 && skill.uses >= cfg.maxUses) {
+                    if (skill.uses === cfg.maxUses) {
+                        console.log(`[技能] ${unit.tag} ${cfg.name} 已达上限(${cfg.maxUses}次)`);
+                        skill.uses++; // 标记已跳过，避免重复日志
+                    }
+                    continue;
                 }
+
+                // 检查能量是否足够
+                if (unit.energy < cfg.energyCost) continue;
+
+                // 扣除能量，增加使用次数
+                unit.energy -= cfg.energyCost;
+                skill.uses++;
+                console.log(`[技能] ${unit.tag} 释放 ${cfg.name} | 消耗能量:${cfg.energyCost} 剩余:${unit.energy}`);
+
+                this.castSkill(unit, cfg);
+                skill.currentCd = cfg.cooldown;
             }
         }
     }
@@ -238,12 +261,17 @@ export class BattleManager {
         const leftSurvivors = this._leftUnits.filter(u => u.isAlive).length;
         const rightSurvivors = this._rightUnits.filter(u => u.isAlive).length;
 
-        // 评选 MVP（我方伤害最高）
+        // 评选 MVP（我方综合评分最高）
         let mvp: BattleUnit | null = null;
-        let maxDmg = 0;
+        let maxScore = 0;
         for (const u of this._leftUnits) {
-            if (u.damageDealt > maxDmg) {
-                maxDmg = u.damageDealt;
+            const score = u.kills * 3
+                + u.assists * 1.5
+                + u.damageDealt / 100
+                + u.damageTaken / 150
+                + u.healingDone / 80;
+            if (score > maxScore) {
+                maxScore = score;
                 mvp = u;
             }
         }
@@ -261,7 +289,7 @@ export class BattleManager {
 
         console.log(`[BattleManager] 战斗结束: ${result}, 用时 ${this._battleTime.toFixed(1)}s, 存活 ${leftSurvivors} vs ${rightSurvivors}`);
         if (mvp) {
-            console.log(`[BattleManager] MVP: ${mvp.config.name} 伤害 ${mvp.damageDealt} 击杀 ${mvp.kills}`);
+            console.log(`[BattleManager] MVP: ${mvp.config.name} | 击杀:${mvp.kills} 助攻:${mvp.assists} 伤害:${mvp.damageDealt} 承伤:${mvp.damageTaken} 治疗:${mvp.healingDone}`);
         }
 
         EventBus.instance.emit('battle:end', report);
@@ -284,7 +312,7 @@ export class BattleManager {
         this._ais.clear();
         this._battleTime = 0;
         this._state = BattleState.NONE;
-        BattleUnit['resetUid'] && BattleUnit['resetUid'](); // 如果有
+        BattleUnit._onAssistCallback = null;
     }
 
     /** 清理资源 */

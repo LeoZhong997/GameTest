@@ -6,7 +6,7 @@
 
 import { _decorator, Component, Node, resources, JsonAsset, UITransform, Label, Color, Graphics } from 'cc';
 import { BattleManager, BattleConfig, BattleReport } from '../battle/BattleManager';
-import { BattleUnit, TeamSide } from '../battle/Unit';
+import { BattleUnit, TeamSide, GameConstants } from '../battle/Unit';
 import { UnitConfig, Quality } from '../models/UnitData';
 import { SkillConfig } from '../models/SkillData';
 import { EventBus } from '../core/EventBus';
@@ -56,6 +56,13 @@ export class BattleScene extends Component {
 
     private async loadConfigs(): Promise<void> {
         try {
+            // 加载全局常量
+            const constantsAsset = await this.loadJson('configs/constants');
+            if (constantsAsset) {
+                BattleUnit.initConstants(constantsAsset as GameConstants);
+            }
+
+            // 加载兵种
             const unitsAsset = await this.loadJson('configs/units');
             if (unitsAsset) {
                 for (const [id, cfg] of Object.entries(unitsAsset)) {
@@ -63,11 +70,13 @@ export class BattleScene extends Component {
                 }
             }
 
+            // 加载技能
             const skillsAsset = await this.loadJson('configs/skills');
             if (skillsAsset) {
                 const skills: SkillConfig[] = Object.values(skillsAsset);
                 skills.forEach(s => this._skillConfigs.set(s.id, s));
                 this._bm.registerSkills(skills);
+                BattleUnit.initSkillConfigs(this._skillConfigs);
             }
 
             console.log(`[BattleScene] 配置加载完成: ${this._unitConfigs.size} 兵种, ${this._skillConfigs.size} 技能`);
@@ -196,11 +205,15 @@ export class BattleScene extends Component {
         drawShape(bodyGraphics, style.shape, style.size);
         bodyGraphics.fill();
 
+        // 血条+能量条：同一区域，上半HP下半能量
+        const barY = style.size / 2 + 10;
+        const halfH = hpHeight / 2;
+
         const hpBorder = new Node('HpBorder');
         hpBorder.setParent(node);
         const hpBorderT = hpBorder.addComponent(UITransform);
         hpBorderT.contentSize.set(hpWidth + 4, hpHeight + 4);
-        hpBorder.setPosition(0, style.size / 2 + 10, 0);
+        hpBorder.setPosition(0, barY, 0);
         const hpBorderG = hpBorder.addComponent(Graphics);
         hpBorderG.fillColor = new Color(0, 0, 0, 255);
         hpBorderG.rect(-(hpWidth + 4) / 2, -(hpHeight + 4) / 2, hpWidth + 4, hpHeight + 4);
@@ -210,21 +223,33 @@ export class BattleScene extends Component {
         hpBg.setParent(node);
         const hpBgT = hpBg.addComponent(UITransform);
         hpBgT.contentSize.set(hpWidth, hpHeight);
-        hpBg.setPosition(0, style.size / 2 + 10, 0);
+        hpBg.setPosition(0, barY, 0);
         const hpBgG = hpBg.addComponent(Graphics);
         hpBgG.fillColor = new Color(40, 40, 40, 255);
         hpBgG.rect(-hpWidth / 2, -hpHeight / 2, hpWidth, hpHeight);
         hpBgG.fill();
 
+        // HP 填充（上半，高度 halfH）
         const hpFill = new Node('HpFill');
         hpFill.setParent(node);
         const hpFillT = hpFill.addComponent(UITransform);
-        hpFillT.contentSize.set(hpWidth, hpHeight);
-        hpFill.setPosition(0, style.size / 2 + 10, 0);
+        hpFillT.setContentSize(hpWidth, halfH);
+        hpFill.setPosition(0, barY + halfH / 2, 0);
         const hpFillG = hpFill.addComponent(Graphics);
         hpFillG.fillColor = new Color(0, 255, 80, 255);
-        hpFillG.rect(-hpWidth / 2, -hpHeight / 2, hpWidth, hpHeight);
+        hpFillG.rect(-hpWidth / 2, -halfH / 2, hpWidth, halfH);
         hpFillG.fill();
+
+        // 能量填充（下半，高度 halfH）
+        const epFill = new Node('EpFill');
+        epFill.setParent(node);
+        const epFillT = epFill.addComponent(UITransform);
+        epFillT.setContentSize(hpWidth, halfH);
+        epFill.setPosition(0, barY - halfH / 2, 0);
+        const epFillG = epFill.addComponent(Graphics);
+        epFillG.fillColor = new Color(60, 140, 255, 255);
+        epFillG.rect(-hpWidth / 2, -halfH / 2, hpWidth, halfH);
+        epFillG.fill();
 
         const nameNode = new Node('Name');
         nameNode.setParent(node);
@@ -239,6 +264,7 @@ export class BattleScene extends Component {
         view.shapeType = style.shape;
         view.hpBarNode = hpBg;
         view.hpBarFill = hpFillG;
+        view.energyBarFill = epFillG;
         view.nameLabel = nameLabel;
         view.init(unit);
 

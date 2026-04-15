@@ -59,6 +59,9 @@ export interface SkillConfig {
     castTime: number;        // 施法时间（秒）
     range: number;           // 施法距离
     unlockRating: string;
+    initialCd: number;       // 战斗开始时的初始 CD（秒）
+    energyCost: number;      // 能量消耗（0 = 免费）
+    maxUses: number;         // 最大使用次数（0 = 无限）
 }
 
 /** 运行时技能状态 */
@@ -66,6 +69,7 @@ export interface SkillState {
     configId: string;
     level: number;
     currentCd: number;       // 剩余冷却
-    energy: number;          // 必杀技能量
+    energy: number;          // 必杀技能量（已废弃，改用 Unit.energy）
     maxEnergy: number;
+    uses: number;            // 已使用次数
 }

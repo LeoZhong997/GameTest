@@ -30,159 +30,6 @@
         },
         {
           "type": "frame",
-          "id": "uzT29",
-          "x": 0,
-          "y": 0,
-          "name": "TopBar",
-          "opacity": 0.9,
-          "width": 960,
-          "height": 50,
-          "fill": "#0f3460",
-          "padding": [
-            0,
-            20
-          ],
-          "justifyContent": "space_between",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "frame",
-              "id": "NqTMQ",
-              "name": "LeftInfo",
-              "gap": 12,
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "ellipse",
-                  "id": "QZTQ6",
-                  "name": "leftIcon",
-                  "fill": "#4A90D9",
-                  "width": 28,
-                  "height": 28
-                },
-                {
-                  "type": "text",
-                  "id": "90mV0",
-                  "name": "LeftCount",
-                  "fill": "#FFFFFF",
-                  "content": "50/50",
-                  "fontFamily": "Inter",
-                  "fontSize": 18,
-                  "fontWeight": "bold"
-                },
-                {
-                  "type": "text",
-                  "id": "9nSS4",
-                  "name": "leftName",
-                  "fill": "#A0C4FF",
-                  "content": "蓝方",
-                  "fontFamily": "Inter",
-                  "fontSize": 14,
-                  "fontWeight": "normal"
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "o6IAD",
-              "name": "TimerBox",
-              "fill": "#1a1a2e",
-              "cornerRadius": 8,
-              "gap": 8,
-              "padding": [
-                4,
-                16
-              ],
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "text",
-                  "id": "v2XEe",
-                  "name": "timerIcon",
-                  "fill": "#FFD700",
-                  "content": "⏱",
-                  "fontFamily": "Inter",
-                  "fontSize": 16,
-                  "fontWeight": "normal"
-                },
-                {
-                  "type": "text",
-                  "id": "SPs69",
-                  "name": "TimerLabel",
-                  "fill": "#FFD700",
-                  "content": "30.0s",
-                  "fontFamily": "Inter",
-                  "fontSize": 20,
-                  "fontWeight": "bold"
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "9aAhb",
-              "name": "RightInfo",
-              "gap": 12,
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "text",
-                  "id": "mlNOk",
-                  "name": "rightName",
-                  "fill": "#FFB0B0",
-                  "content": "红方",
-                  "fontFamily": "Inter",
-                  "fontSize": 14,
-                  "fontWeight": "normal"
-                },
-                {
-                  "type": "ellipse",
-                  "id": "RNqix",
-                  "name": "rightIcon",
-                  "fill": "#D94A4A",
-                  "width": 28,
-                  "height": 28
-                },
-                {
-                  "type": "text",
-                  "id": "Q3uPP",
-                  "name": "RightCount",
-                  "fill": "#FFFFFF",
-                  "content": "50/50",
-                  "fontFamily": "Inter",
-                  "fontSize": 18,
-                  "fontWeight": "bold"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "7JCek",
-          "x": 880,
-          "y": 55,
-          "name": "SpeedBtn",
-          "width": 60,
-          "height": 30,
-          "fill": "#2a2a4a",
-          "cornerRadius": 6,
-          "justifyContent": "center",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "text",
-              "id": "BjXKK",
-              "name": "SpeedLabel",
-              "fill": "#FFFFFF",
-              "content": "1.0x",
-              "fontFamily": "Inter",
-              "fontSize": 14,
-              "fontWeight": "bold"
-            }
-          ]
-        },
-        {
-          "type": "frame",
           "id": "l9W0J",
           "x": 20,
           "y": 60,
@@ -220,92 +67,13 @@
         },
         {
           "type": "frame",
-          "id": "1t31l",
-          "x": 280,
-          "y": 140,
-          "name": "ResultPanel",
-          "opacity": 0.95,
-          "width": 400,
-          "height": 360,
-          "fill": "#1a1a2e",
-          "cornerRadius": 16,
-          "stroke": {
-            "align": "inside",
-            "thickness": 2,
-            "fill": "#FFD700"
-          },
-          "layout": "vertical",
-          "gap": 20,
-          "padding": 32,
-          "justifyContent": "center",
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "text",
-              "id": "84YHd",
-              "name": "ResultLabel",
-              "fill": "#FFD700",
-              "content": "VICTORY !",
-              "fontFamily": "Inter",
-              "fontSize": 42,
-              "fontWeight": "bold"
-            },
-            {
-              "type": "rectangle",
-              "id": "MdfdY",
-              "name": "resultDivider",
-              "opacity": 0.2,
-              "fill": "#FFFFFF",
-              "width": 300,
-              "height": 1
-            },
-            {
-              "type": "text",
-              "id": "Fxx8w",
-              "name": "ResultDetail",
-              "fill": "#CCCCCC",
-              "textGrowth": "fixed-width",
-              "width": 300,
-              "content": "用时 15.3s\n存活 32 vs 0\nMVP: 哥布林骑士\n伤害: 4520 击杀: 8",
-              "lineHeight": 1.6,
-              "fontFamily": "Inter",
-              "fontSize": 16,
-              "fontWeight": "normal"
-            },
-            {
-              "type": "frame",
-              "id": "VXykJ",
-              "name": "BtnRestart",
-              "width": 160,
-              "height": 48,
-              "fill": "#FFD700",
-              "cornerRadius": 24,
-              "justifyContent": "center",
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "text",
-                  "id": "KHkSc",
-                  "name": "btnLabel",
-                  "fill": "#1a1a2e",
-                  "content": "再来一局",
-                  "fontFamily": "Inter",
-                  "fontSize": 20,
-                  "fontWeight": "bold"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "frame",
           "id": "Yz6R8",
           "x": 20,
           "y": 420,
           "name": "UnitLegend",
           "opacity": 0.7,
           "width": 200,
-          "height": 200,
+          "height": 220,
           "fill": "#0a0a1a",
           "cornerRadius": 8,
           "layout": "vertical",
@@ -447,6 +215,34 @@
                   "id": "I3YTN",
                   "fill": "#AABBCC",
                   "content": "辅助 六边形",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "fCui7",
+              "name": "row6",
+              "gap": 8,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "polygon",
+                  "polygonCount": 4,
+                  "id": "P1SdZ",
+                  "name": "assassin",
+                  "fill": "#A0EEFF",
+                  "width": 20,
+                  "height": 20
+                },
+                {
+                  "type": "text",
+                  "id": "SjITb",
+                  "name": "atx",
+                  "fill": "#AABBCC",
+                  "content": "刺客 菱形",
                   "fontFamily": "Inter",
                   "fontSize": 10,
                   "fontWeight": "normal"
@@ -904,19 +700,748 @@
               ]
             }
           ]
+        },
+        {
+          "type": "frame",
+          "id": "lKFHM",
+          "x": 0,
+          "y": 0,
+          "name": "TopBar",
+          "opacity": 0.9,
+          "width": 960,
+          "height": 50,
+          "fill": "#0f3460",
+          "padding": [
+            0,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "6JvOd",
+              "name": "LeftInfo",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "33sqC",
+                  "name": "leftIcon",
+                  "fill": "#4A90D9",
+                  "width": 28,
+                  "height": 28
+                },
+                {
+                  "type": "text",
+                  "id": "8q2bt",
+                  "name": "LeftCount",
+                  "fill": "#FFFFFF",
+                  "content": "50/50",
+                  "fontFamily": "Inter",
+                  "fontSize": 18,
+                  "fontWeight": "bold"
+                },
+                {
+                  "type": "text",
+                  "id": "1qEaT",
+                  "name": "leftName",
+                  "fill": "#A0C4FF",
+                  "content": "蓝方",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "NoK5Q",
+              "name": "CenterGroup",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "hW742",
+                  "name": "PauseBtn",
+                  "width": 40,
+                  "height": 40,
+                  "fill": "#1a1a2e",
+                  "cornerRadius": 20,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "N0iWA",
+                      "name": "pt",
+                      "fill": "#FFFFFF",
+                      "content": "⏸",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "bold"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "k9vUQ",
+                  "name": "TimerBox",
+                  "width": 130,
+                  "height": 36,
+                  "fill": "#1a1a2e",
+                  "cornerRadius": 8,
+                  "gap": 8,
+                  "padding": [
+                    4,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "b1fdG",
+                      "name": "ti",
+                      "fill": "#FFD700",
+                      "content": "⏱",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "6HSHK",
+                      "name": "TimerLabel",
+                      "fill": "#FFD700",
+                      "content": "30.0s",
+                      "fontFamily": "Inter",
+                      "fontSize": 20,
+                      "fontWeight": "bold"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "6yt6C",
+                  "name": "SpeedBtn",
+                  "width": 64,
+                  "height": 34,
+                  "fill": "#1a1a2e",
+                  "cornerRadius": 8,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "SLpeR",
+                      "name": "st",
+                      "fill": "#FFFFFF",
+                      "content": "1x",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "bold"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ZCOpv",
+              "name": "RightInfo",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "WTIsT",
+                  "name": "rightName",
+                  "fill": "#FFB0B0",
+                  "content": "红方",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "ellipse",
+                  "id": "9RKSt",
+                  "name": "rightIcon",
+                  "fill": "#D94A4A",
+                  "width": 28,
+                  "height": 28
+                },
+                {
+                  "type": "text",
+                  "id": "ypcsp",
+                  "name": "RightCount",
+                  "fill": "#FFFFFF",
+                  "content": "50/50",
+                  "fontFamily": "Inter",
+                  "fontSize": 18,
+                  "fontWeight": "bold"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "YetSh",
+          "x": 390,
+          "y": 294,
+          "name": "BtnStart",
+          "width": 180,
+          "height": 52,
+          "fill": "#FFD700",
+          "cornerRadius": 24,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "8v96S",
+              "name": "stxt",
+              "fill": "#1a1a2e",
+              "content": "开  战",
+              "fontFamily": "Inter",
+              "fontSize": 22,
+              "fontWeight": "bold"
+            }
+          ]
         }
       ]
     },
     {
       "type": "frame",
-      "id": "Pc74R",
+      "id": "ORjtW",
       "x": 894,
       "y": 16,
-      "name": "Deployment - 布阵界面",
+      "name": "Result Screen - 结算界面",
       "width": 960,
       "height": 640,
       "fill": "#1a1a2e",
-      "layout": "none"
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "Hpdm5",
+          "x": 0,
+          "y": 0,
+          "name": "Overlay",
+          "opacity": 0.6,
+          "width": 960,
+          "height": 640,
+          "fill": "#000000"
+        },
+        {
+          "type": "frame",
+          "id": "gxHbu",
+          "x": 170,
+          "y": 50,
+          "name": "ResultPanel",
+          "opacity": 0.95,
+          "width": 620,
+          "height": 540,
+          "fill": "#1a1a2e",
+          "cornerRadius": 16,
+          "stroke": {
+            "align": "inside",
+            "thickness": 2,
+            "fill": "#FFD700"
+          },
+          "layout": "vertical",
+          "gap": 14,
+          "padding": 24,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "7iXFv",
+              "name": "ResultLabel",
+              "fill": "#FFD700",
+              "content": "胜 利 !",
+              "fontFamily": "Inter",
+              "fontSize": 42,
+              "fontWeight": "bold"
+            },
+            {
+              "type": "rectangle",
+              "id": "sdCg2",
+              "name": "resultDivider",
+              "opacity": 0.2,
+              "fill": "#FFFFFF",
+              "width": 480,
+              "height": 2
+            },
+            {
+              "type": "text",
+              "id": "0UCsM",
+              "name": "ResultDetail",
+              "fill": "#CCCCCC",
+              "textGrowth": "fixed-width",
+              "width": 480,
+              "content": "用时 15.3s  存活 32 vs 0\nMVP兵种: 哥布林骑士  伤害:4520(28%)  承伤:1230(15%)\n(下方统计为各兵种合计)",
+              "lineHeight": 1.5,
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "rectangle",
+              "id": "5QSJR",
+              "name": "StatsDivider",
+              "opacity": 0.2,
+              "fill": "#FFFFFF",
+              "width": 480,
+              "height": 2
+            },
+            {
+              "type": "frame",
+              "id": "XJsDm",
+              "name": "StatsSection",
+              "width": 580,
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "G0nxQ",
+                  "name": "BlueStats",
+                  "width": 280,
+                  "layout": "vertical",
+                  "gap": 6,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "7k5PA",
+                      "name": "bh",
+                      "fill": "#78B4FF",
+                      "textGrowth": "fixed-width",
+                      "width": 280,
+                      "content": "蓝方统计",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "bold"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "0HSMi",
+                      "name": "BarRow1",
+                      "width": 280,
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "EXKX5",
+                          "name": "bn1",
+                          "fill": "#CCCCCC",
+                          "textGrowth": "fixed-width",
+                          "width": 40,
+                          "content": "坦克",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "T4NXO",
+                          "name": "Bars1",
+                          "width": 120,
+                          "layout": "vertical",
+                          "gap": 2,
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 2,
+                              "id": "ZbIqH",
+                              "name": "DmgBar",
+                              "fill": "#FFA032",
+                              "width": 96,
+                              "height": 13
+                            },
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 2,
+                              "id": "9h6cq",
+                              "name": "TankBar",
+                              "fill": "#50B4DC",
+                              "width": 72,
+                              "height": 13
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "HPFpq",
+                          "name": "bv1",
+                          "fill": "#CCCCCC",
+                          "content": "4520(28%)\n1230(15%)",
+                          "lineHeight": 1.3,
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "UYlnf",
+                      "name": "BarRow2",
+                      "width": 280,
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "6US9a",
+                          "name": "bn2",
+                          "fill": "#CCCCCC",
+                          "textGrowth": "fixed-width",
+                          "width": 40,
+                          "content": "骑兵",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "HI5VV",
+                          "name": "Bars2",
+                          "width": 120,
+                          "layout": "vertical",
+                          "gap": 2,
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 2,
+                              "id": "wlxwF",
+                              "name": "DmgBar",
+                              "fill": "#FFA032",
+                              "width": 66,
+                              "height": 13
+                            },
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 2,
+                              "id": "eEccA",
+                              "name": "TankBar",
+                              "fill": "#50B4DC",
+                              "width": 44,
+                              "height": 13
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "tfNiK",
+                          "name": "bv2",
+                          "fill": "#CCCCCC",
+                          "content": "3200(20%)\n800(10%)",
+                          "lineHeight": 1.3,
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "SsbcE",
+                      "name": "BarRow3",
+                      "width": 280,
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "0nSvA",
+                          "name": "bn3",
+                          "fill": "#CCCCCC",
+                          "textGrowth": "fixed-width",
+                          "width": 40,
+                          "content": "远程",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "lzASe",
+                          "name": "Bars3",
+                          "width": 120,
+                          "layout": "vertical",
+                          "gap": 2,
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 2,
+                              "id": "dbji1",
+                              "name": "DmgBar",
+                              "fill": "#FFA032",
+                              "width": 48,
+                              "height": 13
+                            },
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 2,
+                              "id": "hFRLW",
+                              "name": "TankBar",
+                              "fill": "#50B4DC",
+                              "width": 33,
+                              "height": 13
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "ZAapV",
+                          "name": "bv3",
+                          "fill": "#CCCCCC",
+                          "content": "2100(13%)\n600(8%)",
+                          "lineHeight": 1.3,
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "mexRL",
+                  "name": "RedStats",
+                  "width": 280,
+                  "layout": "vertical",
+                  "gap": 6,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "RQ2Mc",
+                      "name": "rh",
+                      "fill": "#FF8C8C",
+                      "textGrowth": "fixed-width",
+                      "width": 280,
+                      "content": "红方统计",
+                      "fontFamily": "Inter",
+                      "fontSize": 18,
+                      "fontWeight": "bold"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "WvK5R",
+                      "name": "BarRow1",
+                      "width": 280,
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "RSe2y",
+                          "name": "rn1",
+                          "fill": "#CCCCCC",
+                          "textGrowth": "fixed-width",
+                          "width": 40,
+                          "content": "法师",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "riYf4",
+                          "name": "Bars1",
+                          "width": 120,
+                          "layout": "vertical",
+                          "gap": 2,
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 2,
+                              "id": "oWt7I",
+                              "name": "DmgBar",
+                              "fill": "#FFA032",
+                              "width": 84,
+                              "height": 13
+                            },
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 2,
+                              "id": "dv0V8",
+                              "name": "TankBar",
+                              "fill": "#50B4DC",
+                              "width": 55,
+                              "height": 13
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "5A3DD",
+                          "name": "rv1",
+                          "fill": "#CCCCCC",
+                          "content": "3800(24%)\n960(12%)",
+                          "lineHeight": 1.3,
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ssVe7",
+                      "name": "BarRow2",
+                      "width": 280,
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "7X0TT",
+                          "name": "rn2",
+                          "fill": "#CCCCCC",
+                          "textGrowth": "fixed-width",
+                          "width": 40,
+                          "content": "坦克",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "UhMWc",
+                          "name": "Bars2",
+                          "width": 120,
+                          "layout": "vertical",
+                          "gap": 2,
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 2,
+                              "id": "GGPa7",
+                              "name": "DmgBar",
+                              "fill": "#FFA032",
+                              "width": 72,
+                              "height": 13
+                            },
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 2,
+                              "id": "U2f0j",
+                              "name": "TankBar",
+                              "fill": "#50B4DC",
+                              "width": 40,
+                              "height": 13
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "VvtCF",
+                          "name": "rv2",
+                          "fill": "#CCCCCC",
+                          "content": "3200(20%)\n720(9%)",
+                          "lineHeight": 1.3,
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "izLxB",
+                      "name": "BarRow3",
+                      "width": 280,
+                      "gap": 6,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "kwtt4",
+                          "name": "rn3",
+                          "fill": "#CCCCCC",
+                          "textGrowth": "fixed-width",
+                          "width": 40,
+                          "content": "骑兵",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "wer9W",
+                          "name": "Bars3",
+                          "width": 120,
+                          "layout": "vertical",
+                          "gap": 2,
+                          "children": [
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 2,
+                              "id": "2syFM",
+                              "name": "DmgBar",
+                              "fill": "#FFA032",
+                              "width": 55,
+                              "height": 13
+                            },
+                            {
+                              "type": "rectangle",
+                              "cornerRadius": 2,
+                              "id": "ONOrv",
+                              "name": "TankBar",
+                              "fill": "#50B4DC",
+                              "width": 33,
+                              "height": 13
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "re400",
+                          "name": "rv3",
+                          "fill": "#CCCCCC",
+                          "content": "2800(18%)\n640(8%)",
+                          "lineHeight": 1.3,
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "sup7C",
+              "name": "BtnRestart",
+              "width": 180,
+              "height": 52,
+              "fill": "#FFD700",
+              "cornerRadius": 24,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "GIbwx",
+                  "name": "btxt",
+                  "fill": "#1a1a2e",
+                  "content": "再来一局",
+                  "fontFamily": "Inter",
+                  "fontSize": 20,
+                  "fontWeight": "bold"
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }

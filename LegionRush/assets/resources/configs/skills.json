@@ -7,7 +7,8 @@
         "effects": [
             { "type": "damage", "targetType": "enemy_nearest", "value": 50, "ratio": 1.5, "range": 100, "duration": 0 }
         ],
-        "cooldown": 8, "castTime": 0.3, "range": 3.0, "unlockRating": "B"
+        "cooldown": 8, "castTime": 0.3, "range": 3.0, "unlockRating": "B",
+        "initialCd": 2.0, "energyCost": 0, "maxUses": 1
     },
     "war_cry": {
         "id": "war_cry",
@@ -17,7 +18,8 @@
         "effects": [
             { "type": "buff", "targetType": "ally_nearest", "value": 20, "ratio": 0, "range": 150, "duration": 5 }
         ],
-        "cooldown": 12, "castTime": 0.5, "range": 3.0, "unlockRating": "B"
+        "cooldown": 12, "castTime": 0.5, "range": 3.0, "unlockRating": "B",
+        "initialCd": 8.0, "energyCost": 5, "maxUses": 0
     },
     "cannon_blast": {
         "id": "cannon_blast",
@@ -27,7 +29,8 @@
         "effects": [
             { "type": "aoe", "targetType": "enemy_range", "value": 80, "ratio": 1.2, "range": 120, "duration": 0 }
         ],
-        "cooldown": 6, "castTime": 0.4, "range": 5.0, "unlockRating": "B"
+        "cooldown": 6, "castTime": 0.4, "range": 5.0, "unlockRating": "B",
+        "initialCd": 4.0, "energyCost": 8, "maxUses": 0
     },
     "scatter_shot": {
         "id": "scatter_shot",
@@ -37,7 +40,8 @@
         "effects": [
             { "type": "aoe", "targetType": "enemy_range", "value": 40, "ratio": 0.8, "range": 100, "duration": 0 }
         ],
-        "cooldown": 4, "castTime": 0.2, "range": 4.0, "unlockRating": "B"
+        "cooldown": 4, "castTime": 0.2, "range": 4.0, "unlockRating": "B",
+        "initialCd": 3.0, "energyCost": 3, "maxUses": 0
     },
     "clone": {
         "id": "clone",
@@ -47,7 +51,8 @@
         "effects": [
             { "type": "summon", "targetType": "self", "value": 0, "ratio": 0, "range": 0, "duration": 0, "summonId": "goblin_warrior", "summonCount": 2 }
         ],
-        "cooldown": 15, "castTime": 0.5, "range": 0, "unlockRating": "B"
+        "cooldown": 15, "castTime": 0.5, "range": 0, "unlockRating": "B",
+        "initialCd": 10.0, "energyCost": 10, "maxUses": 0
     },
     "furious_strike": {
         "id": "furious_strike",
@@ -57,7 +62,8 @@
         "effects": [
             { "type": "damage", "targetType": "enemy_nearest", "value": 30, "ratio": 2.0, "range": 0, "duration": 0 }
         ],
-        "cooldown": 5, "castTime": 0.3, "range": 1.5, "unlockRating": "B"
+        "cooldown": 5, "castTime": 0.3, "range": 1.5, "unlockRating": "B",
+        "initialCd": 3.0, "energyCost": 3, "maxUses": 0
     },
     "hex": {
         "id": "hex",
@@ -68,7 +74,8 @@
             { "type": "debuff", "targetType": "enemy_nearest", "value": -30, "ratio": 0, "range": 0, "duration": 4 },
             { "type": "control", "targetType": "enemy_nearest", "value": 30, "ratio": 0, "range": 0, "duration": 3, "controlType": "slow" }
         ],
-        "cooldown": 10, "castTime": 0.3, "range": 4.0, "unlockRating": "B"
+        "cooldown": 10, "castTime": 0.3, "range": 4.0, "unlockRating": "B",
+        "initialCd": 6.0, "energyCost": 5, "maxUses": 0
     },
     "mystery_box": {
         "id": "mystery_box",
@@ -78,7 +85,8 @@
         "effects": [
             { "type": "summon", "targetType": "self", "value": 0, "ratio": 0, "range": 0, "duration": 8, "summonId": "mystery_box", "summonCount": 1 }
         ],
-        "cooldown": 15, "castTime": 0.5, "range": 0, "unlockRating": "B"
+        "cooldown": 15, "castTime": 0.5, "range": 0, "unlockRating": "B",
+        "initialCd": 8.0, "energyCost": 8, "maxUses": 0
     },
     "shadow_control": {
         "id": "shadow_control",
@@ -88,7 +96,8 @@
         "effects": [
             { "type": "control", "targetType": "enemy_all", "value": 0, "ratio": 0, "range": 0, "duration": 2, "controlType": "stun" }
         ],
-        "cooldown": 20, "castTime": 0.5, "range": 99, "unlockRating": "B"
+        "cooldown": 20, "castTime": 0.5, "range": 99, "unlockRating": "B",
+        "initialCd": 12.0, "energyCost": 10, "maxUses": 2
     },
     "soul_reap": {
         "id": "soul_reap",
@@ -98,7 +107,8 @@
         "effects": [
             { "type": "aoe", "targetType": "enemy_range", "value": 40, "ratio": 0.5, "range": 200, "duration": 0 }
         ],
-        "cooldown": 12, "castTime": 0.5, "range": 6.0, "unlockRating": "B"
+        "cooldown": 12, "castTime": 0.5, "range": 6.0, "unlockRating": "B",
+        "initialCd": 8.0, "energyCost": 5, "maxUses": 0
     },
     "demon_slash": {
         "id": "demon_slash",
@@ -108,7 +118,8 @@
         "effects": [
             { "type": "damage", "targetType": "enemy_nearest", "value": 60, "ratio": 1.8, "range": 0, "duration": 0 }
         ],
-        "cooldown": 4, "castTime": 0.3, "range": 2.0, "unlockRating": "B"
+        "cooldown": 4, "castTime": 0.3, "range": 2.0, "unlockRating": "B",
+        "initialCd": 4.0, "energyCost": 3, "maxUses": 0
     },
     "iron_body": {
         "id": "iron_body",
@@ -118,6 +129,7 @@
         "effects": [
             { "type": "buff", "targetType": "self", "value": 50, "ratio": 0, "range": 0, "duration": 6 }
         ],
-        "cooldown": 15, "castTime": 0.2, "range": 0, "unlockRating": "B"
+        "cooldown": 15, "castTime": 0.2, "range": 0, "unlockRating": "B",
+        "initialCd": 10.0, "energyCost": 0, "maxUses": 1
     }
 }

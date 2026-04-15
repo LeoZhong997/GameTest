@@ -375,38 +375,41 @@ LegionRush/                   # Cocos Creator 3.8.8 项目根目录
 ### 第一阶段：基础框架 + 战斗核心（预计2-3周）
 **目标**：跑通100v100自动战斗
 
-1. **项目初始化**
+1. **项目初始化**（已完成）
    - ~~创建 Cocos Creator 3.x 项目~~（已完成：Cocos Creator 3.8.8，2D模板，项目名 LegionRush）
-   - 搭建目录结构和核心框架（EventBus、对象池、配置管理）
+   - ~~搭建目录结构和核心框架~~（已完成：EventBus、对象池、ConfigManager、TimerManager、SaveSystem、ResourceLoader）
    - 集成 TypeScript 严格模式
 
-2. **战斗系统核心**
-   - `BattleManager`：管理战斗流程（初始化 → 开战 → 每帧更新 → 结算）
-   - `Unit` 类：基础属性（HP/ATK/DEF/SPD/Range）、状态机
-   - `UnitAI`：自动寻敌 → 移动 → 攻击逻辑
-   - `Skill` 系统：技能注册、CD管理、效果执行（伤害/治疗/Buff）
-   - `BuffSystem`：增益/减益效果管理（攻速降低、攻击降低等）
-   - `Formation`：阵型坐标映射，支持多种预设阵型
+2. **战斗系统核心**（已完成）
+   - ~~`BattleManager`~~：管理战斗流程（初始化 → 布阵 → 开战 → 每帧更新 → 结算）
+   - ~~`Unit` 类~~：基础属性（HP/ATK/DEF/SPD/Range/AtkSpd/CritRate/CritDmg）、状态机、品质倍率
+   - ~~`UnitAI`~~：自动寻敌 → 移动 → 攻击逻辑
+   - ~~`Skill` 系统~~：技能注册、CD管理、效果执行（伤害/治疗/Buff/Debuff/控制/召唤）
+   - ~~`BuffSystem`~~：增益/减益效果管理（攻速降低、攻击降低、眩晕/恐惧/冰冻/减速等控制效果）
+   - ~~`Formation`~~：3x3 九宫格阵型坐标映射，支持玩家自由布阵
 
-3. **兵种数据配置**
-   - 设计 `units.json` 配置格式（包含4种族 + 中立所有兵种的基础属性）
-   - 先实现6个核心兵种：哥布林骑士、炮手、勇士、预言家、影魔、剑魔
-   - 技能配置 `skills.json`（AOE/控制/分身/治疗等类型）
+3. **兵种数据配置**（已完成）
+   - ~~设计 `units.json` 配置格式~~（已完成：`resources/configs/units.json`，JSON 数据驱动）
+   - ~~先实现6个核心兵种~~（已完成：骑兵、远程、刺客、辅助、法师、坦克，6 种通用兵种）
+   - ~~技能配置 `skills.json`~~（已完成：`resources/configs/skills.json`，含冲锋/战吼/炮击/散弹/分身/狂暴打击/妖术/神秘盒子/暗影控制/灵魂收割/魔刃斩/铁壁共 12 个技能）
+   - **后续扩展**：将通用兵种细化为设计文档 2.2 节的四种族 + 中立具名兵种（哥布林骑士、炮手等）
 
-4. **战斗场景**
-   - 战场渲染：地面 + 单位Sprite + 血条 + 伤害数字
-   - 单位动画：待机、移动、攻击、死亡（先用简单Sprite占位）
-   - 战斗UI：双方兵力对比、时间倒计时、战斗速度控制
+4. **战斗场景**（已完成）
+   - ~~战场渲染~~：单位图形占位（几何形状按角色区分）+ 血条 + 名称标签
+   - ~~战斗特效~~：伤害飘字、受击闪烁、死亡动画、技能脉冲
+   - ~~战斗UI~~：TopBar（蓝/红方兵力 + 计时器 + 暂停/倍速按钮）、结算面板（胜/败/平 + MVP）、暂停蒙版
+   - ~~布阵界面~~：九宫格全开放、6 种兵种卡片选择、数量调节、确认布阵、localStorage 持久化
+   - 单位动画：待机、移动、攻击、死亡（当前用几何图形占位，待美术替换）
 
-**验证**：进入战斗场景 → 双方100个单位自动对战 → 30秒内出结果
+**验证**：进入战斗场景 → 布阵确认 → 双方自动对战 → 30秒内出结果 → 结算面板显示 ✅
 
 ### 第二阶段：阵型 + 兵种养成（预计2-3周）
 **目标**：完整兵种系统和阵型部署
 
-5. **阵型系统**
-   - 阵型编辑UI：拖拽排布兵种位置
-   - 预设阵型模板（默认解锁2-3个，后续通过圣器解锁）
-   - 阵型保存/读取
+5. **阵型系统**（已完成基础版）
+   - ~~阵型编辑UI~~：九宫格点击放置兵种，数量 +/- 调节（1~5）
+   - ~~预设阵型模板~~：默认十字阵（6 格开放），localStorage + 内存缓存双保存
+   - 阵型模板扩展（需圣器解锁更多阵型 — 待实现）
 
 6. **兵种养成**
    - 兵种等级系统（经验 → 升级 → 属性成长）
@@ -695,19 +698,52 @@ LegionRush/                   # Cocos Creator 3.8.8 项目根目录
 ### units.json（兵种配置）
 ```json
 {
-  "goblin_knight": {
-    "name": "哥布林骑士",
-    "race": "goblin",
-    "rarity": "legendary",
-    "role": "cavalry",
-    "baseStats": { "hp": 1200, "atk": 180, "def": 80, "spd": 3.5, "range": 1.2 },
-    "growths": { "hp": 120, "atk": 18, "def": 8, "spd": 0.1 },
-    "skills": ["charge", "war_cry"],
-    "unlockRating": "A+",
-    "passiveAPlus": "attack_aura"
+  "cavalry": {
+    "id": "cavalry", "name": "骑兵", "role": "cavalry",
+    "description": "高机动近战，突袭后排",
+    "baseStats": { "hp": 1200, "atk": 180, "def": 80, "spd": 3.5, "range": 1.2, "atkSpd": 0.8, "critRate": 0.1, "critDmg": 1.5 },
+    "growths": { "hp": 120, "atk": 18, "def": 8, "spd": 0.05 },
+    "skills": ["charge", "war_cry"]
+  },
+  "ranged": {
+    "id": "ranged", "name": "远程", "role": "ranged",
+    "description": "范围伤害，核心输出",
+    "baseStats": { "hp": 600, "atk": 220, "def": 30, "spd": 1.5, "range": 5.0, "atkSpd": 0.6, "critRate": 0.15, "critDmg": 2.0 },
+    "growths": { "hp": 60, "atk": 22, "def": 3, "spd": 0.02 },
+    "skills": ["cannon_blast", "scatter_shot"]
+  },
+  "assassin": {
+    "id": "assassin", "name": "刺客", "role": "assassin",
+    "description": "高爆发近战，突袭关键目标",
+    "baseStats": { "hp": 600, "atk": 250, "def": 30, "spd": 4.0, "range": 1.2, "atkSpd": 1.2, "critRate": 0.25, "critDmg": 2.5 },
+    "growths": { "hp": 60, "atk": 25, "def": 3, "spd": 0.05 },
+    "skills": ["clone", "furious_strike"]
+  },
+  "support": {
+    "id": "support", "name": "辅助", "role": "support",
+    "description": "削弱敌军，提供控场",
+    "baseStats": { "hp": 700, "atk": 80, "def": 40, "spd": 1.8, "range": 4.0, "atkSpd": 0.5, "critRate": 0.05, "critDmg": 1.5 },
+    "growths": { "hp": 70, "atk": 8, "def": 4, "spd": 0.02 },
+    "skills": ["hex", "mystery_box"]
+  },
+  "mage": {
+    "id": "mage", "name": "法师", "role": "mage",
+    "description": "远程法术输出，搭配人海更强",
+    "baseStats": { "hp": 1000, "atk": 200, "def": 60, "spd": 1.5, "range": 6.0, "atkSpd": 0.4, "critRate": 0.1, "critDmg": 1.8 },
+    "growths": { "hp": 100, "atk": 20, "def": 6, "spd": 0.02 },
+    "skills": ["soul_reap"]
+  },
+  "tank": {
+    "id": "tank", "name": "坦克", "role": "tank",
+    "description": "前排肉盾，硬度与输出兼备",
+    "baseStats": { "hp": 1800, "atk": 150, "def": 150, "spd": 2.0, "range": 1.5, "atkSpd": 0.7, "critRate": 0.08, "critDmg": 1.5 },
+    "growths": { "hp": 180, "atk": 15, "def": 15, "spd": 0.03 },
+    "skills": ["demon_slash", "iron_body"]
   }
 }
 ```
+
+> **说明**：当前使用 6 种通用兵种（按角色分类），后续扩展为四种族 + 中立的具名兵种时，将新增 `race`/`rarity`/`unlockRating` 等字段。
 
 ### stages.json（关卡配置）
 ```json

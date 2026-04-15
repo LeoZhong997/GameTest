@@ -72,11 +72,14 @@ export class UnitView extends Component {
     public shapeType: UnitShape = 'rect';
     public hpBarNode: Node = null!;
     public hpBarFill: Graphics | null = null;
+    public energyBarFill: Graphics | null = null;
     public nameLabel: Label = null!;
 
     private _unit: BattleUnit | null = null;
     private _hpBarWidth: number = 40;
-    private _hpBarHeight: number = 10;
+    private _hpBarHeight: number = 5;       // 上半 HP
+    private _epBarWidth: number = 40;
+    private _epBarHeight: number = 5;       // 下半能量
     private _bodySize: number = 32;
     private _lastColor: Color = new Color(0, 0, 0, 0);
     private _dying: boolean = false;
@@ -110,6 +113,15 @@ export class UnitView extends Component {
             }
         }
 
+        // 记录能量条尺寸
+        if (this.energyBarFill && this.energyBarFill.node) {
+            const t = this.energyBarFill.node.getComponent(UITransform);
+            if (t) {
+                this._epBarWidth = t.contentSize.width;
+                this._epBarHeight = t.contentSize.height;
+            }
+        }
+
         this.refresh(unit);
     }
 
@@ -129,6 +141,17 @@ export class UnitView extends Component {
             this.hpBarFill.fillColor = pct > 0.6 ? HP_COLORS.HIGH : pct > 0.3 ? HP_COLORS.MID : HP_COLORS.LOW;
             this.hpBarFill.rect(-this._hpBarWidth / 2, -h / 2, w, h);
             this.hpBarFill.fill();
+        }
+
+        // 能量条（蓝色）
+        if (this.energyBarFill) {
+            const pct = unit.energyPercent;
+            const w = this._epBarWidth * pct;
+            const h = this._epBarHeight;
+            this.energyBarFill.clear();
+            this.energyBarFill.fillColor = new Color(60, 140, 255, 255);
+            this.energyBarFill.rect(-this._epBarWidth / 2, -h / 2, w, h);
+            this.energyBarFill.fill();
         }
 
         // 死亡动画
