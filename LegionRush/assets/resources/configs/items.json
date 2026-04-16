@@ -1,0 +1,23 @@
+{
+    "soul_shard_green": {
+        "id": "soul_shard_green",
+        "name": "翠绿灵魂碎片",
+        "type": "material",
+        "description": "基础升品材料，用于绿色→蓝色品质提升",
+        "rarity": "common"
+    },
+    "soul_shard_blue": {
+        "id": "soul_shard_blue",
+        "name": "蔚蓝灵魂碎片",
+        "type": "material",
+        "description": "稀有升品材料，用于蓝色→紫色品质提升",
+        "rarity": "rare"
+    },
+    "ascension_scroll": {
+        "id": "ascension_scroll",
+        "name": "升品卷轴",
+        "type": "material",
+        "description": "品质提升的必备材料",
+        "rarity": "rare"
+    }
+}

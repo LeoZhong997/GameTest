@@ -8,6 +8,8 @@ import { _decorator, Component, Node, Label, Button, Color, Graphics, UITransfor
 import { BattleManager, BattleState, BattleResult, BattleReport } from '../battle/BattleManager';
 import { BattleUnit, TeamSide } from '../battle/Unit';
 import { EventBus } from '../core/EventBus';
+import { PlayerManager } from '../systems/PlayerManager';
+import { StageManager } from '../systems/StageManager';
 
 const { ccclass } = _decorator;
 
@@ -76,6 +78,9 @@ export class BattleUI extends Component {
     private _speedOptions: number[] = [1, 2, 3, 4];
     private _speedIndex: number = 0;
     private _statsNodes: Node[] = [];
+    private _lastResult: BattleResult = BattleResult.WIN;
+    private _btnTextLabel: Label | null = null;
+    private _stageLabel: Label | null = null;
 
     onLoad() {
         // 自动绑定子节点
@@ -234,6 +239,7 @@ export class BattleUI extends Component {
             txt.horizontalAlign = Label.HorizontalAlign.CENTER;
             txt.verticalAlign = Label.VerticalAlign.CENTER;
             btnNode.addChild(btnTextNode);
+            this._btnTextLabel = txt;
 
             this.btnRestart.transition = Button.Transition.SCALE;
             this.btnRestart.zoomScale = 0.9;
@@ -314,6 +320,20 @@ export class BattleUI extends Component {
         lnLbl.color = BLUE_NAME;
         lnLbl.horizontalAlign = Label.HorizontalAlign.CENTER;
         topBar.addChild(leftName);
+
+        // "蓝方" 右侧: 关卡名称
+        const stageLbl = new Node('StageLabel');
+        const slut = stageLbl.addComponent(UITransform);
+        slut.setContentSize(160, 20);
+        slut.setAnchorPoint(0, 0.5);
+        stageLbl.setPosition(leftBaseX + 115, 0, 0);
+        const sl = stageLbl.addComponent(Label);
+        sl.fontSize = 14;
+        sl.color = new Color(255, 230, 150, 255);
+        sl.horizontalAlign = Label.HorizontalAlign.LEFT;
+        this._stageLabel = sl;
+        this.updateStageLabel();
+        topBar.addChild(stageLbl);
 
         // === 中间: TimerBox (深色背景 + ⏱ + 时间) ===
         const timerBox = new Node('TimerBox');
@@ -523,6 +543,22 @@ export class BattleUI extends Component {
         }
     }
 
+    /** 更新关卡名称 */
+    private updateStageLabel(): void {
+        if (!this._stageLabel) return;
+        if (!PlayerManager.instance.isLoaded) {
+            this._stageLabel.string = '1-1 边境哨站';
+            return;
+        }
+        const pm = PlayerManager.instance;
+        const stage = StageManager.instance.getCurrentStage(pm.data.currentChapter, pm.data.currentStage);
+        if (stage) {
+            this._stageLabel.string = `${stage.id} ${stage.name}`;
+        } else {
+            this._stageLabel.string = `${pm.data.currentChapter}-${pm.data.currentStage}`;
+        }
+    }
+
     private drawPanelBg(border: Color): void {
         if (!this.panelGfx) return;
         const g = this.panelGfx;
@@ -578,6 +614,7 @@ export class BattleUI extends Component {
     /** 布阵确认后，显示开战按钮 */
     private onDeployConfirmed(): void {
         if (this.btnStartNode) this.btnStartNode.active = true;
+        this.updateStageLabel();
     }
 
     private onBattleEnd(report: BattleReport): void {
@@ -613,6 +650,12 @@ export class BattleUI extends Component {
                           report.result === BattleResult.LOSE ? LOSE_RED : GOLD;
             this.resultLabel.color = theme;
             this.drawPanelBg(theme);
+
+            // 按钮文字：胜利→"下一关"，失败/平局→"再来一局"
+            this._lastResult = report.result;
+            if (this._btnTextLabel) {
+                this._btnTextLabel.string = report.result === BattleResult.WIN ? '下 一 关' : '再来一局';
+            }
         }
 
         // 详情文本（MVP 为个人表现，下方统计为兵种合计）
@@ -691,7 +734,15 @@ export class BattleUI extends Component {
         this._bm.setBattleSpeed(1);
         if (this.btnSpeedLabel) this.btnSpeedLabel.string = '1x';
         if (this.btnPauseLabel) this.btnPauseLabel.string = '⏸';
-        EventBus.instance.emit('battle:restart');
+
+        if (this._lastResult === BattleResult.WIN) {
+            // 胜利 → 进入下一关（回到布阵界面，关卡已由 PlayerManager 推进）
+            this.updateStageLabel();
+            EventBus.instance.emit('battle:restart');
+        } else {
+            // 失败/平局 → 重新挑战当前关卡
+            EventBus.instance.emit('battle:restart');
+        }
     }
 
     /** 构建开战按钮（居中，金色圆角） */

@@ -6,8 +6,9 @@
  */
 
 import { _decorator, Component, Node, Label, Graphics, UITransform, Color, Button, EventTouch, sys } from 'cc';
-import { UnitConfig } from '../models/UnitData';
+import { UnitConfig, UnitInstanceData } from '../models/UnitData';
 import { EventBus } from '../core/EventBus';
+import { PlayerManager } from '../systems/PlayerManager';
 import { drawShape, UnitShape } from './UnitView';
 
 const { ccclass } = _decorator;
@@ -88,6 +89,7 @@ export interface DeployCellData {
 export class DeploymentUI extends Component {
 
     private _configs: Map<string, UnitConfig> = new Map();
+    private _playerUnits: Map<string, UnitInstanceData> = new Map();  // configId -> unit instance
     private _cells: DeployCellData[] = [];
     private _cellNodes: Map<string, Node> = new Map();
     private _cellGfx: Map<string, Graphics> = new Map();
@@ -117,12 +119,21 @@ export class DeploymentUI extends Component {
         this._selectedId = null;
         this._cells = ALL_CELLS.map(c => ({ row: c.row, col: c.col, configId: null, count: 0 }));
 
+        // 构建玩家拥有的单位映射 configId -> UnitInstanceData
+        this._playerUnits.clear();
+        if (PlayerManager.instance.isLoaded) {
+            for (const unit of PlayerManager.instance.getAllUnits()) {
+                this._playerUnits.set(unit.configId, unit);
+            }
+        }
+        console.log(`[DeploymentUI] 玩家拥有 ${this._playerUnits.size} 种兵种`);
+
         // 加载上次布阵（优先模块缓存，其次 localStorage，最后默认十字阵）
         let loaded = false;
         if (_sessionDeploy) {
             for (const entry of _sessionDeploy) {
                 const cell = this._cells.find(c => c.row === entry.gridRow && c.col === entry.gridCol);
-                if (cell && configs.has(entry.configId)) {
+                if (cell && configs.has(entry.configId) && this._playerUnits.has(entry.configId)) {
                     cell.configId = entry.configId;
                     cell.count = entry.count;
                 }
@@ -134,7 +145,7 @@ export class DeploymentUI extends Component {
             if (saved) {
                 for (const entry of saved) {
                     const cell = this._cells.find(c => c.row === entry.gridRow && c.col === entry.gridCol);
-                    if (cell && configs.has(entry.configId)) {
+                    if (cell && configs.has(entry.configId) && this._playerUnits.has(entry.configId)) {
                         cell.configId = entry.configId;
                         cell.count = entry.count;
                     }
@@ -145,10 +156,10 @@ export class DeploymentUI extends Component {
         }
 
         if (!loaded) {
-            // 首次使用默认十字阵
+            // 首次使用默认十字阵（仅放置玩家拥有的兵种）
             for (const entry of DEFAULT_DEPLOY) {
                 const cell = this._cells.find(c => c.row === entry.row && c.col === entry.col);
-                if (cell && configs.has(entry.configId)) {
+                if (cell && configs.has(entry.configId) && this._playerUnits.has(entry.configId)) {
                     cell.configId = entry.configId;
                     cell.count = entry.count;
                 }
@@ -401,7 +412,10 @@ export class DeploymentUI extends Component {
         this._cardNodes.clear();
         this._cardGfx.clear();
 
-        const configs = Array.from(this._configs.values()).filter(c => c.race === this._selectedRace);
+        // 只显示玩家拥有且属于当前种族的兵种
+        const ownedConfigIds = new Set(this._playerUnits.keys());
+        const configs = Array.from(this._configs.values())
+            .filter(c => c.race === this._selectedRace && ownedConfigIds.has(c.id));
         const totalW = configs.length * CARD_W + (configs.length - 1) * 10;
         const startX = -totalW / 2 + CARD_W / 2;
 
@@ -457,8 +471,13 @@ export class DeploymentUI extends Component {
             // Name
             this.addLabel(card, cfg.name, 12, Color.WHITE, 0, -10, CARD_W, true);
 
+            // Level & quality info
+            const unitInst = this._playerUnits.get(cfg.id);
+            const lvlText = unitInst ? `Lv${unitInst.level}` : 'Lv1';
+            this.addLabel(card, lvlText, 9, new Color(180, 180, 180, 255), 0, -24, CARD_W);
+
             // Count
-            const countNode = this.addLabel(card, '×5', 10, GOLD, 0, -28, CARD_W);
+            const countNode = this.addLabel(card, '×5', 10, GOLD, 0, -38, CARD_W);
 
             // Touch
             card.on(Node.EventType.TOUCH_END, () => this.onCardTap(cfg.id), this);
@@ -767,12 +786,16 @@ export class DeploymentUI extends Component {
             return;
         }
 
-        const deployData = placed.map(c => ({
-            configId: c.configId!,
-            count: c.count,
-            gridRow: c.row,
-            gridCol: c.col,
-        }));
+        const deployData = placed.map(c => {
+            const unitInst = this._playerUnits.get(c.configId!);
+            return {
+                configId: c.configId!,
+                unitUid: unitInst?.uid || '',
+                count: c.count,
+                gridRow: c.row,
+                gridCol: c.col,
+            };
+        });
 
         // 保存布阵到 localStorage
         this.saveDeploy(deployData);
@@ -784,7 +807,7 @@ export class DeploymentUI extends Component {
 
     // ---- Persistence ----
 
-    private saveDeploy(data: { configId: string; count: number; gridRow: number; gridCol: number }[]): void {
+    private saveDeploy(data: { configId: string; unitUid: string; count: number; gridRow: number; gridCol: number }[]): void {
         // 模块级缓存（立即可靠）
         _sessionDeploy = data;
         // localStorage 补充（跨会话）

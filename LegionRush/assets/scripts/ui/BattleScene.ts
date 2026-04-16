@@ -13,12 +13,17 @@ import { EventBus } from '../core/EventBus';
 import { UnitView, UnitShape, drawShape } from './UnitView';
 import { BattleEffectManager } from './BattleEffectManager';
 import { FormationType } from '../battle/Formation';
+import { PlayerManager } from '../systems/PlayerManager';
+import { StageManager } from '../systems/StageManager';
+import { LevelSystem } from '../systems/LevelSystem';
+import { UpgradeSystem } from '../systems/UpgradeSystem';
 
 const { ccclass } = _decorator;
 
 /** 玩家布阵数据（由 DeploymentUI 发出） */
 interface DeployEntry {
     configId: string;
+    unitUid: string;     // 玩家单位实例 uid
     count: number;
     gridRow: number;
     gridCol: number;
@@ -60,6 +65,8 @@ export class BattleScene extends Component {
             const constantsAsset = await this.loadJson('configs/constants');
             if (constantsAsset) {
                 BattleUnit.initConstants(constantsAsset as GameConstants);
+                LevelSystem.instance.init(constantsAsset);
+                UpgradeSystem.instance.init(constantsAsset);
             }
 
             // 加载兵种
@@ -78,6 +85,15 @@ export class BattleScene extends Component {
                 this._bm.registerSkills(skills);
                 BattleUnit.initSkillConfigs(this._skillConfigs);
             }
+
+            // 加载关卡
+            const stagesAsset = await this.loadJson('configs/stages');
+            if (stagesAsset) {
+                StageManager.instance.loadConfigs(stagesAsset);
+            }
+
+            // 初始化玩家数据（加载存档或创建新档）
+            await PlayerManager.instance.init();
 
             console.log(`[BattleScene] 配置加载完成: ${this._unitConfigs.size} 兵种, ${this._skillConfigs.size} 技能`);
 
@@ -103,31 +119,55 @@ export class BattleScene extends Component {
 
     /** 收到玩家布阵数据，创建单位并展示阵型 */
     private onBattleDeploy(entries: DeployEntry[]): void {
+        const pm = PlayerManager.instance;
+
+        // 左方（玩家）：从 PlayerManager 读取各单位实际等级/品质
         const leftUnits = entries.map(e => {
             const cfg = this._unitConfigs.get(e.configId);
-            return { config: cfg!, level: 5, quality: Quality.BLUE, count: e.count, gridRow: e.gridRow, gridCol: e.gridCol };
+            const unitInstance = pm.getUnit(e.unitUid);
+            const level = unitInstance ? unitInstance.level : 1;
+            const quality = unitInstance ? unitInstance.quality as Quality : Quality.GREEN;
+            return { config: cfg!, level, quality, count: e.count, gridRow: e.gridRow, gridCol: e.gridCol };
         }).filter(u => u.config);
 
-        // 右方（AI）：5 个角色各随机选一个种族，组成十字阵
-        const roles: string[] = ['tank', 'melee', 'ranged', 'support', 'assassin'];
-        const races: string[] = ['human', 'beast', 'spirit', 'demon'];
-        const allConfigs = Array.from(this._unitConfigs.values());
-        const crossPositions = [
-            { row: 0, col: 1 }, // 上
-            { row: 1, col: 0 }, // 左
-            { row: 1, col: 1 }, // 中
-            { row: 1, col: 2 }, // 右
-            { row: 2, col: 1 }, // 下
-        ];
+        // 右方（敌方）：从当前关卡配置读取
+        const stage = StageManager.instance.getCurrentStage(pm.data.currentChapter, pm.data.currentStage);
         const rightUnits: { config: UnitConfig; level: number; quality: Quality; count: number; gridRow: number; gridCol: number }[] = [];
-        for (let i = 0; i < roles.length; i++) {
-            const race = races[Math.floor(Math.random() * races.length)];
-            const cfg = allConfigs.find(c => c.role === roles[i] && c.race === race);
-            if (cfg) {
-                rightUnits.push({
-                    config: cfg, level: 5, quality: Quality.BLUE, count: 3,
-                    gridRow: crossPositions[i].row, gridCol: crossPositions[i].col,
-                });
+
+        if (stage) {
+            for (const enemy of stage.enemies) {
+                const cfg = this._unitConfigs.get(enemy.configId);
+                if (cfg) {
+                    rightUnits.push({
+                        config: cfg,
+                        level: enemy.level,
+                        quality: enemy.quality as Quality,
+                        count: enemy.count,
+                        gridRow: enemy.gridRow,
+                        gridCol: enemy.gridCol,
+                    });
+                }
+            }
+            console.log(`[BattleScene] 关卡 ${stage.id} "${stage.name}": ${rightUnits.reduce((s, e) => s + e.count, 0)} 个敌人`);
+        } else {
+            console.warn('[BattleScene] 未找到关卡配置，使用备用随机敌人');
+            // 备用：随机 5 个不同角色
+            const roles: string[] = ['tank', 'melee', 'ranged', 'support', 'assassin'];
+            const races: string[] = ['human', 'beast', 'spirit', 'demon'];
+            const allConfigs = Array.from(this._unitConfigs.values());
+            const crossPositions = [
+                { row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 },
+                { row: 1, col: 2 }, { row: 2, col: 1 },
+            ];
+            for (let i = 0; i < roles.length; i++) {
+                const race = races[Math.floor(Math.random() * races.length)];
+                const cfg = allConfigs.find(c => c.role === roles[i] && c.race === race);
+                if (cfg) {
+                    rightUnits.push({
+                        config: cfg, level: 5, quality: Quality.BLUE, count: 3,
+                        gridRow: crossPositions[i].row, gridCol: crossPositions[i].col,
+                    });
+                }
             }
         }
 
@@ -136,7 +176,7 @@ export class BattleScene extends Component {
             rightFormation: FormationType.DEFAULT,
             leftUnits,
             rightUnits,
-            timeLimit: 30,
+            timeLimit: 60,
         };
 
         this._bm.prepareBattle(config);

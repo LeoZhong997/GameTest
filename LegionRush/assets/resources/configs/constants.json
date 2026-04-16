@@ -17,8 +17,52 @@
         "killReward": 5
     },
     "battle": {
-        "defaultTimeLimit": 30,
+        "defaultTimeLimit": 60,
         "defaultLevel": 5,
         "defaultQuality": "blue"
+    },
+    "maxLevel": 20,
+    "expTable": {
+        "1": 0,
+        "2": 100,
+        "3": 250,
+        "4": 500,
+        "5": 900,
+        "6": 1400,
+        "7": 2100,
+        "8": 3000,
+        "9": 4200,
+        "10": 5700,
+        "11": 7600,
+        "12": 10000,
+        "13": 13000,
+        "14": 16500,
+        "15": 21000,
+        "16": 27000,
+        "17": 34000,
+        "18": 43000,
+        "19": 54000,
+        "20": 67000
+    },
+    "qualityOrder": ["green", "blue", "purple", "gold", "gold1", "gold2", "gold3"],
+    "qualityUpgradeCosts": {
+        "green_to_blue": {
+            "bottleCaps": 500,
+            "soul_shard_green": 5,
+            "ascension_scroll": 1,
+            "minLevel": 5
+        },
+        "blue_to_purple": {
+            "bottleCaps": 2000,
+            "soul_shard_blue": 5,
+            "ascension_scroll": 3,
+            "minLevel": 10
+        },
+        "purple_to_gold": {
+            "bottleCaps": 8000,
+            "soul_shard_blue": 15,
+            "ascension_scroll": 8,
+            "minLevel": 15
+        }
     }
 }

@@ -1,0 +1,257 @@
+{
+    "1-1": {
+        "id": "1-1",
+        "chapter": 1,
+        "stage": 1,
+        "type": "normal",
+        "name": "边境哨站",
+        "recommendedLevel": 1,
+        "enemies": [
+            { "configId": "iron_guard", "level": 1, "quality": "green", "count": 3, "gridRow": 1, "gridCol": 1 },
+            { "configId": "swordsman", "level": 1, "quality": "green", "count": 3, "gridRow": 0, "gridCol": 1 },
+            { "configId": "mage", "level": 1, "quality": "green", "count": 2, "gridRow": 1, "gridCol": 0 }
+        ],
+        "rewards": {
+            "exp": 50,
+            "crystals": 10,
+            "tokens": 5,
+            "bottleCaps": 30,
+            "items": [
+                { "id": "soul_shard_green", "count": 1, "probability": 0.5 }
+            ],
+            "firstClearBonus": { "crystals": 50, "tokens": 20 }
+        }
+    },
+    "1-2": {
+        "id": "1-2",
+        "chapter": 1,
+        "stage": 2,
+        "type": "normal",
+        "name": "森林小径",
+        "recommendedLevel": 1,
+        "enemies": [
+            { "configId": "bone_golem", "level": 1, "quality": "green", "count": 3, "gridRow": 1, "gridCol": 1 },
+            { "configId": "berserker", "level": 1, "quality": "green", "count": 3, "gridRow": 0, "gridCol": 1 },
+            { "configId": "thunder_shaman", "level": 1, "quality": "green", "count": 2, "gridRow": 1, "gridCol": 0 },
+            { "configId": "witch_doctor", "level": 1, "quality": "green", "count": 1, "gridRow": 2, "gridCol": 1 }
+        ],
+        "rewards": {
+            "exp": 60,
+            "crystals": 15,
+            "tokens": 5,
+            "bottleCaps": 40,
+            "items": [
+                { "id": "soul_shard_green", "count": 1, "probability": 0.6 }
+            ]
+        }
+    },
+    "1-3": {
+        "id": "1-3",
+        "chapter": 1,
+        "stage": 3,
+        "type": "normal",
+        "name": "兽族前哨",
+        "recommendedLevel": 2,
+        "enemies": [
+            { "configId": "bone_golem", "level": 2, "quality": "green", "count": 3, "gridRow": 1, "gridCol": 0 },
+            { "configId": "berserker", "level": 2, "quality": "green", "count": 3, "gridRow": 0, "gridCol": 1 },
+            { "configId": "thunder_shaman", "level": 2, "quality": "green", "count": 3, "gridRow": 1, "gridCol": 1 },
+            { "configId": "witch_doctor", "level": 2, "quality": "green", "count": 2, "gridRow": 2, "gridCol": 1 },
+            { "configId": "blood_moon", "level": 2, "quality": "green", "count": 2, "gridRow": 1, "gridCol": 2 }
+        ],
+        "rewards": {
+            "exp": 80,
+            "crystals": 20,
+            "tokens": 8,
+            "bottleCaps": 50,
+            "items": [
+                { "id": "soul_shard_green", "count": 2, "probability": 0.6 },
+                { "id": "ascension_scroll", "count": 1, "probability": 0.2 }
+            ]
+        }
+    },
+    "1-4": {
+        "id": "1-4",
+        "chapter": 1,
+        "stage": 4,
+        "type": "normal",
+        "name": "灵族村落",
+        "recommendedLevel": 3,
+        "enemies": [
+            { "configId": "treant", "level": 3, "quality": "green", "count": 3, "gridRow": 1, "gridCol": 0 },
+            { "configId": "blade_dancer", "level": 3, "quality": "green", "count": 3, "gridRow": 0, "gridCol": 1 },
+            { "configId": "wind_archer", "level": 3, "quality": "green", "count": 3, "gridRow": 1, "gridCol": 1 },
+            { "configId": "moon_singer", "level": 3, "quality": "green", "count": 3, "gridRow": 2, "gridCol": 1 },
+            { "configId": "faceless", "level": 3, "quality": "green", "count": 2, "gridRow": 1, "gridCol": 2 }
+        ],
+        "rewards": {
+            "exp": 100,
+            "crystals": 25,
+            "tokens": 10,
+            "bottleCaps": 60,
+            "items": [
+                { "id": "soul_shard_green", "count": 2, "probability": 0.7 },
+                { "id": "ascension_scroll", "count": 1, "probability": 0.3 }
+            ]
+        }
+    },
+    "1-5": {
+        "id": "1-5",
+        "chapter": 1,
+        "stage": 5,
+        "type": "miniBoss",
+        "name": "混族营地",
+        "recommendedLevel": 3,
+        "enemies": [
+            { "configId": "iron_guard", "level": 3, "quality": "green", "count": 5, "gridRow": 0, "gridCol": 1 },
+            { "configId": "bone_golem", "level": 3, "quality": "blue", "count": 5, "gridRow": 1, "gridCol": 0 },
+            { "configId": "treant", "level": 3, "quality": "green", "count": 5, "gridRow": 1, "gridCol": 1 },
+            { "configId": "demon_golem", "level": 3, "quality": "green", "count": 5, "gridRow": 1, "gridCol": 2 },
+            { "configId": "berserker", "level": 3, "quality": "blue", "count": 3, "gridRow": 2, "gridCol": 1 }
+        ],
+        "rewards": {
+            "exp": 150,
+            "crystals": 40,
+            "tokens": 15,
+            "bottleCaps": 100,
+            "items": [
+                { "id": "soul_shard_green", "count": 3, "probability": 0.8 },
+                { "id": "soul_shard_blue", "count": 1, "probability": 0.4 },
+                { "id": "ascension_scroll", "count": 1, "probability": 0.5 }
+            ],
+            "firstClearBonus": { "crystals": 100, "tokens": 50 }
+        }
+    },
+    "1-6": {
+        "id": "1-6",
+        "chapter": 1,
+        "stage": 6,
+        "type": "normal",
+        "name": "恶魔边境",
+        "recommendedLevel": 4,
+        "enemies": [
+            { "configId": "demon_golem", "level": 4, "quality": "green", "count": 3, "gridRow": 1, "gridCol": 0 },
+            { "configId": "demon_blade", "level": 4, "quality": "green", "count": 3, "gridRow": 0, "gridCol": 1 },
+            { "configId": "shadow_demon", "level": 4, "quality": "green", "count": 3, "gridRow": 1, "gridCol": 1 },
+            { "configId": "warlock", "level": 4, "quality": "green", "count": 3, "gridRow": 2, "gridCol": 1 },
+            { "configId": "nightmare", "level": 4, "quality": "green", "count": 2, "gridRow": 1, "gridCol": 2 }
+        ],
+        "rewards": {
+            "exp": 120,
+            "crystals": 30,
+            "tokens": 12,
+            "bottleCaps": 80,
+            "items": [
+                { "id": "soul_shard_green", "count": 2, "probability": 0.7 },
+                { "id": "ascension_scroll", "count": 1, "probability": 0.3 }
+            ]
+        }
+    },
+    "1-7": {
+        "id": "1-7",
+        "chapter": 1,
+        "stage": 7,
+        "type": "normal",
+        "name": "暗影走廊",
+        "recommendedLevel": 4,
+        "enemies": [
+            { "configId": "demon_golem", "level": 4, "quality": "blue", "count": 3, "gridRow": 1, "gridCol": 0 },
+            { "configId": "demon_blade", "level": 4, "quality": "blue", "count": 4, "gridRow": 0, "gridCol": 1 },
+            { "configId": "shadow_demon", "level": 5, "quality": "green", "count": 4, "gridRow": 1, "gridCol": 1 },
+            { "configId": "warlock", "level": 4, "quality": "blue", "count": 3, "gridRow": 2, "gridCol": 1 },
+            { "configId": "nightmare", "level": 4, "quality": "blue", "count": 3, "gridRow": 1, "gridCol": 2 }
+        ],
+        "rewards": {
+            "exp": 140,
+            "crystals": 35,
+            "tokens": 14,
+            "bottleCaps": 90,
+            "items": [
+                { "id": "soul_shard_green", "count": 3, "probability": 0.7 },
+                { "id": "soul_shard_blue", "count": 1, "probability": 0.3 },
+                { "id": "ascension_scroll", "count": 1, "probability": 0.4 }
+            ]
+        }
+    },
+    "1-8": {
+        "id": "1-8",
+        "chapter": 1,
+        "stage": 8,
+        "type": "normal",
+        "name": "血月祭坛",
+        "recommendedLevel": 5,
+        "enemies": [
+            { "configId": "blood_moon", "level": 5, "quality": "blue", "count": 5, "gridRow": 0, "gridCol": 1 },
+            { "configId": "berserker", "level": 5, "quality": "blue", "count": 5, "gridRow": 1, "gridCol": 0 },
+            { "configId": "bone_golem", "level": 5, "quality": "blue", "count": 5, "gridRow": 1, "gridCol": 1 },
+            { "configId": "nightmare", "level": 5, "quality": "blue", "count": 5, "gridRow": 1, "gridCol": 2 },
+            { "configId": "shadow_demon", "level": 5, "quality": "blue", "count": 3, "gridRow": 2, "gridCol": 1 }
+        ],
+        "rewards": {
+            "exp": 160,
+            "crystals": 40,
+            "tokens": 16,
+            "bottleCaps": 100,
+            "items": [
+                { "id": "soul_shard_blue", "count": 1, "probability": 0.5 },
+                { "id": "soul_shard_green", "count": 3, "probability": 0.8 },
+                { "id": "ascension_scroll", "count": 1, "probability": 0.5 }
+            ]
+        }
+    },
+    "1-9": {
+        "id": "1-9",
+        "chapter": 1,
+        "stage": 9,
+        "type": "normal",
+        "name": "深渊裂隙",
+        "recommendedLevel": 5,
+        "enemies": [
+            { "configId": "demon_golem", "level": 5, "quality": "blue", "count": 5, "gridRow": 0, "gridCol": 0 },
+            { "configId": "demon_golem", "level": 5, "quality": "blue", "count": 5, "gridRow": 0, "gridCol": 2 },
+            { "configId": "warlock", "level": 5, "quality": "blue", "count": 5, "gridRow": 1, "gridCol": 1 },
+            { "configId": "nightmare", "level": 5, "quality": "blue", "count": 5, "gridRow": 2, "gridCol": 0 },
+            { "configId": "nightmare", "level": 5, "quality": "blue", "count": 5, "gridRow": 2, "gridCol": 2 }
+        ],
+        "rewards": {
+            "exp": 180,
+            "crystals": 50,
+            "tokens": 18,
+            "bottleCaps": 120,
+            "items": [
+                { "id": "soul_shard_blue", "count": 2, "probability": 0.5 },
+                { "id": "ascension_scroll", "count": 1, "probability": 0.6 }
+            ]
+        }
+    },
+    "1-10": {
+        "id": "1-10",
+        "chapter": 1,
+        "stage": 10,
+        "type": "boss",
+        "name": "魔王城门",
+        "recommendedLevel": 5,
+        "enemies": [
+            { "configId": "demon_golem", "level": 5, "quality": "blue", "count": 5, "gridRow": 0, "gridCol": 0 },
+            { "configId": "demon_blade", "level": 5, "quality": "blue", "count": 5, "gridRow": 0, "gridCol": 1 },
+            { "configId": "shadow_demon", "level": 5, "quality": "blue", "count": 5, "gridRow": 0, "gridCol": 2 },
+            { "configId": "warlock", "level": 5, "quality": "blue", "count": 5, "gridRow": 1, "gridCol": 0 },
+            { "configId": "nightmare", "level": 6, "quality": "purple", "count": 5, "gridRow": 1, "gridCol": 1 },
+            { "configId": "warlock", "level": 5, "quality": "blue", "count": 5, "gridRow": 1, "gridCol": 2 },
+            { "configId": "blood_moon", "level": 5, "quality": "blue", "count": 3, "gridRow": 2, "gridCol": 0 },
+            { "configId": "berserker", "level": 5, "quality": "blue", "count": 3, "gridRow": 2, "gridCol": 1 },
+            { "configId": "faceless", "level": 5, "quality": "blue", "count": 3, "gridRow": 2, "gridCol": 2 }
+        ],
+        "rewards": {
+            "exp": 250,
+            "crystals": 80,
+            "tokens": 30,
+            "bottleCaps": 200,
+            "items": [
+                { "id": "soul_shard_blue", "count": 3, "probability": 0.7 },
+                { "id": "ascension_scroll", "count": 2, "probability": 0.6 }
+            ],
+            "firstClearBonus": { "crystals": 200, "tokens": 100 }
+        }
+    }
+}

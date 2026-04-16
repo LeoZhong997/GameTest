@@ -2,7 +2,13 @@
  * PlayerData - 玩家数据模型
  */
 
+import { UnitInstanceData, Quality } from './UnitData';
+
+/** 存档版本号（结构变更时递增，用于迁移） */
+export const SAVE_VERSION = 1;
+
 export interface PlayerData {
+    version: number;
     uid: string;
     name: string;
     level: number;
@@ -22,8 +28,11 @@ export interface PlayerData {
     highestChapter: number;
     highestStage: number;
 
-    // 拥有的兵种 UID 列表
-    unitUids: string[];
+    // 拥有的兵种实例（uid -> UnitInstanceData）
+    units: Record<string, UnitInstanceData>;
+
+    // 物品背包（itemId -> 数量）
+    inventory: Record<string, number>;
 
     // 离线
     lastOnlineTime: number;
@@ -37,16 +46,38 @@ export interface PlayerData {
     lastSaveTime: number;
 }
 
-/** 创建默认玩家数据 */
+/** 生成唯一 uid */
+function generateUid(): string {
+    return `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+/** 创建默认玩家数据（赠送 5 个人族兵种） */
 export function createDefaultPlayerData(name: string = '魔王'): PlayerData {
+    const now = Date.now();
+    const starterUnits: Record<string, UnitInstanceData> = {};
+    const starterIds = ['iron_guard', 'swordsman', 'mage', 'apothecary', 'shadow_blade'];
+    for (const configId of starterIds) {
+        const uid = generateUid();
+        starterUnits[uid] = {
+            configId,
+            uid,
+            level: 1,
+            quality: Quality.GREEN,
+            rating: undefined as any,
+            exp: 0,
+            skillLevels: [1, 1, 1],
+        };
+    }
+
     return {
-        uid: `player_${Date.now()}`,
+        version: SAVE_VERSION,
+        uid: `player_${now}`,
         name,
         level: 1,
         exp: 0,
         crystals: 0,
         magicCrystals: 0,
-        tokens: 10,          // 初始筹码
+        tokens: 10,
         bottleCaps: 0,
         arenaCoins: 0,
         relicFragments: 0,
@@ -54,11 +85,12 @@ export function createDefaultPlayerData(name: string = '魔王'): PlayerData {
         currentStage: 1,
         highestChapter: 1,
         highestStage: 1,
-        unitUids: [],
-        lastOnlineTime: Date.now(),
+        units: starterUnits,
+        inventory: {},
+        lastOnlineTime: now,
         offlineRewardHours: 8,
         buildings: {},
-        createdAt: Date.now(),
-        lastSaveTime: Date.now(),
+        createdAt: now,
+        lastSaveTime: now,
     };
 }
