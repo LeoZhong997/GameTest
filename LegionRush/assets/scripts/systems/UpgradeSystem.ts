@@ -1,14 +1,14 @@
 /**
- * UpgradeSystem - 品质升阶系统
- * 管理升品消耗表、升阶判定
+ * UpgradeSystem - 品质升阶 + 碎片合成系统
+ * 每个兵种有独立碎片 (configId_shard_quality)
+ * 升阶消耗该兵种对应碎片，碎片可 3:1 合成
  */
 
 import { UnitInstanceData, Quality } from '../models/UnitData';
 
 export interface UpgradeCost {
-    bottleCaps: number;
-    [materialId: string]: number;   // 材料消耗
-    minLevel: number;
+    materialId: string;   // 碎片物品 ID
+    count: number;
 }
 
 export interface UpgradeResult {
@@ -18,10 +18,21 @@ export interface UpgradeResult {
     newQuality: string;
 }
 
+export interface SynthesisResult {
+    success: boolean;
+    reason: string;
+    fromQuality: string;
+    toQuality: string;
+}
+
+/** 碎片品质阶位（绿/蓝/紫，gold+ 暂不开放碎片） */
+const SHARD_QUALITIES = ['green', 'blue', 'purple'];
+
 export class UpgradeSystem {
     private static _instance: UpgradeSystem = null!;
-    private _costs: Map<string, UpgradeCost> = new Map();  // "green_to_blue" -> cost
     private _qualityOrder: string[] = [];
+    private _shardUpgradeCount: number = 3;
+    private _synthesisRecipes: Map<string, number> = new Map();  // "green_to_blue" -> count
 
     public static get instance(): UpgradeSystem {
         if (!this._instance) {
@@ -32,34 +43,47 @@ export class UpgradeSystem {
 
     /** 从 constants 初始化 */
     init(constants: any): void {
-        this._costs.clear();
-        if (constants.qualityUpgradeCosts) {
-            for (const [key, cost] of Object.entries(constants.qualityUpgradeCosts)) {
-                this._costs.set(key, cost as UpgradeCost);
-            }
-        }
+        this._synthesisRecipes.clear();
         if (constants.qualityOrder) {
             this._qualityOrder = constants.qualityOrder;
         }
-        console.log(`[UpgradeSystem] 初始化: ${this._costs.size} 个升阶配置, 品质顺序: ${this._qualityOrder.join(' → ')}`);
+        if (constants.shardUpgradeCount) {
+            this._shardUpgradeCount = constants.shardUpgradeCount;
+        }
+        if (constants.shardSynthesis) {
+            for (const [key, val] of Object.entries(constants.shardSynthesis) as [string, any][]) {
+                this._synthesisRecipes.set(key, val.count || 3);
+            }
+        }
+        console.log(`[UpgradeSystem] 初始化: 升阶消耗=${this._shardUpgradeCount}, 品质顺序: ${this._qualityOrder.join(' → ')}, 合成配方: ${this._synthesisRecipes.size}`);
+    }
+
+    /** 拼接碎片物品 ID */
+    static shardId(configId: string, quality: string): string {
+        return `${configId}_shard_${quality}`;
     }
 
     /** 获取下一个品质 */
     getNextQuality(current: string): string | null {
         const idx = this._qualityOrder.indexOf(current);
         if (idx < 0 || idx >= this._qualityOrder.length - 1) return null;
-        return this._qualityOrder[idx + 1];
+        // gold+ 暂不开放
+        const next = this._qualityOrder[idx + 1];
+        if (next === 'gold1') return null;
+        return next;
     }
 
-    /** 获取升品消耗 */
+    /** 获取升阶消耗（动态：该兵种当前品质碎片 × N） */
     getCost(unit: UnitInstanceData): UpgradeCost | null {
         const next = this.getNextQuality(unit.quality);
         if (!next) return null;
-        const key = `${unit.quality}_to_${next}`;
-        return this._costs.get(key) || null;
+        return {
+            materialId: UpgradeSystem.shardId(unit.configId, unit.quality),
+            count: this._shardUpgradeCount,
+        };
     }
 
-    /** 检查是否可以升品 */
+    /** 检查是否可以升阶 */
     canUpgrade(unit: UnitInstanceData, inventory: Record<string, number>): { can: boolean; reason: string } {
         const next = this.getNextQuality(unit.quality);
         if (!next) return { can: false, reason: '已达最高品质' };
@@ -67,22 +91,15 @@ export class UpgradeSystem {
         const cost = this.getCost(unit);
         if (!cost) return { can: false, reason: '无升阶配置' };
 
-        if (unit.level < cost.minLevel) {
-            return { can: false, reason: `需要等级 ${cost.minLevel}` };
-        }
-
-        for (const [itemId, amount] of Object.entries(cost)) {
-            if (itemId === 'minLevel') continue;
-            const have = inventory[itemId] || 0;
-            if (have < amount) {
-                return { can: false, reason: `${itemId} 不足 (需要${amount}, 拥有${have})` };
-            }
+        const have = inventory[cost.materialId] || 0;
+        if (have < cost.count) {
+            return { can: false, reason: `碎片不足 (${have}/${cost.count})` };
         }
 
         return { can: true, reason: '' };
     }
 
-    /** 执行升品（扣材料、改品质） */
+    /** 执行升阶（扣碎片、改品质） */
     upgrade(unit: UnitInstanceData, inventory: Record<string, number>): UpgradeResult {
         const check = this.canUpgrade(unit, inventory);
         if (!check.can) {
@@ -93,15 +110,71 @@ export class UpgradeSystem {
         const oldQuality = unit.quality;
         const newQuality = this.getNextQuality(unit.quality)!;
 
-        // 扣除材料
-        for (const [itemId, amount] of Object.entries(cost)) {
-            if (itemId === 'minLevel') continue;
-            inventory[itemId] = (inventory[itemId] || 0) - amount;
-        }
+        // 扣除碎片
+        inventory[cost.materialId] = (inventory[cost.materialId] || 0) - cost.count;
 
         unit.quality = newQuality as Quality;
-        console.log(`[UpgradeSystem] ${unit.configId} 升品: ${oldQuality} → ${newQuality}`);
+        console.log(`[UpgradeSystem] ${unit.configId} 升阶: ${oldQuality} → ${newQuality}`);
 
         return { success: true, reason: '', oldQuality, newQuality };
+    }
+
+    /** 获取某品质碎片的下一级品质 */
+    getNextShardQuality(quality: string): string | null {
+        const idx = SHARD_QUALITIES.indexOf(quality);
+        if (idx < 0 || idx >= SHARD_QUALITIES.length - 1) return null;
+        return SHARD_QUALITIES[idx + 1];
+    }
+
+    /** 获取合成所需数量 */
+    getSynthesisCount(fromQuality: string): number {
+        const next = this.getNextShardQuality(fromQuality);
+        if (!next) return Infinity;
+        const key = `${fromQuality}_to_${next}`;
+        return this._synthesisRecipes.get(key) || 3;
+    }
+
+    /** 检查是否可以合成 */
+    canSynthesize(configId: string, fromQuality: string, inventory: Record<string, number>): { can: boolean; reason: string } {
+        const next = this.getNextShardQuality(fromQuality);
+        if (!next) return { can: false, reason: '已达最高碎片品质' };
+
+        const count = this.getSynthesisCount(fromQuality);
+        const shardItemId = UpgradeSystem.shardId(configId, fromQuality);
+        const have = inventory[shardItemId] || 0;
+        if (have < count) {
+            return { can: false, reason: `碎片不足 (${have}/${count})` };
+        }
+
+        return { can: true, reason: '' };
+    }
+
+    /** 执行合成（扣 N 个低级碎片，加 1 个高级碎片） */
+    synthesize(configId: string, fromQuality: string, inventory: Record<string, number>): SynthesisResult {
+        const check = this.canSynthesize(configId, fromQuality, inventory);
+        if (!check.can) {
+            return { success: false, reason: check.reason, fromQuality, toQuality: fromQuality };
+        }
+
+        const next = this.getNextShardQuality(fromQuality)!;
+        const count = this.getSynthesisCount(fromQuality);
+        const fromItemId = UpgradeSystem.shardId(configId, fromQuality);
+        const toItemId = UpgradeSystem.shardId(configId, next);
+
+        // 扣低级
+        inventory[fromItemId] = (inventory[fromItemId] || 0) - count;
+        // 加高级
+        inventory[toItemId] = (inventory[toItemId] || 0) + 1;
+
+        console.log(`[UpgradeSystem] 合成: ${fromItemId} ×${count} → ${toItemId} ×1`);
+        return { success: true, reason: '', fromQuality, toQuality: next };
+    }
+
+    /** 获取兵种所有碎片持有量 */
+    getShardCounts(configId: string, inventory: Record<string, number>): { quality: string; count: number }[] {
+        return SHARD_QUALITIES.map(q => ({
+            quality: q,
+            count: inventory[UpgradeSystem.shardId(configId, q)] || 0,
+        }));
     }
 }

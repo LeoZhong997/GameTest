@@ -19,6 +19,8 @@ export class PlayerManager {
     private static _instance: PlayerManager = null!;
     private _data: PlayerData | null = null;
     private _dirty: boolean = false;
+    private _playingChapter: number = 0;
+    private _playingStage: number = 0;
 
     public static get instance(): PlayerManager {
         if (!this._instance) {
@@ -141,6 +143,12 @@ export class PlayerManager {
         return this._data?.inventory?.[itemId] || 0;
     }
 
+    /** 设置当前正在打的关卡（由 BattleScene 在开战前调用） */
+    setPlayingStage(chapter: number, stage: number): void {
+        this._playingChapter = chapter;
+        this._playingStage = stage;
+    }
+
     // --- 关卡推进 ---
 
     advanceStage(): void {
@@ -168,12 +176,17 @@ export class PlayerManager {
         if (!this._data) return;
 
         if (report.result === BattleResult.WIN) {
-            // 获取当前关卡配置
-            const stage = StageManager.instance.getCurrentStage(this._data.currentChapter, this._data.currentStage);
+            // 获取实际打的关卡配置
+            const playedChapter = this._playingChapter || this._data.highestChapter;
+            const playedStage = this._playingStage || this._data.highestStage;
+            const stage = StageManager.instance.getCurrentStage(playedChapter, playedStage);
             if (!stage) {
-                console.warn('[PlayerManager] 未找到当前关卡配置');
+                console.warn('[PlayerManager] 未找到关卡配置');
                 return;
             }
+
+            const playedValue = playedChapter * 100 + playedStage;
+            const highest = this._data.highestChapter * 100 + this._data.highestStage;
 
             const rewards = stage.rewards;
             const rewardInfo: any = { exp: rewards.exp, crystals: rewards.crystals, tokens: rewards.tokens, bottleCaps: rewards.bottleCaps, items: [] as any[] };
@@ -204,8 +217,13 @@ export class PlayerManager {
                 }
             }
 
-            // 推进关卡
-            this.advanceStage();
+            // 推进关卡：只有打的关是"最高进度下一关"才推进
+            const nextStageValue = highest + 1;
+            if (playedValue === nextStageValue) {
+                this.advanceStage();
+            } else {
+                console.log(`[PlayerManager] 重玩关卡 ${playedChapter}-${playedStage}，不推进进度`);
+            }
 
             console.log(`[PlayerManager] 奖励发放: EXP+${rewards.exp} 氪晶+${rewards.crystals} 筹码+${rewards.tokens} 瓶盖+${rewards.bottleCaps}`);
             if (rewardInfo.items.length > 0) {

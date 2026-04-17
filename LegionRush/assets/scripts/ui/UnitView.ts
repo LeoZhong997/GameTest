@@ -3,8 +3,9 @@
  * 由 BattleScene 纯代码创建，设置引用后 init
  */
 
-import { _decorator, Component, Label, Color, Node, Graphics, UITransform, UIOpacity, tween, Vec3 } from 'cc';
+import { _decorator, Component, Label, Color, Node, Graphics, UITransform, UIOpacity, tween, Vec3, Vec2, EventTouch } from 'cc';
 import { BattleUnit, TeamSide, UnitState } from '../battle/Unit';
+import { BattleManager, BattleState } from '../battle/BattleManager';
 
 const { ccclass } = _decorator;
 
@@ -82,6 +83,25 @@ export class UnitView extends Component {
     private _dying: boolean = false;
     private _flashing: boolean = false;
     private _opacity: UIOpacity | null = null;
+    private static _viewMap: Map<string, UnitView> = new Map();
+
+    /** LEFT 方九宫格中心坐标（index = row*3+col） */
+    private static readonly GRID_CENTERS: Vec2[] = (() => {
+        const halfW = 960 * 0.35;
+        const centers: Vec2[] = [];
+        for (let r = 0; r < 3; r++) {
+            for (let c = 0; c < 3; c++) {
+                centers.push(new Vec2(-halfW + (c - 1) * 120, (1 - r) * 160));
+            }
+        }
+        return centers;
+    })();
+
+    private _dragging: boolean = false;
+    private _dragStartPos: Vec2 = new Vec2();
+    private _dragGroupOrigins: Map<string, Vec2> = new Map();
+    private _dragOrigCellIdx: number = -1;
+    private _dragCellOccupancy: Map<number, string> = new Map();
 
     init(unit: BattleUnit): void {
         this._unit = unit;
@@ -120,14 +140,22 @@ export class UnitView extends Component {
         }
 
         this.refresh(unit);
+
+        // 注册视图
+        UnitView._viewMap.set(unit.uid, this);
+
+        // 布阵阶段允许拖拽（仅左方单位）
+        this.registerDrag();
     }
 
     refresh(unit: BattleUnit): void {
         if (!this._unit || unit.uid !== this._unit.uid) return;
         this._unit = unit;
 
-        // 位置同步
-        this.node.setPosition(unit.position.x, unit.position.y, 0);
+        // 拖拽中跳过位置同步，避免和拖拽冲突
+        if (!this._dragging) {
+            this.node.setPosition(unit.position.x, unit.position.y, 0);
+        }
 
         // 血条（重绘填充宽度 + 颜色）
         if (this.hpBarFill) {
@@ -227,6 +255,158 @@ export class UnitView extends Component {
         } else {
             this.node.active = false;
         }
+    }
+
+    /** 清除全局视图注册表（BattleScene 清理时调用） */
+    static clearViewMap(): void {
+        UnitView._viewMap.clear();
+    }
+
+    /** 找到距离 pos 最近的格子索引 */
+    private static findNearestCell(pos: { x: number; y: number }): number {
+        let bestIdx = 0, bestDist = Infinity;
+        for (let i = 0; i < UnitView.GRID_CENTERS.length; i++) {
+            const c = UnitView.GRID_CENTERS[i];
+            const d = (pos.x - c.x) ** 2 + (pos.y - c.y) ** 2;
+            if (d < bestDist) { bestDist = d; bestIdx = i; }
+        }
+        return bestIdx;
+    }
+
+    /** 注册触摸拖拽（仅布阵阶段、仅左方单位） */
+    private registerDrag(): void {
+        if (!this._unit || this._unit.team !== TeamSide.LEFT) return;
+        this.node.on(Node.EventType.TOUCH_START, this.onDragStart, this);
+        this.node.on(Node.EventType.TOUCH_MOVE, this.onDragMove, this);
+        this.node.on(Node.EventType.TOUCH_END, this.onDragEnd, this);
+        this.node.on(Node.EventType.TOUCH_CANCEL, this.onDragEnd, this);
+    }
+
+    private onDragStart(event: EventTouch): void {
+        if (BattleManager.instance.state !== BattleState.PREPARING) return;
+        if (!this._unit || this._unit.team !== TeamSide.LEFT) return;
+
+        const uiPos = event.getUILocation();
+        this._dragStartPos.set(uiPos.x - this.node.position.x, uiPos.y - this.node.position.y);
+
+        // 记录同兵种所有单位的起始位置，标记 dragging
+        this._dragGroupOrigins.clear();
+        const myConfigId = this._unit.configId;
+        for (const [uid, view] of UnitView._viewMap) {
+            if (view._unit && view._unit.configId === myConfigId && view._unit.team === TeamSide.LEFT) {
+                this._dragGroupOrigins.set(uid, new Vec2(view._unit.position.x, view._unit.position.y));
+                view._dragging = true;
+                view.node.setSiblingIndex(view.node.parent!.children.length - 1);
+            }
+        }
+
+        // 记录九宫格当前占位：cellIdx → configId
+        this._dragCellOccupancy.clear();
+        const seen = new Set<string>();
+        for (const view of UnitView._viewMap.values()) {
+            if (!view._unit || view._unit.team !== TeamSide.LEFT) continue;
+            if (seen.has(view._unit.configId)) continue;
+            seen.add(view._unit.configId);
+            const center = this.getGroupCenter(view._unit.configId);
+            if (center) {
+                this._dragCellOccupancy.set(UnitView.findNearestCell(center), view._unit.configId);
+            }
+        }
+
+        // 记录本组起始格子
+        const myCenter = this.getGroupCenter(myConfigId);
+        this._dragOrigCellIdx = myCenter ? UnitView.findNearestCell(myCenter) : -1;
+    }
+
+    private onDragMove(event: EventTouch): void {
+        if (!this._dragging || !this._unit) return;
+
+        const uiPos = event.getUILocation();
+        const newX = uiPos.x - this._dragStartPos.x;
+        const newY = uiPos.y - this._dragStartPos.y;
+
+        const myStart = this._dragGroupOrigins.get(this._unit.uid);
+        if (!myStart) return;
+        const deltaX = newX - myStart.x;
+        const deltaY = newY - myStart.y;
+
+        for (const [uid, view] of UnitView._viewMap) {
+            if (view._unit && view._unit.configId === this._unit.configId && view._unit.team === TeamSide.LEFT) {
+                const orig = this._dragGroupOrigins.get(uid);
+                if (orig) {
+                    view._unit.position.set(orig.x + deltaX, orig.y + deltaY);
+                    view.node.setPosition(view._unit.position.x, view._unit.position.y, 0);
+                }
+            }
+        }
+    }
+
+    private onDragEnd(_event: EventTouch): void {
+        if (!this._dragging || !this._unit) { this.resetGroupDrag(); return; }
+
+        const myConfigId = this._unit.configId;
+        const myCenter = this.getGroupCenter(myConfigId);
+        if (!myCenter || this._dragOrigCellIdx < 0) { this.resetGroupDrag(); return; }
+
+        const targetCellIdx = UnitView.findNearestCell(myCenter);
+
+        if (targetCellIdx !== this._dragOrigCellIdx) {
+            // 目标格子有其他兵种 → 先把对方移到本组原格子
+            const occupant = this._dragCellOccupancy.get(targetCellIdx);
+            if (occupant && occupant !== myConfigId) {
+                this.snapGroupToCell(occupant, this._dragOrigCellIdx);
+            }
+            // 本组吸附到目标格子
+            this.snapGroupToCell(myConfigId, targetCellIdx);
+        } else {
+            // 放回原位
+            this.snapGroupToCell(myConfigId, this._dragOrigCellIdx);
+        }
+
+        this.resetGroupDrag();
+    }
+
+    /** 将指定兵种组吸附到指定格子（平移整个组，保持内部散布） */
+    private snapGroupToCell(configId: string, cellIdx: number): void {
+        const cellCenter = UnitView.GRID_CENTERS[cellIdx];
+        const groupCenter = this.getGroupCenter(configId);
+        if (!groupCenter) return;
+
+        const dx = cellCenter.x - groupCenter.x;
+        const dy = cellCenter.y - groupCenter.y;
+        for (const view of UnitView._viewMap.values()) {
+            if (view._unit && view._unit.configId === configId && view._unit.team === TeamSide.LEFT) {
+                view._unit.position.set(view._unit.position.x + dx, view._unit.position.y + dy);
+                view.node.setPosition(view._unit.position.x, view._unit.position.y, 0);
+            }
+        }
+    }
+
+    /** 获取某兵种组所有左方单位的中心坐标 */
+    private getGroupCenter(configId: string): Vec2 | null {
+        let sx = 0, sy = 0, n = 0;
+        for (const view of UnitView._viewMap.values()) {
+            if (view._unit && view._unit.configId === configId && view._unit.team === TeamSide.LEFT) {
+                sx += view._unit.position.x;
+                sy += view._unit.position.y;
+                n++;
+            }
+        }
+        return n > 0 ? new Vec2(sx / n, sy / n) : null;
+    }
+
+    /** 重置拖拽状态 */
+    private resetGroupDrag(): void {
+        if (this._unit) {
+            for (const view of UnitView._viewMap.values()) {
+                if (view._unit && view._unit.configId === this._unit.configId && view._unit.team === TeamSide.LEFT) {
+                    view._dragging = false;
+                }
+            }
+        }
+        this._dragGroupOrigins.clear();
+        this._dragCellOccupancy.clear();
+        this._dragOrigCellIdx = -1;
     }
 
     get unit(): BattleUnit | null {

@@ -4,7 +4,7 @@
  * 结算面板样式参考 designs/battle-ui.pen
  */
 
-import { _decorator, Component, Node, Label, Button, Color, Graphics, UITransform, UIOpacity, tween, Vec3, Layout } from 'cc';
+import { _decorator, Component, Node, Label, Button, Color, Graphics, UITransform, UIOpacity, tween, Vec3, Layout, Layers, view, director } from 'cc';
 import { BattleManager, BattleState, BattleResult, BattleReport } from '../battle/BattleManager';
 import { BattleUnit, TeamSide } from '../battle/Unit';
 import { EventBus } from '../core/EventBus';
@@ -75,14 +75,22 @@ export class BattleUI extends Component {
     private pauseTextLabel: Label | null = null;
 
     private _bm: BattleManager = BattleManager.instance;
-    private _speedOptions: number[] = [1, 2, 3, 4];
+    private _SW: number = 1280;
+    private _SH: number = 720;
+    private _speedOptions: number[] = [1, 2, 4, 6];
     private _speedIndex: number = 0;
     private _statsNodes: Node[] = [];
     private _lastResult: BattleResult = BattleResult.WIN;
     private _btnTextLabel: Label | null = null;
     private _stageLabel: Label | null = null;
+    private _topBar: Node | null = null;
 
     onLoad() {
+        const design = view.getDesignResolutionSize();
+        this._SW = design.width || 1280;
+        this._SH = design.height || 720;
+        this.node.layer = Layers.Enum.UI_2D;
+
         // 自动绑定子节点
         this.timerLabel = this.node.getChildByName('TimerLabel')?.getComponent(Label)!;
         this.leftCountLabel = this.node.getChildByName('LeftCount')?.getComponent(Label)!;
@@ -106,11 +114,16 @@ export class BattleUI extends Component {
         this.setupTopBar();
         this.setupStartButton();
 
-        // 开战按钮初始隐藏，等布阵确认后再显示
-        if (this.btnStartNode) this.btnStartNode.active = false;
+        // PREPARING 状态下显示开战按钮（布阵阶段可见）
+        if (this.btnStartNode) {
+            this.btnStartNode.active = (this._bm.state === BattleState.PREPARING);
+        }
+
+        // 所有动态创建完成后，统一修正 layer
+        const setLayer = (n: Node) => { n.layer = Layers.Enum.UI_2D; n.children.forEach(setLayer); };
+        setLayer(this.node);
 
         EventBus.instance.on('battle:end', this.onBattleEnd, this);
-        EventBus.instance.on('battle:deploy', this.onDeployConfirmed, this);
     }
 
     /** 构建结算面板的视觉效果 */
@@ -139,9 +152,8 @@ export class BattleUI extends Component {
         // --- 半透明遮罩 ---
         this.overlay = new Node('BattleOverlay');
         const ot = this.overlay.addComponent(UITransform);
-        const parentUT = this.node.getComponent(UITransform);
-        const sw = parentUT ? parentUT.contentSize.width : 1280;
-        const sh = parentUT ? parentUT.contentSize.height : 720;
+        const sw = this._SW;
+        const sh = this._SH;
         ot.setContentSize(sw, sh);
         ot.setAnchorPoint(0.5, 0.5);
         this.overlay.setPosition(0, 0, 0);
@@ -250,9 +262,8 @@ export class BattleUI extends Component {
 
     /** 构建 TopBar（蓝方/计时器/红方）匹配设计图 */
     private setupTopBar(): void {
-        const parentUT = this.node.getComponent(UITransform);
-        const SW = parentUT ? parentUT.contentSize.width : 1280;
-        const SH = parentUT ? parentUT.contentSize.height : 720;
+        const SW = this._SW;
+        const SH = this._SH;
         const TB_W = SW, TB_H = 50;
         const TB_BG = new Color(15, 52, 96, 230);       // #0f3460 90%
         const BOX_BG = new Color(26, 26, 46, 255);       // #1a1a2e
@@ -481,6 +492,7 @@ export class BattleUI extends Component {
         // 暂停蒙版挂到 UIRoot 而非 topBar，保证全屏覆盖
         this.node.addChild(this.pauseOverlay);
 
+        this._topBar = topBar;
         this.node.addChild(topBar);
     }
 
@@ -575,6 +587,12 @@ export class BattleUI extends Component {
     }
 
     update(dt: number) {
+        if (this._bm.state === BattleState.PREPARING) {
+            // 布阵阶段保持按钮组可见
+            if (this.btnStartNode) this.btnStartNode.active = true;
+            return;
+        }
+
         if (this._bm.state !== BattleState.RUNNING && this._bm.state !== BattleState.PAUSED) return;
 
         // 暂停时只更新暂停状态显示
@@ -608,7 +626,6 @@ export class BattleUI extends Component {
 
     onDestroy() {
         EventBus.instance.off('battle:end', this.onBattleEnd, this);
-        EventBus.instance.off('battle:deploy', this.onDeployConfirmed, this);
     }
 
     /** 布阵确认后，显示开战按钮 */
@@ -721,6 +738,10 @@ export class BattleUI extends Component {
             const btnY = Math.min(yBottom - 16, -(PANEL_H / 2 - 36));
             this.btnRestart.node.setPosition(0, btnY, 0);
         }
+
+        // 修正所有统计节点的 layer
+        const setLayer = (n: Node) => { n.layer = Layers.Enum.UI_2D; n.children.forEach(setLayer); };
+        for (const sn of this._statsNodes) { setLayer(sn); }
     }
 
     onRestart(): void {
@@ -745,23 +766,25 @@ export class BattleUI extends Component {
         }
     }
 
-    /** 构建开战按钮（居中，金色圆角） */
+    /** 构建开战按钮（居中，金色圆角）+ 返回按钮 */
     private setupStartButton(): void {
-        const parentUT = this.node.getComponent(UITransform);
-        const sw = parentUT ? parentUT.contentSize.width : 1280;
-        const sh = parentUT ? parentUT.contentSize.height : 720;
+        const btnGroup = new Node('StartBtnGroup');
+        const bgut = btnGroup.addComponent(UITransform);
+        bgut.setContentSize(BTN_W, BTN_H * 2 + 16);
+        bgut.setAnchorPoint(0.5, 0.5);
+        btnGroup.setPosition(0, 0, 0);
 
+        // 开战按钮
         const btnNode = new Node('BtnStart');
         const bt = btnNode.addComponent(UITransform);
         bt.setContentSize(BTN_W, BTN_H);
         bt.setAnchorPoint(0.5, 0.5);
-        btnNode.setPosition(0, 0, 0);
+        btnNode.setPosition(0, (BTN_H + 16) / 2, 0);
 
-        // 金色背景
         const bg = new Node('StartBg');
-        const bgut = bg.addComponent(UITransform);
-        bgut.setContentSize(BTN_W, BTN_H);
-        bgut.setAnchorPoint(0.5, 0.5);
+        const bgut2 = bg.addComponent(UITransform);
+        bgut2.setContentSize(BTN_W, BTN_H);
+        bgut2.setAnchorPoint(0.5, 0.5);
         bg.setPosition(0, 0, 0);
         const gfx = bg.addComponent(Graphics);
         gfx.fillColor = GOLD;
@@ -769,7 +792,6 @@ export class BattleUI extends Component {
         gfx.fill();
         btnNode.insertChild(bg, 0);
 
-        // 文字
         const txtNode = new Node('StartText');
         const txtut = txtNode.addComponent(UITransform);
         txtut.setContentSize(BTN_W, BTN_H);
@@ -784,14 +806,56 @@ export class BattleUI extends Component {
         txt.verticalAlign = Label.VerticalAlign.CENTER;
         btnNode.addChild(txtNode);
 
-        // 按钮交互
         const btn = btnNode.addComponent(Button);
         btn.transition = Button.Transition.SCALE;
         btn.zoomScale = 0.9;
         btnNode.on(Button.EventType.CLICK, this.onStartBattle, this);
+        btnGroup.addChild(btnNode);
 
-        this.node.addChild(btnNode);
-        this.btnStartNode = btnNode;
+        // 返回按钮（开战按钮下方）
+        const backW = 140, backH = 40;
+        const backNode = new Node('BtnBack');
+        const bbut = backNode.addComponent(UITransform);
+        bbut.setContentSize(backW, backH);
+        bbut.setAnchorPoint(0.5, 0.5);
+        backNode.setPosition(0, -(BTN_H + 16) / 2, 0);
+
+        const backBg = new Node('BackBg');
+        const bbgut = backBg.addComponent(UITransform);
+        bbgut.setContentSize(backW, backH);
+        bbgut.setAnchorPoint(0.5, 0.5);
+        backBg.setPosition(0, 0, 0);
+        const bbgGfx = backBg.addComponent(Graphics);
+        bbgGfx.fillColor = new Color(60, 60, 90, 230);
+        bbgGfx.roundRect(-backW / 2, -backH / 2, backW, backH, backH / 2);
+        bbgGfx.fill();
+        bbgGfx.strokeColor = new Color(120, 120, 160, 180);
+        bbgGfx.lineWidth = 1;
+        bbgGfx.roundRect(-backW / 2, -backH / 2, backW, backH, backH / 2);
+        bbgGfx.stroke();
+        backNode.insertChild(backBg, 0);
+
+        const backTxt = new Node('BackText');
+        const btut = backTxt.addComponent(UITransform);
+        btut.setContentSize(backW, backH);
+        btut.setAnchorPoint(0.5, 0.5);
+        backTxt.setPosition(0, 0, 0);
+        const btl = backTxt.addComponent(Label);
+        btl.string = '返  回';
+        btl.fontSize = 18;
+        btl.isBold = true;
+        btl.color = Color.WHITE;
+        btl.horizontalAlign = Label.HorizontalAlign.CENTER;
+        btl.verticalAlign = Label.VerticalAlign.CENTER;
+        backNode.addChild(backTxt);
+
+        backNode.on(Node.EventType.TOUCH_END, () => {
+            director.loadScene('battle');
+        }, this);
+        btnGroup.addChild(backNode);
+
+        this.node.addChild(btnGroup);
+        this.btnStartNode = btnGroup;
     }
 
     private onStartBattle(): void {

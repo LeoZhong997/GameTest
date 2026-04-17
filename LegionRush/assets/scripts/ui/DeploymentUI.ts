@@ -5,16 +5,16 @@
  * 挂载在 UIRoot 节点
  */
 
-import { _decorator, Component, Node, Label, Graphics, UITransform, Color, Button, EventTouch, sys } from 'cc';
+import { _decorator, Component, Node, Label, Graphics, UITransform, Color, Button, sys, view, Layers, director } from 'cc';
 import { UnitConfig, UnitInstanceData } from '../models/UnitData';
 import { EventBus } from '../core/EventBus';
 import { PlayerManager } from '../systems/PlayerManager';
+import { LevelSystem } from '../systems/LevelSystem';
 import { drawShape, UnitShape } from './UnitView';
 
 const { ccclass } = _decorator;
 
 // --- Layout constants (matching deployment-ui.pen) ---
-const SW = 960, SH = 640;
 const CELL = 80;
 const GRID_GAP = 4;
 const CARD_W = 80, CARD_H = 100;
@@ -23,11 +23,11 @@ const SAVE_KEY = 'legionrush_deploy';
 
 /** 默认十字阵 */
 const DEFAULT_DEPLOY: { row: number; col: number; configId: string; count: number }[] = [
-    { row: 0, col: 1, configId: 'mage', count: 3 },
-    { row: 1, col: 0, configId: 'swordsman', count: 3 },
-    { row: 1, col: 1, configId: 'iron_guard', count: 3 },
-    { row: 1, col: 2, configId: 'apothecary', count: 3 },
-    { row: 2, col: 1, configId: 'shadow_blade', count: 3 },
+    { row: 0, col: 1, configId: 'mage', count: 0 },
+    { row: 1, col: 0, configId: 'swordsman', count: 0 },
+    { row: 1, col: 1, configId: 'iron_guard', count: 0 },
+    { row: 1, col: 2, configId: 'apothecary', count: 0 },
+    { row: 2, col: 1, configId: 'shadow_blade', count: 0 },
 ];
 
 /** 模块级缓存，同一次页面会话内重启可立即恢复 */
@@ -46,7 +46,6 @@ const CARD_BORDER = new Color(74, 144, 217, 255);
 const BTN_TEXT_C  = new Color(26, 26, 46, 255);
 const GRAY        = new Color(100, 100, 100, 255);
 const PLACEHOLDER = new Color(255, 255, 255, 64);
-const SMALL_BTN_BG = new Color(255, 255, 255, 30);
 
 const RACE_NAMES: Record<string, string> = {
     human: '人族', beast: '兽族', spirit: '灵族', demon: '魔族',
@@ -99,17 +98,15 @@ export class DeploymentUI extends Component {
     private _selectedRace: string = 'human';
     private _raceTabGfx: Map<string, Graphics> = new Map();
     private _container: Node | null = null;
+    private _SW: number = 1280;
+    private _SH: number = 720;
 
     onLoad() {
-        this.buildUI();
-        // 隐藏布阵容器（不要隐藏 this.node，那是 UIRoot）
-        if (this._container) this._container.active = false;
-
-        EventBus.instance.on('deployment:ready', this.onReady, this);
+        // 布阵已改为自动布阵，不再创建 UI
+        console.log('[DeploymentUI] 已禁用，使用自动布阵');
     }
 
     onDestroy() {
-        EventBus.instance.off('deployment:ready', this.onReady, this);
     }
 
     // ---- Event handlers ----
@@ -156,12 +153,13 @@ export class DeploymentUI extends Component {
         }
 
         if (!loaded) {
-            // 首次使用默认十字阵（仅放置玩家拥有的兵种）
+            // 首次使用默认十字阵（自动填充等级对应数量）
             for (const entry of DEFAULT_DEPLOY) {
                 const cell = this._cells.find(c => c.row === entry.row && c.col === entry.col);
                 if (cell && configs.has(entry.configId) && this._playerUnits.has(entry.configId)) {
                     cell.configId = entry.configId;
-                    cell.count = entry.count;
+                    const unitInst = this._playerUnits.get(entry.configId);
+                    cell.count = unitInst ? LevelSystem.instance.getDeployCount(unitInst.level) : 1;
                 }
             }
             console.log('[DeploymentUI] 使用默认十字阵');
@@ -170,12 +168,14 @@ export class DeploymentUI extends Component {
         this.drawCards();
         this.refreshGrid();
         this.refreshCardCounts();
+        // 不自动显示 — 由 BattleScene 通过 deployment:show 事件控制
         if (this._container) this._container.active = true;
     }
 
     // ---- Build UI ----
 
     private buildUI(): void {
+        const SW = this._SW, SH = this._SH;
         const container = new Node('DeployContainer');
         const ct = container.addComponent(UITransform);
         ct.setContentSize(SW, SH);
@@ -195,6 +195,7 @@ export class DeploymentUI extends Component {
     }
 
     private buildTopBar(parent: Node): void {
+        const SW = this._SW, SH = this._SH;
         const TB_H = 50;
         const topBar = new Node('TopBar');
         const tut = topBar.addComponent(UITransform);
@@ -204,7 +205,35 @@ export class DeploymentUI extends Component {
 
         this.drawRect(topBar, SW, TB_H, TOPBAR_BG, 0, 0);
 
-        // 布阵阶段只显示标题
+        // 返回按钮（左上角）
+        const backBtn = new Node('BtnBack');
+        const bbut = backBtn.addComponent(UITransform);
+        bbut.setContentSize(80, 36);
+        bbut.setAnchorPoint(0.5, 0.5);
+        backBtn.setPosition(-SW / 2 + 60, 0, 0);
+
+        const backBg = new Node('BackBg');
+        const bbgut = backBg.addComponent(UITransform);
+        bbgut.setContentSize(80, 36);
+        bbgut.setAnchorPoint(0.5, 0.5);
+        backBg.setPosition(0, 0, 0);
+        const bbg = backBg.addComponent(Graphics);
+        bbg.fillColor = GOLD;
+        bbg.roundRect(-40, -18, 80, 36, 18);
+        bbg.fill();
+        backBtn.insertChild(backBg, 0);
+
+        this.addLabel(backBtn, '返回', 16, new Color(26, 26, 46, 255), 0, 0, 80, true);
+        backBtn.on(Node.EventType.TOUCH_END, () => {
+            console.log('[DeploymentUI] 返回关卡选择');
+            if (this._container) this._container.active = false;
+            // 重新显示关卡选择界面
+            const stageSelectNode = this.node.getChildByName('StageSelectContainer');
+            if (stageSelectNode) stageSelectNode.active = true;
+        }, this);
+        topBar.addChild(backBtn);
+
+        // 标题
         this.addLabel(topBar, '选 兵 布 阵', 24, GOLD, 0, 0, 200, true);
 
         parent.addChild(topBar);
@@ -250,6 +279,7 @@ export class DeploymentUI extends Component {
     }
 
     private buildCardArea(parent: Node): void {
+        const SW = this._SW;
         const cardArea = new Node('CardArea');
         const caut = cardArea.addComponent(UITransform);
         caut.setContentSize(SW - 40, CARD_H + 20);
@@ -259,6 +289,7 @@ export class DeploymentUI extends Component {
     }
 
     private buildRaceTabs(parent: Node): void {
+        const SW = this._SW;
         const TAB_W = 90, TAB_H = 32;
         const tabNode = new Node('RaceTabs');
         const tut = tabNode.addComponent(UITransform);
@@ -307,6 +338,7 @@ export class DeploymentUI extends Component {
     }
 
     private buildButton(parent: Node): void {
+        const SH = this._SH;
         const btnNode = new Node('BtnConfirm');
         const but = btnNode.addComponent(UITransform);
         but.setContentSize(BTN_W, BTN_H);
@@ -476,8 +508,9 @@ export class DeploymentUI extends Component {
             const lvlText = unitInst ? `Lv${unitInst.level}` : 'Lv1';
             this.addLabel(card, lvlText, 9, new Color(180, 180, 180, 255), 0, -24, CARD_W);
 
-            // Count
-            const countNode = this.addLabel(card, '×5', 10, GOLD, 0, -38, CARD_W);
+            // Count (from level)
+            const deployCount = unitInst ? LevelSystem.instance.getDeployCount(unitInst.level) : 1;
+            const countNode = this.addLabel(card, `×${deployCount}`, 10, GOLD, 0, -38, CARD_W);
 
             // Touch
             card.on(Node.EventType.TOUCH_END, () => this.onCardTap(cfg.id), this);
@@ -558,9 +591,10 @@ export class DeploymentUI extends Component {
                     this.refreshCardSelection();
                     return;
                 }
-                // 放置选中兵种，继承默认数量
+                // 放置选中兵种，自动使用等级对应最大数量
                 cell.configId = this._selectedId;
-                cell.count = cell.count || 3;
+                const unitInst = this._playerUnits.get(this._selectedId);
+                cell.count = unitInst ? LevelSystem.instance.getDeployCount(unitInst.level) : 1;
             }
             this._selectedId = null;
         } else {
@@ -572,22 +606,6 @@ export class DeploymentUI extends Component {
         this.refreshGrid();
         this.refreshCardCounts();
         this.refreshCardSelection();
-    }
-
-    private onPlus(cell: DeployCellData): void {
-        if (cell.count < 5) {
-            cell.count++;
-            this.refreshGrid();
-            this.refreshCardCounts();
-        }
-    }
-
-    private onMinus(cell: DeployCellData): void {
-        if (cell.count > 1) {
-            cell.count--;
-            this.refreshGrid();
-            this.refreshCardCounts();
-        }
     }
 
     // ---- Refresh ----
@@ -636,18 +654,6 @@ export class DeploymentUI extends Component {
 
                     // Count
                     this.addLabel(node, `×${cell.count}`, 10, GOLD, 0, -20, CELL);
-
-                    // + button
-                    const plus = this.createSmallBtn('+');
-                    plus.setPosition(CELL / 2 - 14, CELL / 2 - 14, 0);
-                    plus.on(Node.EventType.TOUCH_END, (e: EventTouch) => { e.propagationStopped = true; this.onPlus(cell); }, this);
-                    node.addChild(plus);
-
-                    // - button
-                    const minus = this.createSmallBtn('−');
-                    minus.setPosition(-CELL / 2 + 14, CELL / 2 - 14, 0);
-                    minus.on(Node.EventType.TOUCH_END, (e: EventTouch) => { e.propagationStopped = true; this.onMinus(cell); }, this);
-                    node.addChild(minus);
                 }
             } else {
                 // Empty cell
@@ -671,37 +677,6 @@ export class DeploymentUI extends Component {
         }
     }
 
-    private createSmallBtn(text: string): Node {
-        const n = new Node(`SmBtn${text}`);
-        const ut = n.addComponent(UITransform);
-        ut.setContentSize(20, 20);
-        ut.setAnchorPoint(0.5, 0.5);
-        const bg = new Node('Bg');
-        const bgut = bg.addComponent(UITransform);
-        bgut.setContentSize(20, 20);
-        bgut.setAnchorPoint(0.5, 0.5);
-        bg.setPosition(0, 0, 0);
-        const g = bg.addComponent(Graphics);
-        g.fillColor = SMALL_BTN_BG;
-        g.circle(0, 0, 10);
-        g.fill();
-        n.insertChild(bg, 0);
-        const lNode = new Node('Lbl');
-        const lut = lNode.addComponent(UITransform);
-        lut.setContentSize(20, 20);
-        lut.setAnchorPoint(0.5, 0.5);
-        lNode.setPosition(0, 0, 0);
-        const l = lNode.addComponent(Label);
-        l.string = text;
-        l.fontSize = 14;
-        l.isBold = true;
-        l.color = Color.WHITE;
-        l.horizontalAlign = Label.HorizontalAlign.CENTER;
-        l.verticalAlign = Label.VerticalAlign.CENTER;
-        n.addChild(lNode);
-        return n;
-    }
-
     private refreshCardSelection(): void {
         for (const [id, gfx] of this._cardGfx) {
             const deployed = this._cells.some(c => c.configId === id);
@@ -719,19 +694,14 @@ export class DeploymentUI extends Component {
     }
 
     private refreshCardCounts(): void {
-        const used = new Map<string, number>();
-        for (const cell of this._cells) {
-            if (cell.configId) {
-                used.set(cell.configId, (used.get(cell.configId) || 0) + cell.count);
-            }
-        }
         for (const [id, card] of this._cardNodes) {
-            const remaining = 5 - (used.get(id) || 0);
-            // Update count text
+            const unitInst = this._playerUnits.get(id);
+            const maxCount = unitInst ? LevelSystem.instance.getDeployCount(unitInst.level) : 1;
+            // Update count text to show max deploy count
             const countNode = card.children.find(c => c.name === 'Lbl' && c.getComponent(Label)?.string?.startsWith('×'));
             if (countNode) {
                 const lbl = countNode.getComponent(Label)!;
-                lbl.string = `×${remaining}`;
+                lbl.string = `×${maxCount}`;
             }
             // Update shape color (gray if depleted)
             const cfg = this._configs.get(id);
@@ -741,7 +711,7 @@ export class DeploymentUI extends Component {
                     const sg = shapeNode.getComponent(Graphics);
                     if (sg) {
                         sg.clear();
-                        sg.fillColor = remaining > 0 ? (RACE_COLORS[cfg.race] || BLUE) : GRAY;
+                        sg.fillColor = (RACE_COLORS[cfg.race] || BLUE);
                         drawShape(sg, getShape(cfg.role), 28);
                         sg.fill();
                     }

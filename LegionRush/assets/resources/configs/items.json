@@ -19,5 +19,29 @@
         "type": "material",
         "description": "品质提升的必备材料",
         "rarity": "rare"
+    },
+    "exp_book_s": {
+        "id": "exp_book_s",
+        "name": "初级经验书",
+        "type": "exp_book",
+        "description": "使用后获得 50 经验",
+        "rarity": "common",
+        "exp": 50
+    },
+    "exp_book_m": {
+        "id": "exp_book_m",
+        "name": "中级经验书",
+        "type": "exp_book",
+        "description": "使用后获得 200 经验",
+        "rarity": "rare",
+        "exp": 200
+    },
+    "exp_book_l": {
+        "id": "exp_book_l",
+        "name": "高级经验书",
+        "type": "exp_book",
+        "description": "使用后获得 800 经验",
+        "rarity": "epic",
+        "exp": 800
     }
 }

@@ -19,7 +19,6 @@ export interface StageEnemy {
     configId: string;
     level: number;
     quality: string;
-    count: number;
     gridRow: number;
     gridCol: number;
 }

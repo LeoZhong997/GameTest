@@ -11,9 +11,16 @@ export interface LevelUpResult {
     oldLevel: number;
 }
 
+export interface ExpBookConfig {
+    exp: number;
+    name: string;
+}
+
 export class LevelSystem {
     private static _instance: LevelSystem = null!;
     private _expTable: Map<number, number> = new Map();  // level -> cumulative exp
+    private _deployCount: Map<number, number> = new Map(); // level -> deploy count
+    private _expBooks: Map<string, ExpBookConfig> = new Map(); // bookId -> config
     private _maxLevel: number = 20;
 
     public static get instance(): LevelSystem {
@@ -26,6 +33,9 @@ export class LevelSystem {
     /** 从 constants 初始化 */
     init(constants: any): void {
         this._expTable.clear();
+        this._deployCount.clear();
+        this._expBooks.clear();
+
         if (constants.expTable) {
             for (const [lvl, exp] of Object.entries(constants.expTable)) {
                 this._expTable.set(Number(lvl), Number(exp));
@@ -34,7 +44,17 @@ export class LevelSystem {
         if (constants.maxLevel) {
             this._maxLevel = constants.maxLevel;
         }
-        console.log(`[LevelSystem] 初始化: maxLevel=${this._maxLevel}, expTable=${this._expTable.size} 条`);
+        if (constants.levelDeployCount) {
+            for (const [lvl, cnt] of Object.entries(constants.levelDeployCount)) {
+                this._deployCount.set(Number(lvl), Number(cnt));
+            }
+        }
+        if (constants.expBooks) {
+            for (const [id, cfg] of Object.entries(constants.expBooks) as [string, any][]) {
+                this._expBooks.set(id, { exp: cfg.exp, name: cfg.name });
+            }
+        }
+        console.log(`[LevelSystem] 初始化: maxLevel=${this._maxLevel}, expTable=${this._expTable.size}, deployCount=${this._deployCount.size}, expBooks=${this._expBooks.size}`);
     }
 
     /** 获取升到某级所需的总经验 */
@@ -61,6 +81,21 @@ export class LevelSystem {
 
     getMaxLevel(): number {
         return this._maxLevel;
+    }
+
+    /** 获取指定等级可部署的数量 */
+    getDeployCount(level: number): number {
+        return this._deployCount.get(level) ?? 1;
+    }
+
+    /** 获取经验书配置 */
+    getExpBookConfig(bookId: string): ExpBookConfig | null {
+        return this._expBooks.get(bookId) || null;
+    }
+
+    /** 获取所有经验书 ID */
+    getExpBookIds(): string[] {
+        return Array.from(this._expBooks.keys());
     }
 
     /** 给单位增加经验，返回升级结果 */

@@ -97,9 +97,9 @@ export class BattleManager {
             if (unit) unit.assists++;
         };
 
-        // 生成左方单位（每兵种最多 5 个，使用玩家布阵的格子坐标）
+        // 生成左方单位（数量由等级系统决定，无需截断）
         for (const group of config.leftUnits) {
-            const effectiveCount = Math.min(5, group.count);
+            const effectiveCount = group.count;
             const positions = Formation.getPositionsForCell(group.gridRow, group.gridCol, effectiveCount, true);
             for (let i = 0; i < effectiveCount; i++) {
                 const unit = new BattleUnit(group.config, TeamSide.LEFT, group.level, group.quality);
@@ -110,9 +110,9 @@ export class BattleManager {
             }
         }
 
-        // 生成右方单位（每兵种最多 5 个，使用十字阵格子坐标）
+        // 生成右方单位（数量由等级系统决定，无需截断）
         for (const group of config.rightUnits) {
-            const effectiveCount = Math.min(5, group.count);
+            const effectiveCount = group.count;
             const positions = Formation.getPositionsForCell(group.gridRow, group.gridCol, effectiveCount, false);
             for (let i = 0; i < effectiveCount; i++) {
                 const unit = new BattleUnit(group.config, TeamSide.RIGHT, group.level, group.quality);

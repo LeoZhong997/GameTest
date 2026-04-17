@@ -4,7 +4,7 @@
  * 挂载在 BattleField 节点
  */
 
-import { _decorator, Component, Node, Label, Color, UITransform, UIOpacity, tween, Vec3 } from 'cc';
+import { _decorator, Component, Node, Label, Color, UITransform, UIOpacity, tween, Vec3, Layers } from 'cc';
 import { EventBus } from '../core/EventBus';
 import { UnitView } from './UnitView';
 import { BattleManager, BattleState } from '../battle/BattleManager';
@@ -116,6 +116,7 @@ export class BattleEffectManager extends Component {
         const opacity = node.addComponent(UIOpacity);
 
         this.node.addChild(node);
+        node.layer = Layers.Enum.UI_2D;
         this._activeFloats.push(node);
 
         // 动画：上移 + 淡出

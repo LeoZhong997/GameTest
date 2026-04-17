@@ -5,7 +5,7 @@
 import { UnitInstanceData, Quality } from './UnitData';
 
 /** 存档版本号（结构变更时递增，用于迁移） */
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 3;
 
 export interface PlayerData {
     version: number;
@@ -86,7 +86,15 @@ export function createDefaultPlayerData(name: string = '魔王'): PlayerData {
         highestChapter: 1,
         highestStage: 1,
         units: starterUnits,
-        inventory: {},
+        inventory: {
+            'exp_book_s': 5,
+            'exp_book_m': 2,
+            'iron_guard_shard_green': 3,
+            'swordsman_shard_green': 3,
+            'mage_shard_green': 3,
+            'apothecary_shard_green': 3,
+            'shadow_blade_shard_green': 3,
+        },
         lastOnlineTime: now,
         offlineRewardHours: 8,
         buildings: {},
