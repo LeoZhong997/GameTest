@@ -5,7 +5,7 @@
 import { UnitInstanceData, Quality } from './UnitData';
 
 /** 存档版本号（结构变更时递增，用于迁移） */
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 
 export interface PlayerData {
     version: number;
@@ -33,6 +33,9 @@ export interface PlayerData {
 
     // 物品背包（itemId -> 数量）
     inventory: Record<string, number>;
+
+    // 已通关关卡（首通奖励判断）
+    clearedStages: string[];
 
     // 离线
     lastOnlineTime: number;
@@ -83,9 +86,10 @@ export function createDefaultPlayerData(name: string = '魔王'): PlayerData {
         relicFragments: 0,
         currentChapter: 1,
         currentStage: 1,
-        highestChapter: 1,
-        highestStage: 1,
+        highestChapter: 0,
+        highestStage: 0,
         units: starterUnits,
+        clearedStages: [],
         inventory: {
             'exp_book_s': 5,
             'exp_book_m': 2,

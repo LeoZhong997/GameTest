@@ -9,6 +9,8 @@ import { SkillExecutor } from './Skill';
 import { Formation, FormationType } from './Formation';
 import { UnitConfig, Quality } from '../models/UnitData';
 import { SkillConfig } from '../models/SkillData';
+import { SynergyConfig, ActiveSynergy } from '../models/SynergyData';
+import { SynergySystem } from './SynergySystem';
 import { EventBus } from '../core/EventBus';
 
 /** 战斗状态 */
@@ -57,6 +59,9 @@ export class BattleManager {
     private _rightUnits: BattleUnit[] = [];
     private _ais: Map<string, UnitAI> = new Map();
     private _skillConfigs: Map<string, SkillConfig> = new Map();
+    private _synergyConfigs: SynergyConfig[] = [];
+    private _activeSynergies: ActiveSynergy[] = [];
+    private _rightActiveSynergies: ActiveSynergy[] = [];
     private _battleTime: number = 0;
     private _timeLimit: number = 30;
     private _battleSpeed: number = 1.0;
@@ -76,6 +81,8 @@ export class BattleManager {
     get allUnits(): readonly BattleUnit[] { return this._allUnits; }
     get leftUnits(): readonly BattleUnit[] { return this._leftUnits; }
     get rightUnits(): readonly BattleUnit[] { return this._rightUnits; }
+    get activeSynergies(): readonly ActiveSynergy[] { return this._activeSynergies; }
+    get rightActiveSynergies(): readonly ActiveSynergy[] { return this._rightActiveSynergies; }
 
     setBattleSpeed(speed: number): void {
         this._battleSpeed = Math.max(0.5, Math.min(4.0, speed));
@@ -84,6 +91,11 @@ export class BattleManager {
     /** 注册技能配置 */
     registerSkills(configs: SkillConfig[]): void {
         configs.forEach(c => this._skillConfigs.set(c.id, c));
+    }
+
+    /** 注册羁绊配置 */
+    registerSynergies(configs: SynergyConfig[]): void {
+        this._synergyConfigs = configs;
     }
 
     /** 布阵：创建单位并摆放阵型，但不开始战斗 */
@@ -121,6 +133,19 @@ export class BattleManager {
                 this._allUnits.push(unit);
                 this._ais.set(unit.uid, new UnitAI(unit));
             }
+        }
+
+        // 应用种族羁绊
+        this._activeSynergies = [];
+        this._rightActiveSynergies = [];
+        if (this._synergyConfigs.length > 0) {
+            const leftActives = SynergySystem.applySynergies(this._leftUnits, this._synergyConfigs);
+            const rightActives = SynergySystem.applySynergies(this._rightUnits, this._synergyConfigs);
+            // 交叉应用敌方 debuff（如魔族腐蚀）
+            SynergySystem.applyEnemyEffects(this._leftUnits, this._rightUnits);
+            SynergySystem.applyEnemyEffects(this._rightUnits, this._leftUnits);
+            this._activeSynergies = leftActives;
+            this._rightActiveSynergies = rightActives;
         }
 
         this._state = BattleState.PREPARING;
@@ -184,7 +209,8 @@ export class BattleManager {
     /** 处理普攻 */
     private processAttack(unit: BattleUnit, dt: number): void {
         unit.attackTimer += dt;
-        const interval = 1.0 / unit.atkSpd;
+        const effectiveAtkSpd = unit.atkSpd * unit.buffs.getStatMultiplier('atkSpd');
+        const interval = 1.0 / effectiveAtkSpd;
 
         if (unit.attackTimer >= interval) {
             unit.attackTimer -= interval;
@@ -311,6 +337,8 @@ export class BattleManager {
         this._rightUnits = [];
         this._ais.clear();
         this._battleTime = 0;
+        this._activeSynergies = [];
+        this._rightActiveSynergies = [];
         this._state = BattleState.NONE;
         BattleUnit._onAssistCallback = null;
     }

@@ -77,6 +77,7 @@ export class MainUI extends Component {
 
         EventBus.instance.on('player:loaded', this.refreshInfo, this);
         EventBus.instance.on('configs:ready', this.refreshInfo, this);
+        EventBus.instance.on('offline:rewards', this.showOfflineRewards, this);
     }
 
     start() {
@@ -87,6 +88,7 @@ export class MainUI extends Component {
     onDestroy() {
         EventBus.instance.off('player:loaded', this.refreshInfo, this);
         EventBus.instance.off('configs:ready', this.refreshInfo, this);
+        EventBus.instance.off('offline:rewards', this.showOfflineRewards, this);
     }
 
     // ---- Build UI ----
@@ -229,6 +231,118 @@ export class MainUI extends Component {
                 lbl.string = `${c.icon}${(data as any)[c.id] || 0}`;
             }
         }
+    }
+
+    // ---- Offline rewards popup ----
+
+    private showOfflineRewards(info: { hours: number; exp: number; crystals: number; tokens: number }): void {
+        if (!this._container) return;
+        const SW = this._SW, SH = this._SH;
+
+        // 半透明遮罩
+        const overlay = new Node('OfflineOverlay');
+        const out = overlay.addComponent(UITransform);
+        out.setContentSize(SW, SH);
+        out.setAnchorPoint(0.5, 0.5);
+        overlay.setPosition(0, 0, 0);
+        const og = overlay.addComponent(Graphics);
+        og.fillColor = new Color(0, 0, 0, 160);
+        og.rect(-SW / 2, -SH / 2, SW, SH);
+        og.fill();
+
+        // 面板
+        const PW = 380, PH = 300, PR = 16;
+        const panel = new Node('OfflinePanel');
+        const put = panel.addComponent(UITransform);
+        put.setContentSize(PW, PH);
+        put.setAnchorPoint(0.5, 0.5);
+        panel.setPosition(0, 0, 0);
+        const pg = panel.addComponent(Graphics);
+        pg.fillColor = new Color(20, 20, 40, 250);
+        pg.roundRect(-PW / 2, -PH / 2, PW, PH, PR);
+        pg.fill();
+        pg.strokeColor = GOLD;
+        pg.lineWidth = 2;
+        pg.roundRect(-PW / 2, -PH / 2, PW, PH, PR);
+        pg.stroke();
+
+        // 标题
+        this.addLabel(panel, '离线收益', 24, GOLD, 0, PH / 2 - 35, PW, true);
+
+        // 分隔线
+        const divY = PH / 2 - 60;
+        const div = new Node('OfflineDiv');
+        const dvut = div.addComponent(UITransform);
+        dvut.setContentSize(PW - 40, 2);
+        dvut.setAnchorPoint(0.5, 0.5);
+        div.setPosition(0, divY, 0);
+        const dg = div.addComponent(Graphics);
+        dg.fillColor = new Color(255, 255, 255, 40);
+        dg.rect(-(PW - 40) / 2, -1, PW - 40, 2);
+        dg.fill();
+        panel.addChild(div);
+
+        // 离线时长
+        const hoursInt = Math.floor(info.hours);
+        const mins = Math.round((info.hours - hoursInt) * 60);
+        this.addLabel(panel, `离线 ${hoursInt} 小时 ${mins} 分钟`, 16, WHITE, 0, divY - 22, PW - 40, true);
+
+        // 收益明细
+        const lines = [
+            `经验 +${info.exp}`,
+            `氪晶 +${info.crystals}`,
+            `筹码 +${info.tokens}`,
+        ];
+        let infoY = divY - 50;
+        for (const line of lines) {
+            this.addLabel(panel, line, 16, GOLD, 0, infoY, PW - 40, true);
+            infoY -= 26;
+        }
+
+        // 领取按钮
+        const btnW = 140, btnH = 44, btnR = 22;
+        const btn = new Node('BtnCollect');
+        const but2 = btn.addComponent(UITransform);
+        but2.setContentSize(btnW, btnH);
+        but2.setAnchorPoint(0.5, 0.5);
+        btn.setPosition(0, -PH / 2 + 50, 0);
+
+        const btnBg = new Node('CollectBg');
+        const bbgut = btnBg.addComponent(UITransform);
+        bbgut.setContentSize(btnW, btnH);
+        bbgut.setAnchorPoint(0.5, 0.5);
+        btnBg.setPosition(0, 0, 0);
+        const bbgGfx = btnBg.addComponent(Graphics);
+        bbgGfx.fillColor = GOLD;
+        bbgGfx.roundRect(-btnW / 2, -btnH / 2, btnW, btnH, btnR);
+        bbgGfx.fill();
+        btn.insertChild(btnBg, 0);
+
+        const btnLbl = new Node('CollectTxt');
+        const blut = btnLbl.addComponent(UITransform);
+        blut.setContentSize(btnW, btnH);
+        blut.setAnchorPoint(0.5, 0.5);
+        btnLbl.setPosition(0, 0, 0);
+        const bl = btnLbl.addComponent(Label);
+        bl.string = '领  取';
+        bl.fontSize = 18;
+        bl.isBold = true;
+        bl.color = new Color(26, 26, 46, 255);
+        bl.horizontalAlign = Label.HorizontalAlign.CENTER;
+        btn.addChild(btnLbl);
+
+        btn.on(Node.EventType.TOUCH_END, () => {
+            overlay.destroy();
+            this.refreshInfo();
+        }, this);
+        panel.addChild(btn);
+
+        overlay.addChild(panel);
+        this._container!.addChild(overlay);
+
+        // 修正 layer
+        const setLayer = (n: Node) => { n.layer = Layers.Enum.UI_2D; n.children.forEach(setLayer); };
+        setLayer(overlay);
     }
 
     // ---- Settings panel ----

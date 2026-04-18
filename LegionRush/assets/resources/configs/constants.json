@@ -60,5 +60,19 @@
         "exp_book_s": { "exp": 50, "name": "初级经验书" },
         "exp_book_m": { "exp": 200, "name": "中级经验书" },
         "exp_book_l": { "exp": 800, "name": "高级经验书" }
+    },
+    "offline": {
+        "baseExpPerHour": 30,
+        "baseCrystalsPerHour": 5,
+        "baseTokensPerHour": 2,
+        "stageMultiplier": 0.15
+    },
+    "gacha": {
+        "rates": {
+            "green": 70,
+            "blue": 25,
+            "purple": 5
+        },
+        "tenPullMaxPurple": 2
     }
 }

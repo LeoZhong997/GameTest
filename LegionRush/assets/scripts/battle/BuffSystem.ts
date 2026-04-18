@@ -74,26 +74,34 @@ export class BuffSystem {
         }
     }
 
-    /** 攻击力乘数（综合所有 buff/debuff） */
-    getAtkMultiplier(): number {
+    /** 通用属性乘数 */
+    getStatMultiplier(stat: string): number {
         let mult = 1.0;
         for (const b of this._buffs) {
-            if (b.stat === 'atk') {
+            if (b.stat === stat) {
                 mult *= (1 + b.value / 100);
             }
         }
         return mult;
     }
 
+    /** 攻击力乘数（综合所有 buff/debuff） */
+    getAtkMultiplier(): number {
+        return this.getStatMultiplier('atk');
+    }
+
     /** 防御力乘数 */
     getDefMultiplier(): number {
-        let mult = 1.0;
-        for (const b of this._buffs) {
-            if (b.stat === 'def') {
-                mult *= (1 + b.value / 100);
+        return this.getStatMultiplier('def');
+    }
+
+    /** 按 source 移除 Buff（用于羁绊 enemy scope 标记清理） */
+    removeBuffBySource(source: string): void {
+        for (let i = this._buffs.length - 1; i >= 0; i--) {
+            if (this._buffs[i].source === source) {
+                this._buffs.splice(i, 1);
             }
         }
-        return mult;
     }
 
     get buffs(): readonly Buff[] {

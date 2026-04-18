@@ -10,6 +10,7 @@ import { BattleUnit, TeamSide } from '../battle/Unit';
 import { EventBus } from '../core/EventBus';
 import { PlayerManager } from '../systems/PlayerManager';
 import { StageManager } from '../systems/StageManager';
+import { GameConfig } from '../core/GameConfig';
 
 const { ccclass } = _decorator;
 
@@ -84,6 +85,8 @@ export class BattleUI extends Component {
     private _btnTextLabel: Label | null = null;
     private _stageLabel: Label | null = null;
     private _topBar: Node | null = null;
+    private _lastRewardInfo: any = null;
+    private _synergyLabel: Label | null = null; // 已移除，保留字段避免编译错误
 
     onLoad() {
         const design = view.getDesignResolutionSize();
@@ -124,6 +127,7 @@ export class BattleUI extends Component {
         setLayer(this.node);
 
         EventBus.instance.on('battle:end', this.onBattleEnd, this);
+        EventBus.instance.on('rewards:distributed', this.onRewardsDistributed, this);
     }
 
     /** 构建结算面板的视觉效果 */
@@ -587,6 +591,9 @@ export class BattleUI extends Component {
     }
 
     update(dt: number) {
+        // 更新羁绊标签
+        this.updateSynergyLabel();
+
         if (this._bm.state === BattleState.PREPARING) {
             // 布阵阶段保持按钮组可见
             if (this.btnStartNode) this.btnStartNode.active = true;
@@ -609,7 +616,9 @@ export class BattleUI extends Component {
 
         if (this.timerLabel) {
             const remaining = Math.max(0, this._bm.timeLimit - this._bm.battleTime);
-            this.timerLabel.string = remaining.toFixed(1) + 's';
+            const mins = Math.floor(remaining / 60);
+            const secs = Math.floor(remaining % 60);
+            this.timerLabel.string = `${mins}:${secs.toString().padStart(2, '0')}`;
             this.timerLabel.color = remaining < 5 ? Color.RED : Color.WHITE;
         }
 
@@ -626,6 +635,11 @@ export class BattleUI extends Component {
 
     onDestroy() {
         EventBus.instance.off('battle:end', this.onBattleEnd, this);
+        EventBus.instance.off('rewards:distributed', this.onRewardsDistributed, this);
+    }
+
+    private onRewardsDistributed(info: any): void {
+        this._lastRewardInfo = info;
     }
 
     /** 布阵确认后，显示开战按钮 */
@@ -735,7 +749,13 @@ export class BattleUI extends Component {
 
         // 动态调整按钮位置
         if (this.btnRestart) {
-            const btnY = Math.min(yBottom - 16, -(PANEL_H / 2 - 36));
+            let btnY = Math.min(yBottom - 16, -(PANEL_H / 2 - 36));
+
+            // 胜利时在按钮上方显示奖励
+            if (report.result === BattleResult.WIN && this._lastRewardInfo) {
+                btnY = this.createRewardSection(btnY);
+            }
+
             this.btnRestart.node.setPosition(0, btnY, 0);
         }
 
@@ -750,6 +770,7 @@ export class BattleUI extends Component {
         if (this.resultPanel) this.resultPanel.active = false;
         if (this.btnStartNode) this.btnStartNode.active = false;
         if (this.pauseOverlay) this.pauseOverlay.active = false;
+        this._lastRewardInfo = null;
         // 重置倍速
         this._speedIndex = 0;
         this._bm.setBattleSpeed(1);
@@ -1016,5 +1037,263 @@ export class BattleUI extends Component {
         tvlbl.horizontalAlign = Label.HorizontalAlign.LEFT;
         this.resultPanel.addChild(tankValNode);
         this._statsNodes.push(tankValNode);
+    }
+
+    // ========== 奖励展示 ==========
+
+    private readonly REWARD_COLOR = new Color(255, 215, 0, 255);
+    private readonly FIRST_CLEAR_COLOR = new Color(255, 100, 100, 255);
+    private readonly REWARD_CARD_BG = new Color(35, 35, 55, 220);
+    private readonly REWARD_CARD_BORDER = new Color(80, 130, 200, 150);
+
+    /** 资源图标定义 */
+    private readonly RES_ICONS: { key: string; icon: string; color: Color }[] = [
+        { key: 'exp',       icon: '📜', color: new Color(100, 220, 140, 255) },
+        { key: 'crystals',  icon: '💎', color: new Color(140, 200, 255, 255) },
+        { key: 'tokens',    icon: '🪙', color: new Color(255, 215, 0, 255) },
+        { key: 'bottleCaps',icon: '🍺', color: new Color(200, 180, 140, 255) },
+    ];
+
+    /** 在结算面板底部创建横排奖励区域，返回按钮 Y 坐标 */
+    private createRewardSection(btnY: number): number {
+        const info = this._lastRewardInfo;
+        if (!info) return btnY;
+
+        const totalW = PANEL_W - 40; // 奖励区总宽度（面板宽度 - 左右边距）
+
+        // 标题整体上移 30px
+        const titleShift = 30;
+
+        const divY = btnY + BTN_H / 2 + 6 + titleShift;
+
+        let y = divY + 8;
+
+        // 标题 + 首通
+        const titleParts: string[] = ['—  获得奖励  —'];
+        if (info.firstClear) titleParts.push('★首通');
+        this.makeRewardText(titleParts.join('  '), y + 16, this.REWARD_COLOR, 15, true);
+        y -= 4;
+
+        // ---- 资源横排 ----
+        const resItems = this.RES_ICONS.filter(r => (info as any)[r.key] > 0);
+        if (resItems.length > 0) {
+            y -= 16;
+            const cardW = Math.min(110, (totalW - (resItems.length - 1) * 8) / resItems.length);
+            const cardH = 42;
+            const cardR = 6;
+            const gapX = 8;
+            const totalCardsW = resItems.length * cardW + (resItems.length - 1) * gapX;
+            const startX = -totalCardsW / 2 + cardW / 2;
+
+            for (let i = 0; i < resItems.length; i++) {
+                const res = resItems[i];
+                const cx = startX + i * (cardW + gapX);
+                const val = (info as any)[res.key];
+                this.makeResCard(cx, y, cardW, cardH, cardR, res.icon, `+${val}`, res.color);
+            }
+        }
+
+        // ---- 物品横排 ----
+        const drops = info.items || [];
+        if (drops.length > 0) {
+            y -= 50;
+            const dropCardW = Math.min(130, (totalW - (drops.length - 1) * 8) / drops.length);
+            const dropCardH = 40;
+            const dropCardR = 6;
+            const dropGap = 8;
+            const totalDropW = drops.length * dropCardW + (drops.length - 1) * dropGap;
+            const dropStartX = -totalDropW / 2 + dropCardW / 2;
+
+            for (let i = 0; i < drops.length; i++) {
+                const drop = drops[i];
+                const dx = dropStartX + i * (dropCardW + dropGap);
+                const name = this.resolveItemName(drop.id);
+                this.makeDropCard(dx, y, dropCardW, dropCardH, dropCardR, name, drop.count);
+            }
+            y -= dropCardH / 2;
+        } else {
+            y -= 22;
+        }
+
+        return y - 4 - titleShift;
+    }
+
+    /** 创建奖励区分隔线 */
+    private makeRewardDivider(y: number): void {
+        const div = new Node('RewardDiv');
+        const dvut = div.addComponent(UITransform);
+        dvut.setContentSize(DETAIL_W, 2);
+        dvut.setAnchorPoint(0.5, 0.5);
+        const dg = div.addComponent(Graphics);
+        dg.fillColor = DIVIDER_CLR;
+        dg.rect(-DETAIL_W / 2, -1, DETAIL_W, 2);
+        dg.fill();
+        div.setPosition(0, y, 0);
+        this.resultPanel.addChild(div);
+        this._statsNodes.push(div);
+    }
+
+    /** 创建奖励区文字 */
+    private makeRewardText(text: string, y: number, color: Color, fontSize: number, bold: boolean): Node {
+        const n = new Node('RewardTxt');
+        const ut = n.addComponent(UITransform);
+        ut.setContentSize(DETAIL_W, fontSize + 4);
+        ut.setAnchorPoint(0.5, 0.5);
+        n.setPosition(0, y, 0);
+        const l = n.addComponent(Label);
+        l.string = text;
+        l.fontSize = fontSize;
+        l.isBold = bold;
+        l.color = color;
+        l.horizontalAlign = Label.HorizontalAlign.CENTER;
+        this.resultPanel.addChild(n);
+        this._statsNodes.push(n);
+        return n;
+    }
+
+    /** 创建资源卡片（图标 + 数值横排） */
+    private makeResCard(cx: number, cy: number, w: number, h: number, r: number, icon: string, value: string, accentColor: Color): void {
+        const card = new Node('ResCard');
+        const cut = card.addComponent(UITransform);
+        cut.setContentSize(w, h);
+        cut.setAnchorPoint(0.5, 0.5);
+        card.setPosition(cx, cy, 0);
+
+        // 背景
+        const bg = new Node('ResBg');
+        const bgut = bg.addComponent(UITransform);
+        bgut.setContentSize(w, h);
+        bgut.setAnchorPoint(0.5, 0.5);
+        const bgGfx = bg.addComponent(Graphics);
+        bgGfx.fillColor = this.REWARD_CARD_BG;
+        bgGfx.roundRect(-w / 2, -h / 2, w, h, r);
+        bgGfx.fill();
+        bgGfx.strokeColor = this.REWARD_CARD_BORDER;
+        bgGfx.lineWidth = 1;
+        bgGfx.roundRect(-w / 2, -h / 2, w, h, r);
+        bgGfx.stroke();
+        card.insertChild(bg, 0);
+
+        // 图标（上方）
+        const iconNode = new Node('ResIcon');
+        const iut = iconNode.addComponent(UITransform);
+        iut.setContentSize(w, 18);
+        iut.setAnchorPoint(0.5, 0.5);
+        iconNode.setPosition(0, 8, 0);
+        const iconLbl = iconNode.addComponent(Label);
+        iconLbl.string = icon;
+        iconLbl.fontSize = 16;
+        iconLbl.horizontalAlign = Label.HorizontalAlign.CENTER;
+        card.addChild(iconNode);
+
+        // 数值（下方）
+        const valNode = new Node('ResVal');
+        const vut = valNode.addComponent(UITransform);
+        vut.setContentSize(w, 16);
+        vut.setAnchorPoint(0.5, 0.5);
+        valNode.setPosition(0, -8, 0);
+        const valLbl = valNode.addComponent(Label);
+        valLbl.string = value;
+        valLbl.fontSize = 14;
+        valLbl.isBold = true;
+        valLbl.color = accentColor;
+        valLbl.horizontalAlign = Label.HorizontalAlign.CENTER;
+        card.addChild(valNode);
+
+        this.resultPanel.addChild(card);
+        this._statsNodes.push(card);
+    }
+
+    /** 创建掉落物品卡片 */
+    private makeDropCard(cx: number, cy: number, w: number, h: number, r: number, name: string, count: number): void {
+        const card = new Node('DropCard');
+        const cut = card.addComponent(UITransform);
+        cut.setContentSize(w, h);
+        cut.setAnchorPoint(0.5, 0.5);
+        card.setPosition(cx, cy, 0);
+
+        // 背景
+        const bg = new Node('DropBg');
+        const bgut = bg.addComponent(UITransform);
+        bgut.setContentSize(w, h);
+        bgut.setAnchorPoint(0.5, 0.5);
+        const bgGfx = bg.addComponent(Graphics);
+        bgGfx.fillColor = new Color(30, 45, 35, 220);
+        bgGfx.roundRect(-w / 2, -h / 2, w, h, r);
+        bgGfx.fill();
+        bgGfx.strokeColor = new Color(80, 180, 100, 150);
+        bgGfx.lineWidth = 1;
+        bgGfx.roundRect(-w / 2, -h / 2, w, h, r);
+        bgGfx.stroke();
+        card.insertChild(bg, 0);
+
+        // 名称（上方，截短）
+        const nameNode = new Node('DropName');
+        const nut = nameNode.addComponent(UITransform);
+        nut.setContentSize(w - 6, 16);
+        nut.setAnchorPoint(0.5, 0.5);
+        nameNode.setPosition(0, 7, 0);
+        const nLbl = nameNode.addComponent(Label);
+        nLbl.string = name.length > 5 ? name.substring(0, 5) : name;
+        nLbl.fontSize = 12;
+        nLbl.color = Color.WHITE;
+        nLbl.horizontalAlign = Label.HorizontalAlign.CENTER;
+        card.addChild(nameNode);
+
+        // 数量（下方）
+        const cntNode = new Node('DropCnt');
+        const cut2 = cntNode.addComponent(UITransform);
+        cut2.setContentSize(w - 6, 16);
+        cut2.setAnchorPoint(0.5, 0.5);
+        cntNode.setPosition(0, -8, 0);
+        const cLbl = cntNode.addComponent(Label);
+        cLbl.string = `×${count}`;
+        cLbl.fontSize = 13;
+        cLbl.isBold = true;
+        cLbl.color = this.REWARD_COLOR;
+        cLbl.horizontalAlign = Label.HorizontalAlign.CENTER;
+        card.addChild(cntNode);
+
+        this.resultPanel.addChild(card);
+        this._statsNodes.push(card);
+    }
+
+    // ========== 羁绊标签 ==========
+
+    private updateSynergyLabel(): void {
+        if (!this._synergyLabel) return;
+        const synergies = this._bm.activeSynergies;
+        if (synergies.length === 0) {
+            this._synergyLabel.string = '';
+            return;
+        }
+        const parts = synergies.map(s => {
+            const tier = s.config.tiers[s.activatedTier];
+            const tierLabel = s.activatedTier === 0 ? 'I' : s.activatedTier === 1 ? 'II' : 'III';
+            return `[${s.config.name} ${tierLabel}]`;
+        });
+        this._synergyLabel.string = parts.join('  ');
+    }
+
+    private resolveItemName(itemId: string): string {
+        const itemNames: Record<string, string> = {
+            'exp_book_s': '初级经验书',
+            'exp_book_m': '中级经验书',
+            'exp_book_l': '高级经验书',
+        };
+        if (itemNames[itemId]) return itemNames[itemId];
+
+        // 碎片格式: {configId}_shard_{quality}
+        if (itemId.includes('_shard_')) {
+            const idx = itemId.lastIndexOf('_shard_');
+            const configId = itemId.substring(0, idx);
+            const quality = itemId.substring(idx + 7);
+            const cfg = GameConfig.instance.getUnitConfig(configId);
+            const unitName = cfg ? cfg.name : configId;
+            const qNames: Record<string, string> = { green: '绿', blue: '蓝', purple: '紫' };
+            return `${unitName}${qNames[quality] || quality}碎片`;
+        }
+
+        return itemId;
     }
 }

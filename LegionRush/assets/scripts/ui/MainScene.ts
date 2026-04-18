@@ -8,6 +8,7 @@ import { _decorator, Component, Node, resources, JsonAsset } from 'cc';
 import { director } from 'cc';
 import { UnitConfig } from '../models/UnitData';
 import { SkillConfig } from '../models/SkillData';
+import { SynergyConfig } from '../models/SynergyData';
 import { BattleUnit, GameConstants } from '../battle/Unit';
 import { BattleManager } from '../battle/BattleManager';
 import { LevelSystem } from '../systems/LevelSystem';
@@ -41,6 +42,7 @@ export class MainScene extends Component {
                 BattleUnit.initConstants(constantsAsset as GameConstants);
                 LevelSystem.instance.init(constantsAsset);
                 UpgradeSystem.instance.init(constantsAsset);
+                GameConfig.instance.setConstants(constantsAsset as any);
             }
 
             const unitsAsset = await this.loadJson('configs/units');
@@ -63,6 +65,13 @@ export class MainScene extends Component {
             const stagesAsset = await this.loadJson('configs/stages');
             if (stagesAsset) {
                 StageManager.instance.loadConfigs(stagesAsset);
+            }
+
+            const synergiesAsset = await this.loadJson('configs/synergies');
+            if (synergiesAsset) {
+                const synergyConfigs = synergiesAsset as SynergyConfig[];
+                GameConfig.instance.setSynergyConfigs(synergyConfigs);
+                BattleManager.instance.registerSynergies(synergyConfigs);
             }
 
             GameConfig.instance.setConfigs(unitConfigs, skillConfigs);

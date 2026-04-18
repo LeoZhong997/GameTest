@@ -49,9 +49,9 @@ export class StageSelectUI extends Component {
         this.node.layer = Layers.Enum.UI_2D;
         console.log(`[StageSelectUI] screen size: ${this._SW}x${this._SH}`);
 
-        // 默认显示玩家当前章节
+        // 默认显示玩家当前章节（highest 为 0 表示新玩家，从第 1 章开始）
         if (PlayerManager.instance.isLoaded) {
-            this._selectedChapter = PlayerManager.instance.data.highestChapter;
+            this._selectedChapter = PlayerManager.instance.data.highestChapter || 1;
         }
 
         this.buildUI();
@@ -171,8 +171,11 @@ export class StageSelectUI extends Component {
 
             const stageValue = stage.chapter * 100 + stage.stage;
             let status: StageStatus;
-            if (stageValue <= highest) {
+            if (highest > 0 && stageValue <= highest) {
                 status = 'cleared';
+            } else if (highest === 0 && stage.chapter === 1 && stage.stage === 1) {
+                // 新玩家：1-1 为当前关
+                status = 'current';
             } else if (stageValue === highest + 1) {
                 status = 'current';
             } else {

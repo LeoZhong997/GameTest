@@ -6,12 +6,15 @@
 
 import { UnitConfig } from '../models/UnitData';
 import { SkillConfig } from '../models/SkillData';
+import { SynergyConfig } from '../models/SynergyData';
 
 export class GameConfig {
     private static _instance: GameConfig = null!;
 
     private _unitConfigs: Map<string, UnitConfig> = new Map();
     private _skillConfigs: Map<string, SkillConfig> = new Map();
+    private _synergyConfigs: SynergyConfig[] = [];
+    private _constants: any = null;
     private _loaded: boolean = false;
 
     public static get instance(): GameConfig {
@@ -33,11 +36,29 @@ export class GameConfig {
         return this._skillConfigs;
     }
 
+    get synergyConfigs(): SynergyConfig[] {
+        return this._synergyConfigs;
+    }
+
+    get constants(): any {
+        return this._constants;
+    }
+
     /** 设置配置数据（由主场景调用） */
     setConfigs(units: Map<string, UnitConfig>, skills: Map<string, SkillConfig>): void {
         this._unitConfigs = units;
         this._skillConfigs = skills;
         this._loaded = true;
+    }
+
+    /** 设置常量配置 */
+    setConstants(constants: any): void {
+        this._constants = constants;
+    }
+
+    /** 设置羁绊配置 */
+    setSynergyConfigs(configs: SynergyConfig[]): void {
+        this._synergyConfigs = configs;
     }
 
     getUnitConfig(id: string): UnitConfig | undefined {

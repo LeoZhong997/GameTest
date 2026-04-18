@@ -343,6 +343,162 @@
             },
             {
               "type": "frame",
+              "id": "HKtO5",
+              "name": "RaceTabs",
+              "width": "fill_container",
+              "height": 36,
+              "gap": 12,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "lZGhF",
+                  "name": "Tab_human",
+                  "width": 90,
+                  "height": 32,
+                  "fill": "#1e5090",
+                  "cornerRadius": 6,
+                  "stroke": {
+                    "thickness": 2,
+                    "fill": "#FFD700"
+                  },
+                  "gap": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "ahGyY",
+                      "name": "dot_h",
+                      "fill": "#50A0FF",
+                      "width": 10,
+                      "height": 10
+                    },
+                    {
+                      "type": "text",
+                      "id": "JlSut",
+                      "name": "txt_h",
+                      "fill": "#FFFFFF",
+                      "content": "人族",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "bold"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "QAQ83",
+                  "name": "Tab_beast",
+                  "width": 90,
+                  "height": 32,
+                  "fill": "#0f3460",
+                  "cornerRadius": 6,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#4A90D9"
+                  },
+                  "gap": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "OK0zl",
+                      "name": "dot_b",
+                      "fill": "#C87832",
+                      "width": 10,
+                      "height": 10
+                    },
+                    {
+                      "type": "text",
+                      "id": "xiH0s",
+                      "name": "txt_b",
+                      "fill": "#FFFFFF",
+                      "content": "兽族",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "bold"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "8aA9Q",
+                  "name": "Tab_spirit",
+                  "width": 90,
+                  "height": 32,
+                  "fill": "#0f3460",
+                  "cornerRadius": 6,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#4A90D9"
+                  },
+                  "gap": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "FXTfO",
+                      "name": "dot_s",
+                      "fill": "#50C88C",
+                      "width": 10,
+                      "height": 10
+                    },
+                    {
+                      "type": "text",
+                      "id": "ZQvFV",
+                      "name": "txt_s",
+                      "fill": "#FFFFFF",
+                      "content": "灵族",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "bold"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "qsi6X",
+                  "name": "Tab_demon",
+                  "width": 90,
+                  "height": 32,
+                  "fill": "#0f3460",
+                  "cornerRadius": 6,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#4A90D9"
+                  },
+                  "gap": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "Excxm",
+                      "name": "dot_d",
+                      "fill": "#B43CB4",
+                      "width": 10,
+                      "height": 10
+                    },
+                    {
+                      "type": "text",
+                      "id": "Z6RGe",
+                      "name": "txt_d",
+                      "fill": "#FFFFFF",
+                      "content": "魔族",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "bold"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
               "id": "aWFil",
               "name": "UnitPool",
               "width": "fill_container",
@@ -357,15 +513,11 @@
                 {
                   "type": "frame",
                   "id": "bcFbC",
-                  "name": "Card_tank",
+                  "name": "Card_iron_guard",
                   "width": 80,
                   "height": 100,
                   "fill": "#0f3460",
                   "cornerRadius": 8,
-                  "stroke": {
-                    "thickness": 1,
-                    "fill": "#4A90D9"
-                  },
                   "layout": "vertical",
                   "gap": 4,
                   "justifyContent": "center",
@@ -376,7 +528,7 @@
                       "cornerRadius": 2,
                       "id": "p4o3t",
                       "name": "cs1",
-                      "fill": "#4A90D9",
+                      "fill": "#50A0FF",
                       "width": 28,
                       "height": 28
                     },
@@ -385,7 +537,7 @@
                       "id": "HwStF",
                       "name": "cl1",
                       "fill": "#FFFFFF",
-                      "content": "坦克",
+                      "content": "铁卫",
                       "fontFamily": "Inter",
                       "fontSize": 12,
                       "fontWeight": "600"
@@ -405,15 +557,11 @@
                 {
                   "type": "frame",
                   "id": "2e7xl",
-                  "name": "Card_melee",
+                  "name": "Card_swordsman",
                   "width": 80,
                   "height": 100,
                   "fill": "#0f3460",
                   "cornerRadius": 8,
-                  "stroke": {
-                    "thickness": 1,
-                    "fill": "#4A90D9"
-                  },
                   "layout": "vertical",
                   "gap": 4,
                   "justifyContent": "center",
@@ -424,7 +572,7 @@
                       "polygonCount": 3,
                       "id": "5uo8C",
                       "name": "cs2",
-                      "fill": "#4A90D9",
+                      "fill": "#50A0FF",
                       "width": 28,
                       "height": 28
                     },
@@ -433,7 +581,7 @@
                       "id": "1mSBA",
                       "name": "cl2",
                       "fill": "#FFFFFF",
-                      "content": "近战",
+                      "content": "剑客",
                       "fontFamily": "Inter",
                       "fontSize": 12,
                       "fontWeight": "600"
@@ -453,15 +601,11 @@
                 {
                   "type": "frame",
                   "id": "uypgv",
-                  "name": "Card_ranged",
+                  "name": "Card_mage",
                   "width": 80,
                   "height": 100,
                   "fill": "#0f3460",
                   "cornerRadius": 8,
-                  "stroke": {
-                    "thickness": 1,
-                    "fill": "#4A90D9"
-                  },
                   "layout": "vertical",
                   "gap": 4,
                   "justifyContent": "center",
@@ -471,7 +615,7 @@
                       "type": "ellipse",
                       "id": "ICFih",
                       "name": "cs3",
-                      "fill": "#4A90D9",
+                      "fill": "#50A0FF",
                       "width": 28,
                       "height": 28
                     },
@@ -480,7 +624,7 @@
                       "id": "cXbat",
                       "name": "cl3",
                       "fill": "#FFFFFF",
-                      "content": "远程",
+                      "content": "魔导",
                       "fontFamily": "Inter",
                       "fontSize": 12,
                       "fontWeight": "600"
@@ -500,15 +644,11 @@
                 {
                   "type": "frame",
                   "id": "MG8jV",
-                  "name": "Card_support",
+                  "name": "Card_apothecary",
                   "width": 80,
                   "height": 100,
                   "fill": "#0f3460",
                   "cornerRadius": 8,
-                  "stroke": {
-                    "thickness": 1,
-                    "fill": "#4A90D9"
-                  },
                   "layout": "vertical",
                   "gap": 4,
                   "justifyContent": "center",
@@ -519,7 +659,7 @@
                       "polygonCount": 6,
                       "id": "Hsqjj",
                       "name": "cs5",
-                      "fill": "#4A90D9",
+                      "fill": "#50A0FF",
                       "width": 28,
                       "height": 28
                     },
@@ -528,7 +668,7 @@
                       "id": "7nbzk",
                       "name": "cl5",
                       "fill": "#FFFFFF",
-                      "content": "辅助",
+                      "content": "药师",
                       "fontFamily": "Inter",
                       "fontSize": 12,
                       "fontWeight": "600"
@@ -548,15 +688,11 @@
                 {
                   "type": "frame",
                   "id": "mbPRM",
-                  "name": "Card_assassin",
+                  "name": "Card_shadow_blade",
                   "width": 80,
                   "height": 100,
                   "fill": "#0f3460",
                   "cornerRadius": 8,
-                  "stroke": {
-                    "thickness": 1,
-                    "fill": "#4A90D9"
-                  },
                   "layout": "vertical",
                   "gap": 4,
                   "justifyContent": "center",
@@ -567,7 +703,7 @@
                       "id": "lvdeF",
                       "name": "asnCardShape",
                       "rotation": 45,
-                      "fill": "#4A90D9",
+                      "fill": "#50A0FF",
                       "width": 24,
                       "height": 24
                     },
@@ -576,7 +712,7 @@
                       "id": "Kd0Kz",
                       "name": "cl6",
                       "fill": "#FFFFFF",
-                      "content": "刺客",
+                      "content": "影刃",
                       "fontFamily": "Inter",
                       "fontSize": 12,
                       "fontWeight": "600"

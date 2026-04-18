@@ -36,7 +36,7 @@
             "bottleCaps": 30,
             "items": [
                 {
-                    "id": "soul_shard_green",
+                    "id": "iron_guard_shard_green",
                     "count": 1,
                     "probability": 0.5
                 },
@@ -96,7 +96,7 @@
             "bottleCaps": 40,
             "items": [
                 {
-                    "id": "soul_shard_green",
+                    "id": "iron_guard_shard_green",
                     "count": 1,
                     "probability": 0.6
                 },
@@ -159,7 +159,7 @@
             "bottleCaps": 50,
             "items": [
                 {
-                    "id": "soul_shard_green",
+                    "id": "iron_guard_shard_green",
                     "count": 2,
                     "probability": 0.6
                 },
@@ -227,7 +227,7 @@
             "bottleCaps": 60,
             "items": [
                 {
-                    "id": "soul_shard_green",
+                    "id": "iron_guard_shard_green",
                     "count": 2,
                     "probability": 0.7
                 },
@@ -295,7 +295,7 @@
             "bottleCaps": 100,
             "items": [
                 {
-                    "id": "soul_shard_green",
+                    "id": "iron_guard_shard_green",
                     "count": 3,
                     "probability": 0.8
                 },
@@ -377,7 +377,7 @@
             "bottleCaps": 80,
             "items": [
                 {
-                    "id": "soul_shard_green",
+                    "id": "iron_guard_shard_green",
                     "count": 2,
                     "probability": 0.7
                 },
@@ -450,7 +450,7 @@
             "bottleCaps": 90,
             "items": [
                 {
-                    "id": "soul_shard_green",
+                    "id": "iron_guard_shard_green",
                     "count": 3,
                     "probability": 0.7
                 },
@@ -533,7 +533,7 @@
                     "probability": 0.5
                 },
                 {
-                    "id": "soul_shard_green",
+                    "id": "iron_guard_shard_green",
                     "count": 3,
                     "probability": 0.8
                 },

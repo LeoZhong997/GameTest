@@ -281,42 +281,88 @@ export class GachaUI extends Component {
             .to(0.5, { scale: new Vec3(2.0, 2.0, 1) }, { easing: 'sineIn' })
             .start();
 
-        // Phase 2: 闪光 (0.3s 后)
+        // Phase 2: 碎星散射 (0.8s 后)
         setTimeout(() => {
-            this.spawnFlash();
+            this.spawnStars(results);
         }, 800);
-
-        // Phase 3: 显示结果 (1.2s 后)
-        setTimeout(() => {
-            if (circle) circle.active = false;
-            if (glow) glow.active = false;
-            this.showResults(results);
-        }, 1200);
     }
 
-    /** 全屏白色闪光 */
-    private spawnFlash(): void {
-        const SW = this._SW, SH = this._SH;
-        const flash = new Node('Flash');
-        const fut = flash.addComponent(UITransform);
-        fut.setContentSize(SW, SH);
-        fut.setAnchorPoint(0.5, 0.5);
-        flash.setPosition(0, 0, 0);
-        flash.addComponent(UIOpacity).opacity = 0;
-        const fg = flash.addComponent(Graphics);
-        fg.fillColor = new Color(200, 220, 255, 255);
-        fg.rect(-SW / 2, -SH / 2, SW, SH);
-        fg.fill();
+    /** 碎星散射：从中心迸发光点向外散射，无全屏遮罩 */
+    private spawnStars(results: GachaResult[]): void {
+        if (!this._container) return;
+        const parent = new Node('StarBurst');
+        const put = parent.addComponent(UITransform);
+        put.setContentSize(10, 10);
+        put.setAnchorPoint(0.5, 0.5);
+        parent.setPosition(0, 20, 0);   // 与召唤阵同中心
+        this._container.addChild(parent);
+        parent.layer = Layers.Enum.UI_2D;
 
-        if (this._container) this._container.addChild(flash);
-        flash.layer = Layers.Enum.UI_2D;
+        const STAR_COLORS = [
+            new Color(255, 215, 0, 255),    // 金
+            new Color(255, 255, 255, 255),   // 白
+            new Color(255, 240, 180, 255),   // 暖白
+            new Color(100, 160, 255, 255),   // 蓝
+        ];
+        const COUNT = 24;
 
-        const op = flash.getComponent(UIOpacity)!;
-        tween(op)
-            .to(0.15, { opacity: 255 })
-            .to(0.25, { opacity: 0 })
-            .call(() => flash.destroy())
-            .start();
+        for (let i = 0; i < COUNT; i++) {
+            const dot = new Node(`Star${i}`);
+            const dut = dot.addComponent(UITransform);
+            dut.setContentSize(10, 10);
+            dut.setAnchorPoint(0.5, 0.5);
+            const dg = dot.addComponent(Graphics);
+            const r = 2 + Math.random() * 4;
+            dg.fillColor = STAR_COLORS[i % STAR_COLORS.length];
+            dg.circle(0, 0, r);
+            dg.fill();
+            dot.setPosition(0, 0, 0);
+            parent.addChild(dot);
+            dot.layer = Layers.Enum.UI_2D;
+
+            // 随机方向飞出
+            const angle = (i / COUNT) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+            const dist = 120 + Math.random() * 200;
+            const dx = Math.cos(angle) * dist;
+            const dy = Math.sin(angle) * dist;
+            const dur = 0.4 + Math.random() * 0.3;
+
+            const op = dot.addComponent(UIOpacity);
+            op.opacity = 255;
+            tween(dot)
+                .to(dur, { position: new Vec3(dx, dy, 0) }, { easing: 'quadOut' })
+                .start();
+            tween(op)
+                .delay(dur * 0.4)
+                .to(dur * 0.6, { opacity: 0 })
+                .start();
+        }
+
+        // 召唤阵淡出 + 显示结果
+        const circle = this._circleNode;
+        const glow = this._glowNode;
+        if (glow) {
+            tween(glow.getComponent(UIOpacity) || glow.addComponent(UIOpacity))
+                .to(0.3, { opacity: 0 })
+                .start();
+        }
+        if (circle) {
+            const cop = circle.getComponent(UIOpacity) || circle.addComponent(UIOpacity);
+            tween(cop)
+                .to(0.3, { opacity: 0 })
+                .call(() => {
+                    circle.active = false;
+                    cop.opacity = 255;  // 恢复，供下次使用
+                    if (glow) { glow.active = false; glow.getComponent(UIOpacity)!.opacity = 255; }
+                })
+                .start();
+        }
+
+        // 碎星飞完后清理 + 显示结果
+        setTimeout(() => {
+            parent.destroy();
+            this.showResults(results);
+        }, 500);
     }
 
     /** 显示抽卡结果 */
@@ -337,8 +383,8 @@ export class GachaUI extends Component {
 
         // 卡片布局
         const isSingle = results.length === 1;
-        const cardW = isSingle ? 160 : 100;
-        const cardH = isSingle ? 210 : 140;
+        const cardW = isSingle ? 180 : 120;
+        const cardH = isSingle ? 240 : 165;
         const gap = 14;
         const cols = isSingle ? 1 : 5;
         const rows = Math.ceil(results.length / cols);

@@ -1,0 +1,42 @@
+[
+    {
+        "race": "human",
+        "name": "人族·坚韧",
+        "tiers": [
+            { "threshold": 2, "effects": [{ "stat": "def", "value": 10, "scope": "race" }] },
+            { "threshold": 3, "effects": [{ "stat": "def", "value": 20, "scope": "race" }] }
+        ]
+    },
+    {
+        "race": "beast",
+        "name": "兽族·狂暴",
+        "tiers": [
+            { "threshold": 2, "effects": [{ "stat": "atkSpd", "value": 10, "scope": "race" }] },
+            { "threshold": 3, "effects": [{ "stat": "atk", "value": 15, "scope": "race" }] }
+        ]
+    },
+    {
+        "race": "spirit",
+        "name": "灵族·灵体",
+        "tiers": [
+            { "threshold": 2, "effects": [{ "stat": "atk", "value": 10, "scope": "race" }] },
+            { "threshold": 3, "effects": [{ "stat": "atk", "value": 20, "scope": "race" }] }
+        ]
+    },
+    {
+        "race": "demon",
+        "name": "魔族·腐蚀",
+        "tiers": [
+            { "threshold": 2, "effects": [{ "stat": "atk", "value": -8, "scope": "enemy" }] },
+            { "threshold": 3, "effects": [{ "stat": "atk", "value": -15, "scope": "enemy" }] }
+        ]
+    },
+    {
+        "race": "mixed",
+        "name": "混编·联军",
+        "tiers": [
+            { "threshold": 3, "effects": [{ "stat": "atk", "value": 5, "scope": "team" }, { "stat": "def", "value": 5, "scope": "team" }] },
+            { "threshold": 4, "effects": [{ "stat": "atk", "value": 12, "scope": "team" }, { "stat": "def", "value": 12, "scope": "team" }] }
+        ]
+    }
+]

@@ -1,10 +1,11 @@
 /**
  * BackpackUI - 背包界面
  * 显示玩家拥有的所有物品
+ * 左侧标签分类：碎片 / 其他
  * 纯代码创建，挂载在 UIRoot 节点
  */
 
-import { _decorator, Component, Node, Label, Graphics, UITransform, Color, director, view, Layers } from 'cc';
+import { _decorator, Component, Node, Label, Graphics, UITransform, Color, director, view, Layers, ScrollView, Mask } from 'cc';
 import { EventBus } from '../core/EventBus';
 import { PlayerManager } from '../systems/PlayerManager';
 import { GameConfig } from '../core/GameConfig';
@@ -13,6 +14,8 @@ const { ccclass } = _decorator;
 
 const ITEM_W = 160, ITEM_H = 80;
 const ITEM_GAP = 16;
+const TAB_W = 90;
+const TAB_GAP = 12;
 
 // Colors
 const BG          = new Color(26, 26, 46, 255);
@@ -23,6 +26,9 @@ const GOLD        = new Color(255, 215, 0, 255);
 const WHITE       = Color.WHITE;
 const GRAY_TEXT   = new Color(160, 160, 180, 255);
 const BACK_TEXT   = new Color(26, 26, 46, 255);
+const TAB_ACTIVE  = new Color(20, 50, 90, 255);
+const TAB_INACTIVE = new Color(18, 22, 40, 255);
+const TAB_INDICATOR = new Color(255, 215, 0, 255);
 
 const RARITY_COLORS: Record<string, Color> = {
     common: new Color(160, 160, 160, 255),
@@ -31,11 +37,22 @@ const RARITY_COLORS: Record<string, Color> = {
     legendary: new Color(255, 215, 0, 255),
 };
 
+const TAB_DEFS = [
+    { key: 'shard', label: '碎片' },
+    { key: 'other', label: '其他' },
+];
+const EMPTY_TEXTS: Record<string, string> = {
+    shard: '暂无碎片',
+    other: '暂无其他物品',
+};
+
 @ccclass('BackpackUI')
 export class BackpackUI extends Component {
 
     private _container: Node | null = null;
     private _content: Node | null = null;
+    private _tabNodes: Node[] = [];
+    private _tabIndex: number = 0;
     private _SW: number = 1280;
     private _SH: number = 720;
 
@@ -44,6 +61,7 @@ export class BackpackUI extends Component {
         exp_book_s: { name: '初级经验书', description: '使用后获得 50 经验', rarity: 'common' },
         exp_book_m: { name: '中级经验书', description: '使用后获得 200 经验', rarity: 'rare' },
         exp_book_l: { name: '高级经验书', description: '使用后获得 800 经验', rarity: 'epic' },
+        ascension_scroll: { name: '升阶卷轴', description: '用于兵种升阶', rarity: 'rare' },
     };
 
     /** 碎片物品 ID → 中文名 */
@@ -78,8 +96,6 @@ export class BackpackUI extends Component {
 
         this.buildUI();
 
-        this.refreshItems();
-
         // setLayer 放在所有内容创建之后
         const setLayer = (n: Node) => { n.layer = Layers.Enum.UI_2D; n.children.forEach(setLayer); };
         setLayer(this.node);
@@ -100,13 +116,49 @@ export class BackpackUI extends Component {
 
         this.drawRect(container, SW, SH, BG, 0, 0);
         this.buildTopBar(container);
+        this.buildTabs(container);
 
+        // 内容区域：ScrollView 实现滚动
+        const contentW = SW - TAB_W - 40;
+        const contentH = SH - 100;
+        const viewX = TAB_W / 2 + 10;
+        const viewY = -30;
+
+        // ScrollView 容器
+        const scrollNode = new Node('ScrollView');
+        const scrollUT = scrollNode.addComponent(UITransform);
+        scrollUT.setContentSize(contentW, contentH);
+        scrollUT.setAnchorPoint(0.5, 0.5);
+        scrollNode.setPosition(viewX, viewY, 0);
+
+        // view（裁剪区域）
+        const viewNode = new Node('view');
+        const viewUT = viewNode.addComponent(UITransform);
+        viewUT.setContentSize(contentW, contentH);
+        viewUT.setAnchorPoint(0.5, 0.5);
+        viewNode.setPosition(0, 0, 0);
+        viewNode.addComponent(Mask);
+        scrollNode.addChild(viewNode);
+
+        // content（可滚动内容）
         this._content = new Node('Content');
         const cut = this._content.addComponent(UITransform);
-        cut.setContentSize(SW - 40, SH - 100);
-        cut.setAnchorPoint(0.5, 0.5);
-        this._content.setPosition(0, -30, 0);
-        container.addChild(this._content);
+        cut.setContentSize(contentW, contentH);
+        cut.setAnchorPoint(0.5, 1.0); // 锚点在顶部
+        this._content.setPosition(0, contentH / 2, 0);
+        viewNode.addChild(this._content);
+
+        // ScrollView 组件
+        const sv = scrollNode.addComponent(ScrollView);
+        sv.content = this._content;
+        sv.horizontal = false;
+        sv.vertical = true;
+        sv.elastic = true;
+        sv.brake = 0.5;
+
+        container.addChild(scrollNode);
+
+        this.refreshItems();
     }
 
     private buildTopBar(parent: Node): void {
@@ -150,9 +202,113 @@ export class BackpackUI extends Component {
         parent.addChild(topBar);
     }
 
+    // ---- 左侧标签 ----
+
+    private buildTabs(parent: Node): void {
+        const SH = this._SH;
+        const tabAreaH = SH - 100; // 和内容区等高
+        const tabAreaY = -30;
+
+        const tabArea = new Node('TabArea');
+        const tabUT = tabArea.addComponent(UITransform);
+        tabUT.setContentSize(TAB_W, tabAreaH);
+        tabUT.setAnchorPoint(0.5, 0.5);
+        tabArea.setPosition(-this._SW / 2 + TAB_W / 2 + 10, tabAreaY, 0);
+        parent.addChild(tabArea);
+
+        // 标签背景
+        const tabBg = new Node('TabBg');
+        const tabBgUT = tabBg.addComponent(UITransform);
+        tabBgUT.setContentSize(TAB_W, tabAreaH);
+        tabBgUT.setAnchorPoint(0.5, 0.5);
+        tabBg.setPosition(0, 0, 0);
+        const tabBgG = tabBg.addComponent(Graphics);
+        tabBgG.fillColor = new Color(14, 18, 34, 255);
+        tabBgG.rect(-TAB_W / 2, -tabAreaH / 2, TAB_W, tabAreaH);
+        tabBgG.fill();
+        tabArea.insertChild(tabBg, 0);
+
+        // 两个标签按钮，居中排列
+        const tabH = (tabAreaH - (TAB_DEFS.length + 1) * TAB_GAP) / TAB_DEFS.length;
+        const totalH = TAB_DEFS.length * tabH + (TAB_DEFS.length - 1) * TAB_GAP;
+        const startY = totalH / 2 - tabH / 2;
+
+        this._tabNodes = [];
+        for (let i = 0; i < TAB_DEFS.length; i++) {
+            const def = TAB_DEFS[i];
+            const ty = startY - i * (tabH + TAB_GAP);
+            const tabNode = this.createTabNode(def.label, TAB_W, tabH, i);
+            tabNode.setPosition(0, ty, 0);
+            tabArea.addChild(tabNode);
+            this._tabNodes.push(tabNode);
+        }
+    }
+
+    private createTabNode(label: string, w: number, h: number, index: number): Node {
+        const node = new Node(`Tab_${index}`);
+        const ut = node.addComponent(UITransform);
+        ut.setContentSize(w, h);
+        ut.setAnchorPoint(0.5, 0.5);
+
+        // 背景（会在 refreshTabStyles 中重绘）
+        const bg = new Node('TabBg');
+        const bgUT = bg.addComponent(UITransform);
+        bgUT.setContentSize(w, h);
+        bgUT.setAnchorPoint(0.5, 0.5);
+        bg.setPosition(0, 0, 0);
+        bg.addComponent(Graphics);
+        node.insertChild(bg, 0);
+
+        // 文字
+        this.addLabel(node, label, 16, WHITE, 0, 0, w - 10, true);
+
+        node.on(Node.EventType.TOUCH_END, () => {
+            this._tabIndex = index;
+            this.refreshTabStyles();
+            this.refreshItems();
+        });
+
+        return node;
+    }
+
+    private refreshTabStyles(): void {
+        for (let i = 0; i < this._tabNodes.length; i++) {
+            const tabNode = this._tabNodes[i];
+            const isActive = i === this._tabIndex;
+            const ut = tabNode.getComponent(UITransform)!;
+            const w = ut.contentSize.width;
+            const h = ut.contentSize.height;
+
+            // 重绘背景
+            const bg = tabNode.getChildByName('TabBg')!;
+            const bgG = bg.getComponent(Graphics)!;
+            bgG.clear();
+            bgG.fillColor = isActive ? TAB_ACTIVE : TAB_INACTIVE;
+            bgG.roundRect(-w / 2 + 2, -h / 2 + 2, w - 4, h - 4, 6);
+            bgG.fill();
+
+            // 选中时左侧金色竖条
+            if (isActive) {
+                bgG.fillColor = TAB_INDICATOR;
+                bgG.rect(-w / 2 + 2, -h / 2 + 8, 3, h - 16);
+                bgG.fill();
+            }
+
+            // 文字颜色
+            const lblNode = tabNode.children.find(c => c.getComponent(Label))!;
+            const lbl = lblNode.getComponent(Label)!;
+            lbl.color = isActive ? GOLD : GRAY_TEXT;
+        }
+    }
+
+    // ---- 物品列表 ----
+
     private refreshItems(): void {
         if (!this._content) return;
         this._content.removeAllChildren();
+
+        // 首次渲染时初始化标签样式
+        this.refreshTabStyles();
 
         if (!PlayerManager.instance.isLoaded) {
             this.addLabel(this._content, '加载中...', 16, GRAY_TEXT, 0, 0, 300, true);
@@ -160,20 +316,35 @@ export class BackpackUI extends Component {
         }
 
         const inventory = PlayerManager.instance.data.inventory || {};
-        const items = Object.entries(inventory).filter(([_, count]) => count > 0);
+        const allItems = Object.entries(inventory).filter(([_, count]) => count > 0);
 
-        if (items.length === 0) {
-            this.addLabel(this._content, '背包空空如也', 16, GRAY_TEXT, 0, 0, 300, true);
+        // 按标签过滤
+        const tabKey = TAB_DEFS[this._tabIndex].key;
+        const filtered = allItems.filter(([itemId]) => {
+            const isShard = itemId.includes('_shard_');
+            return tabKey === 'shard' ? isShard : !isShard;
+        });
+
+        if (filtered.length === 0) {
+            const emptyNode = this.addLabel(this._content, EMPTY_TEXTS[tabKey], 16, GRAY_TEXT, 0, 0, 300, true);
+            emptyNode.layer = Layers.Enum.UI_2D;
             return;
         }
 
         const cols = 4;
-        const totalW = cols * ITEM_W + (cols - 1) * ITEM_GAP;
-        const contentH = this._content.getComponent(UITransform)!.contentSize.height;
-        const startX = -totalW / 2 + ITEM_W / 2;
-        const startY = contentH / 2 - ITEM_H / 2 - 10;
+        const totalRows = Math.ceil(filtered.length / cols);
+        const neededH = totalRows * (ITEM_H + ITEM_GAP) + ITEM_GAP;
+        const contentUT = this._content.getComponent(UITransform)!;
+        const contentW = contentUT.contentSize.width;
+        const viewH = this._SH - 100; // ScrollView 可见区域高度
+        contentUT.setContentSize(contentW, Math.max(neededH, viewH));
 
-        items.forEach(([itemId, count], i) => {
+        const totalW = cols * ITEM_W + (cols - 1) * ITEM_GAP;
+        const startX = -totalW / 2 + ITEM_W / 2;
+        // 锚点在顶部，物品从顶部向下排列
+        const startY = -ITEM_H / 2 - 10;
+
+        filtered.forEach(([itemId, count], i) => {
             const row = Math.floor(i / cols);
             const col = i % cols;
             const cx = startX + col * (ITEM_W + ITEM_GAP);
@@ -214,6 +385,10 @@ export class BackpackUI extends Component {
 
             this._content.addChild(itemNode);
         });
+
+        // 确保新创建的节点都有 UI_2D layer
+        const setLayer = (n: Node) => { n.layer = Layers.Enum.UI_2D; n.children.forEach(setLayer); };
+        this._content.children.forEach(c => setLayer(c));
     }
 
     // ---- Draw helpers ----

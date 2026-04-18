@@ -12,6 +12,7 @@ import { BattleReport, BattleResult } from '../battle/BattleManager';
 import { LevelSystem } from './LevelSystem';
 import { StageManager } from './StageManager';
 import { StageItemDrop } from '../models/StageData';
+import { GameConfig } from '../core/GameConfig';
 
 const SAVE_KEY = 'player';
 
@@ -50,6 +51,9 @@ export class PlayerManager {
             console.log('[PlayerManager] 新存档创建: 赠送 5 个人族兵种');
         }
 
+        // 计算离线收益
+        this.calculateOfflineRewards();
+
         // 监听战斗结束
         EventBus.instance.on('battle:end', this.onBattleEnd, this);
 
@@ -60,6 +64,7 @@ export class PlayerManager {
     save(): void {
         if (!this._data) return;
         this._data.lastSaveTime = Date.now();
+        this._data.lastOnlineTime = Date.now();
         SaveSystem.instance.save(SAVE_KEY, this._data);
         this._dirty = false;
     }
@@ -153,19 +158,22 @@ export class PlayerManager {
 
     advanceStage(): void {
         if (!this._data) return;
+
+        // 先把刚打完的关卡标记为最高进度
+        const justCleared = this._data.currentChapter * 100 + this._data.currentStage;
+        const prevHighest = this._data.highestChapter * 100 + this._data.highestStage;
+        if (justCleared > prevHighest) {
+            this._data.highestChapter = this._data.currentChapter;
+            this._data.highestStage = this._data.currentStage;
+        }
+
+        // 推进到下一关（作为当前可玩关卡，不等于已通关）
         const next = StageManager.instance.getNextStage(this._data.currentChapter, this._data.currentStage);
         if (next) {
             this._data.currentChapter = next.chapter;
             this._data.currentStage = next.stage;
-            // 更新最高进度
-            const current = this._data.currentChapter * 100 + this._data.currentStage;
-            const highest = this._data.highestChapter * 100 + this._data.highestStage;
-            if (current > highest) {
-                this._data.highestChapter = this._data.currentChapter;
-                this._data.highestStage = this._data.currentStage;
-            }
             this.markDirty();
-            console.log(`[PlayerManager] 关卡推进: ${this._data.currentChapter}-${this._data.currentStage}`);
+            console.log(`[PlayerManager] 关卡推进: ${this._data.currentChapter}-${this._data.currentStage}，最高进度: ${this._data.highestChapter}-${this._data.highestStage}`);
             EventBus.instance.emit('stage:advanced', { chapter: this._data.currentChapter, stage: this._data.currentStage });
         }
     }
@@ -189,11 +197,31 @@ export class PlayerManager {
             const highest = this._data.highestChapter * 100 + this._data.highestStage;
 
             const rewards = stage.rewards;
-            const rewardInfo: any = { exp: rewards.exp, crystals: rewards.crystals, tokens: rewards.tokens, bottleCaps: rewards.bottleCaps, items: [] as any[] };
+            const rewardInfo: any = {
+                stageId: stage.id,
+                exp: rewards.exp,
+                crystals: rewards.crystals,
+                tokens: rewards.tokens,
+                bottleCaps: rewards.bottleCaps,
+                items: [] as any[],
+                firstClear: false,
+                firstClearBonus: null as any,
+            };
 
-            // 发放经验给参战单位（左方存活+死亡单位都获得经验）
-            const deployedConfigIds = new Set(this._data.units ? Object.keys(this._data.units) : []);
-            // 这里用参战单位的 configId 来匹配
+            // 首通判定
+            if (!this._data.clearedStages.includes(stage.id)) {
+                rewardInfo.firstClear = true;
+                this._data.clearedStages.push(stage.id);
+                if (rewards.firstClearBonus) {
+                    rewardInfo.firstClearBonus = rewards.firstClearBonus;
+                    this.addCurrency('crystals', rewards.firstClearBonus.crystals || 0);
+                    this.addCurrency('tokens', rewards.firstClearBonus.tokens || 0);
+                    rewardInfo.crystals += rewards.firstClearBonus.crystals || 0;
+                    rewardInfo.tokens += rewards.firstClearBonus.tokens || 0;
+                }
+            }
+
+            // 发放经验给所有单位
             for (const uid of Object.keys(this._data.units)) {
                 const unit = this._data.units[uid];
                 const result = LevelSystem.instance.addExp(unit, rewards.exp);
@@ -217,21 +245,78 @@ export class PlayerManager {
                 }
             }
 
-            // 推进关卡：只有打的关是"最高进度下一关"才推进
-            const nextStageValue = highest + 1;
-            if (playedValue === nextStageValue) {
+            // 推进关卡：打的关超过当前最高进度才推进
+            if (playedValue > highest) {
                 this.advanceStage();
             } else {
                 console.log(`[PlayerManager] 重玩关卡 ${playedChapter}-${playedStage}，不推进进度`);
             }
 
-            console.log(`[PlayerManager] 奖励发放: EXP+${rewards.exp} 氪晶+${rewards.crystals} 筹码+${rewards.tokens} 瓶盖+${rewards.bottleCaps}`);
+            console.log(`[PlayerManager] 奖励发放: EXP+${rewards.exp} 氪晶+${rewardInfo.crystals} 筹码+${rewardInfo.tokens} 瓶盖+${rewards.bottleCaps}${rewardInfo.firstClear ? ' (首通)' : ''}`);
             if (rewardInfo.items.length > 0) {
                 console.log(`[PlayerManager] 物品掉落: ${rewardInfo.items.map((i: any) => `${i.id}x${i.count}`).join(', ')}`);
             }
 
             EventBus.instance.emit('rewards:distributed', rewardInfo);
         }
+
+        this.save();
+    }
+
+    // --- 离线收益 ---
+
+    private calculateOfflineRewards(): void {
+        if (!this._data || !this._data.lastOnlineTime) return;
+
+        const now = Date.now();
+        const elapsed = now - this._data.lastOnlineTime;
+        const maxMs = (this._data.offlineRewardHours || 8) * 3600 * 1000;
+        const offlineMs = Math.min(elapsed, maxMs);
+
+        // 至少离线 60 秒才发放
+        if (offlineMs < 60000) {
+            this._data.lastOnlineTime = now;
+            return;
+        }
+
+        const hours = offlineMs / 3600000;
+        const progress = this._data.highestChapter * 100 + this._data.highestStage;
+
+        // 读取离线配置
+        const constants = GameConfig.instance.constants;
+        const offlineConfig = constants?.offline;
+        if (!offlineConfig) {
+            this._data.lastOnlineTime = now;
+            return;
+        }
+
+        const multiplier = 1 + progress * (offlineConfig.stageMultiplier || 0.15);
+        const exp = Math.floor((offlineConfig.baseExpPerHour || 30) * hours * multiplier);
+        const crystals = Math.floor((offlineConfig.baseCrystalsPerHour || 5) * hours * multiplier);
+        const tokens = Math.floor((offlineConfig.baseTokensPerHour || 2) * hours * multiplier);
+
+        // 发放经验
+        if (exp > 0) {
+            for (const uid of Object.keys(this._data.units)) {
+                LevelSystem.instance.addExp(this._data.units[uid], Math.floor(exp / Object.keys(this._data.units).length));
+            }
+        }
+
+        // 发放货币
+        if (crystals > 0) this.addCurrency('crystals', crystals);
+        if (tokens > 0) this.addCurrency('tokens', tokens);
+
+        this._data.lastOnlineTime = now;
+
+        const info = {
+            hours: Math.round(hours * 10) / 10,
+            exp,
+            crystals,
+            tokens,
+        };
+
+        console.log(`[PlayerManager] 离线收益: ${info.hours}小时 EXP+${exp} 氪晶+${crystals} 筹码+${tokens}`);
+        EventBus.instance.emit('offline:rewards', info);
 
         this.save();
     }
