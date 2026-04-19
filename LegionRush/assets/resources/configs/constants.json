@@ -46,6 +46,11 @@
     },
     "qualityOrder": ["green", "blue", "purple", "gold", "gold1", "gold2", "gold3"],
     "shardUpgradeCount": 3,
+    "scrollUpgradeCost": {
+        "green": 1,
+        "blue": 2,
+        "purple": 3
+    },
     "shardSynthesis": {
         "green_to_blue": { "count": 3 },
         "blue_to_purple": { "count": 3 }
@@ -63,8 +68,8 @@
     },
     "offline": {
         "baseExpPerHour": 30,
-        "baseCrystalsPerHour": 5,
-        "baseTokensPerHour": 2,
+        "baseGoldPerHour": 20,
+        "baseCrystalsPerHour": 3,
         "stageMultiplier": 0.15
     },
     "gacha": {
@@ -74,5 +79,38 @@
             "purple": 5
         },
         "tenPullMaxPurple": 2
+    },
+    "relic": {
+        "maxLevel": 20,
+        "subStatLevels": [5, 10, 15],
+        "mainStatBase": { "green": 3.0, "blue": 5.0, "purple": 8.0, "gold": 12.0 },
+        "mainStatGrowth": { "green": 0.3, "blue": 0.4, "purple": 0.5, "gold": 0.6 },
+        "subStatRange": {
+            "green": [1.0, 3.0],
+            "blue": [2.0, 4.0],
+            "purple": [2.0, 5.0],
+            "gold": [3.0, 6.0]
+        },
+        "upgradeCost": {
+            "goldPerLevel": 100,
+            "essencePerLevel": 5
+        },
+        "dismantleYield": { "green": 5, "blue": 15, "purple": 40, "gold": 100 },
+        "statPool": ["atk", "hp", "def", "atkSpd"]
+    },
+    "relicGacha": {
+        "singleCost": { "crystals": 50 },
+        "tenCost": { "crystals": 500 },
+        "rates": { "green": 60, "blue": 28, "purple": 10, "gold": 2 },
+        "tenPullMinBlue": true
+    },
+    "fontSizes": {
+        "hero": 48,
+        "titleLg": 40,
+        "title": 28,
+        "subtitle": 24,
+        "body": 22,
+        "small": 20,
+        "caption": 18
     }
 }

@@ -87,6 +87,7 @@ export class BattleUI extends Component {
     private _topBar: Node | null = null;
     private _lastRewardInfo: any = null;
     private _synergyLabel: Label | null = null; // 已移除，保留字段避免编译错误
+    private _rewardParent: Node | null = null; // 奖励区域临时父节点
 
     onLoad() {
         const design = view.getDesignResolutionSize();
@@ -128,6 +129,7 @@ export class BattleUI extends Component {
 
         EventBus.instance.on('battle:end', this.onBattleEnd, this);
         EventBus.instance.on('rewards:distributed', this.onRewardsDistributed, this);
+        EventBus.instance.on('rewards:choose', this.onRewardsChoose, this);
     }
 
     /** 构建结算面板的视觉效果 */
@@ -182,7 +184,7 @@ export class BattleUI extends Component {
         if (this.resultLabel) {
             const lt = this.resultLabel.node.getComponent(UITransform)!;
             lt.setAnchorPoint(0.5, 0.5);
-            this.resultLabel.fontSize = 40;
+            this.resultLabel.fontSize = this.mapFS(40);
             this.resultLabel.isBold = true;
             this.resultLabel.color = GOLD;
             this.resultLabel.enableOutline = true;
@@ -210,7 +212,7 @@ export class BattleUI extends Component {
             const dlt = this.resultDetailLabel.node.getComponent(UITransform)!;
             dlt.setContentSize(DETAIL_W, 100);
             dlt.setAnchorPoint(0.5, 0.5);
-            this.resultDetailLabel.fontSize = 20;
+            this.resultDetailLabel.fontSize = this.mapFS(20);
             this.resultDetailLabel.lineHeight = 28;
             this.resultDetailLabel.color = DETAIL_CLR;
             this.resultDetailLabel.horizontalAlign = Label.HorizontalAlign.CENTER;
@@ -249,7 +251,7 @@ export class BattleUI extends Component {
             btnTextNode.setPosition(0, 0, 0);
             const txt = btnTextNode.addComponent(Label);
             txt.string = '再来一局';
-            txt.fontSize = 20;
+            txt.fontSize = this.mapFS(20);
             txt.isBold = true;
             txt.color = BTN_TEXT_CLR;
             txt.horizontalAlign = Label.HorizontalAlign.CENTER;
@@ -316,7 +318,7 @@ export class BattleUI extends Component {
             const lt = this.leftCountLabel.node.getComponent(UITransform)!;
             lt.setContentSize(80, 30);
             lt.setAnchorPoint(0.5, 0.5);
-            this.leftCountLabel.fontSize = 18;
+            this.leftCountLabel.fontSize = this.mapFS(18);
             this.leftCountLabel.isBold = true;
             this.leftCountLabel.color = Color.WHITE;
             this.leftCountLabel.node.setPosition(leftBaseX + 40, 0, 0);
@@ -331,7 +333,7 @@ export class BattleUI extends Component {
         leftName.setPosition(leftBaseX + 90, 0, 0);
         const lnLbl = leftName.addComponent(Label);
         lnLbl.string = '蓝方';
-        lnLbl.fontSize = 14;
+        lnLbl.fontSize = this.mapFS(14);
         lnLbl.color = BLUE_NAME;
         lnLbl.horizontalAlign = Label.HorizontalAlign.CENTER;
         topBar.addChild(leftName);
@@ -343,7 +345,7 @@ export class BattleUI extends Component {
         slut.setAnchorPoint(0, 0.5);
         stageLbl.setPosition(leftBaseX + 115, 0, 0);
         const sl = stageLbl.addComponent(Label);
-        sl.fontSize = 14;
+        sl.fontSize = this.mapFS(14);
         sl.color = new Color(255, 230, 150, 255);
         sl.horizontalAlign = Label.HorizontalAlign.LEFT;
         this._stageLabel = sl;
@@ -377,7 +379,7 @@ export class BattleUI extends Component {
         timerIcon.setPosition(-20, 0, 0);
         const tiLbl = timerIcon.addComponent(Label);
         tiLbl.string = '⏱';
-        tiLbl.fontSize = 16;
+        tiLbl.fontSize = this.mapFS(16);
         tiLbl.color = GOLD;
         timerBox.addChild(timerIcon);
 
@@ -387,7 +389,7 @@ export class BattleUI extends Component {
             const ttut = this.timerLabel.node.getComponent(UITransform)!;
             ttut.setContentSize(70, 30);
             ttut.setAnchorPoint(0.5, 0.5);
-            this.timerLabel.fontSize = 20;
+            this.timerLabel.fontSize = this.mapFS(20);
             this.timerLabel.isBold = true;
             this.timerLabel.color = GOLD;
             this.timerLabel.node.setPosition(20, 0, 0);
@@ -407,7 +409,7 @@ export class BattleUI extends Component {
         rightName.setPosition(rightBaseX - 90, 0, 0);
         const rnLbl = rightName.addComponent(Label);
         rnLbl.string = '红方';
-        rnLbl.fontSize = 14;
+        rnLbl.fontSize = this.mapFS(14);
         rnLbl.color = RED_NAME;
         rnLbl.horizontalAlign = Label.HorizontalAlign.CENTER;
         topBar.addChild(rightName);
@@ -430,7 +432,7 @@ export class BattleUI extends Component {
             const rt = this.rightCountLabel.node.getComponent(UITransform)!;
             rt.setContentSize(80, 30);
             rt.setAnchorPoint(0.5, 0.5);
-            this.rightCountLabel.fontSize = 18;
+            this.rightCountLabel.fontSize = this.mapFS(18);
             this.rightCountLabel.isBold = true;
             this.rightCountLabel.color = Color.WHITE;
             this.rightCountLabel.node.setPosition(rightBaseX, 0, 0);
@@ -483,7 +485,7 @@ export class BattleUI extends Component {
         ptut.setAnchorPoint(0.5, 0.5);
         this.pauseTextLabel = pauseTxtNode.addComponent(Label);
         this.pauseTextLabel.string = '已暂停';
-        this.pauseTextLabel.fontSize = 32;
+        this.pauseTextLabel.fontSize = this.mapFS(32);
         this.pauseTextLabel.isBold = true;
         this.pauseTextLabel.color = GOLD;
         this.pauseTextLabel.enableOutline = true;
@@ -529,7 +531,7 @@ export class BattleUI extends Component {
         txtut.setAnchorPoint(0.5, 0.5);
         const label = txtNode.addComponent(Label);
         label.string = text;
-        label.fontSize = 18;
+        label.fontSize = this.mapFS(18);
         label.isBold = true;
         label.color = Color.WHITE;
         label.horizontalAlign = Label.HorizontalAlign.CENTER;
@@ -636,10 +638,186 @@ export class BattleUI extends Component {
     onDestroy() {
         EventBus.instance.off('battle:end', this.onBattleEnd, this);
         EventBus.instance.off('rewards:distributed', this.onRewardsDistributed, this);
+        EventBus.instance.off('rewards:choose', this.onRewardsChoose, this);
     }
 
     private onRewardsDistributed(info: any): void {
         this._lastRewardInfo = info;
+    }
+
+    private onRewardsChoose(data: { fixedRewards: any; chooseOptions: any[] }): void {
+        // 保存固定奖励，刷新结算面板的奖励区域
+        this._lastRewardInfo = {
+            ...data.fixedRewards,
+            items: [],
+        };
+        this.refreshResultRewards();
+
+        // 延迟 0.6 秒显示三选一覆盖层
+        setTimeout(() => {
+            this.showRewardChooseOverlay(data.chooseOptions);
+        }, 600);
+    }
+
+    /** 结算面板已显示后，动态刷新奖励区域 */
+    private refreshResultRewards(): void {
+        if (!this.resultPanel || !this.resultPanel.active || !this._lastRewardInfo) return;
+
+        // 移除旧的奖励节点
+        for (const n of this._statsNodes) {
+            if (n.name === 'RewardSection') {
+                n.removeFromParent();
+                n.destroy();
+            }
+        }
+        this._statsNodes = this._statsNodes.filter(n => n.isValid);
+
+        // 在按钮上方创建奖励区域
+        if (this.btnRestart) {
+            const btnY = this.btnRestart.node.position.y;
+            this.createRewardSection(btnY);
+            // 修正 layer
+            const setLayer = (n: Node) => { n.layer = Layers.Enum.UI_2D; n.children.forEach(setLayer); };
+            for (const sn of this._statsNodes) { if (sn.name === 'RewardSection') setLayer(sn); }
+        }
+    }
+
+    /** 三选一奖励覆盖层 */
+    private showRewardChooseOverlay(options: { itemId: string; name: string; count: number; rarity: string }[]): void {
+        if (options.length === 0) return;
+
+        const SW = this._SW, SH = this._SH;
+        const CARD_W = 160, CARD_H = 220, CARD_GAP = 24;
+
+        // 全屏遮罩
+        const overlay = new Node('RewardChooseOverlay');
+        const out = overlay.addComponent(UITransform);
+        out.setContentSize(SW, SH);
+        out.setAnchorPoint(0.5, 0.5);
+        overlay.setPosition(0, 0, 0);
+        const og = overlay.addComponent(Graphics);
+        og.fillColor = new Color(10, 10, 30, 220);
+        og.rect(-SW / 2, -SH / 2, SW, SH);
+        og.fill();
+        const overlayOpacity = overlay.addComponent(UIOpacity);
+        overlayOpacity.opacity = 0;
+        tween(overlayOpacity).to(0.2, { opacity: 255 }).start();
+
+        // 标题
+        this.addRewardLabel(overlay, '★ 选择一个奖励 ★', 24, new Color(255, 215, 0, 255), 0, SH / 2 - 60, SW, true);
+
+        // 3 张卡片
+        const totalW = options.length * CARD_W + (options.length - 1) * CARD_GAP;
+        const startX = -totalW / 2 + CARD_W / 2;
+        const cardY = 0;
+
+        const RARITY_COLORS: Record<string, Color> = {
+            common: new Color(160, 160, 160, 255),
+            rare: new Color(80, 160, 255, 255),
+            epic: new Color(180, 80, 255, 255),
+        };
+        const RARITY_NAMES: Record<string, string> = {
+            common: '普通',
+            rare: '精良',
+            epic: '史诗',
+        };
+
+        options.forEach((opt, i) => {
+            const cx = startX + i * (CARD_W + CARD_GAP);
+            const card = new Node(`RewardCard_${i}`);
+            const cut = card.addComponent(UITransform);
+            cut.setContentSize(CARD_W, CARD_H);
+            cut.setAnchorPoint(0.5, 0.5);
+            card.setPosition(cx, cardY, 0);
+
+            // 卡片背景
+            const bgNode = new Node('CardBg');
+            const bgut = bgNode.addComponent(UITransform);
+            bgut.setContentSize(CARD_W, CARD_H);
+            bgut.setAnchorPoint(0.5, 0.5);
+            bgNode.setPosition(0, 0, 0);
+            const bg = bgNode.addComponent(Graphics);
+            const rColor = RARITY_COLORS[opt.rarity] || RARITY_COLORS.common;
+            bg.fillColor = new Color(20, 30, 50, 240);
+            bg.roundRect(-CARD_W / 2, -CARD_H / 2, CARD_W, CARD_H, 12);
+            bg.fill();
+            bg.strokeColor = rColor;
+            bg.lineWidth = 3;
+            bg.roundRect(-CARD_W / 2, -CARD_H / 2, CARD_W, CARD_H, 12);
+            bg.stroke();
+            card.insertChild(bgNode, 0);
+
+            // 品质标签
+            const rarityText = RARITY_NAMES[opt.rarity] || '普通';
+            this.addRewardLabel(card, rarityText, 14, rColor, 0, CARD_H / 2 - 24, CARD_W, true);
+
+            // 物品名称
+            this.addRewardLabel(card, opt.name, 16, Color.WHITE, 0, 10, CARD_W - 12, true);
+
+            // 数量
+            this.addRewardLabel(card, `×${opt.count}`, 20, new Color(255, 215, 0, 255), 0, -30, CARD_W, true);
+
+            // 点击选择
+            card.on(Node.EventType.TOUCH_END, () => {
+                // 选中动画
+                tween(card).to(0.15, { scale: new Vec3(1.1, 1.1, 1) })
+                    .to(0.15, { scale: new Vec3(1, 1, 1) })
+                    .call(() => {
+                        // 确认选择
+                        PlayerManager.instance.confirmRewardSelection(i);
+                        // 销毁覆盖层
+                        if (overlay.isValid) overlay.destroy();
+                    })
+                    .start();
+            });
+
+            // 弹入动画
+            card.setScale(0, 0, 1);
+            tween(card)
+                .delay(i * 0.12)
+                .to(0.35, { scale: new Vec3(1, 1, 1) }, { easing: 'backOut' })
+                .start();
+
+            overlay.addChild(card);
+        });
+
+        this.node.addChild(overlay);
+
+        // 递归设置 layer
+        const setLayer = (n: Node) => { n.layer = Layers.Enum.UI_2D; n.children.forEach(setLayer); };
+        setLayer(overlay);
+    }
+
+    private addRewardLabel(parent: Node, text: string, fontSize: number, color: Color,
+        x: number, y: number, w: number = 0, bold: boolean = false): Node {
+        const actualSize = this.mapFS(fontSize);
+        const n = new Node('Lbl');
+        if (w > 0) {
+            const ut = n.addComponent(UITransform);
+            ut.setContentSize(w, actualSize + 4);
+            ut.setAnchorPoint(0.5, 0.5);
+        }
+        n.setPosition(x, y, 0);
+        const l = n.addComponent(Label);
+        l.string = text;
+        l.fontSize = actualSize;
+        l.isBold = bold;
+        l.color = color;
+        if (w > 0) l.horizontalAlign = Label.HorizontalAlign.CENTER;
+        parent.addChild(n);
+        return n;
+    }
+
+    private mapFS(raw: number): number {
+        const fs = GameConfig.instance.fontSizes;
+        if (!fs) return raw;
+        if (raw >= 44) return fs.hero;
+        if (raw >= 34) return fs.titleLg;
+        if (raw >= 26) return fs.title;
+        if (raw >= 22) return fs.subtitle;
+        if (raw >= 18) return fs.body;
+        if (raw >= 14) return fs.small;
+        return fs.caption;
     }
 
     /** 布阵确认后，显示开战按钮 */
@@ -751,8 +929,8 @@ export class BattleUI extends Component {
         if (this.btnRestart) {
             let btnY = Math.min(yBottom - 16, -(PANEL_H / 2 - 36));
 
-            // 胜利时在按钮上方显示奖励
-            if (report.result === BattleResult.WIN && this._lastRewardInfo) {
+            // 胜利时在按钮上方显示奖励（重玩已通关关卡不显示奖励）
+            if (report.result === BattleResult.WIN && this._lastRewardInfo && !this._lastRewardInfo.isReplay) {
                 btnY = this.createRewardSection(btnY);
             }
 
@@ -820,7 +998,7 @@ export class BattleUI extends Component {
         txtNode.setPosition(0, 0, 0);
         const txt = txtNode.addComponent(Label);
         txt.string = '开  战';
-        txt.fontSize = 22;
+        txt.fontSize = this.mapFS(22);
         txt.isBold = true;
         txt.color = BTN_TEXT_CLR;
         txt.horizontalAlign = Label.HorizontalAlign.CENTER;
@@ -863,7 +1041,7 @@ export class BattleUI extends Component {
         backTxt.setPosition(0, 0, 0);
         const btl = backTxt.addComponent(Label);
         btl.string = '返  回';
-        btl.fontSize = 18;
+        btl.fontSize = this.mapFS(18);
         btl.isBold = true;
         btl.color = Color.WHITE;
         btl.horizontalAlign = Label.HorizontalAlign.CENTER;
@@ -933,7 +1111,7 @@ export class BattleUI extends Component {
         hdr.setPosition(colX + COL_W / 2, headerY, 0);
         const hlbl = hdr.addComponent(Label);
         hlbl.string = headerText;
-        hlbl.fontSize = 18;
+        hlbl.fontSize = this.mapFS(18);
         hlbl.isBold = true;
         hlbl.color = headerColor;
         hlbl.horizontalAlign = Label.HorizontalAlign.CENTER;
@@ -969,7 +1147,7 @@ export class BattleUI extends Component {
         nameNode.setPosition(nameX, y, 0);
         const nlbl = nameNode.addComponent(Label);
         nlbl.string = stat.name.substring(0, 4);
-        nlbl.fontSize = 15;
+        nlbl.fontSize = this.mapFS(15);
         nlbl.color = DETAIL_CLR;
         nlbl.horizontalAlign = Label.HorizontalAlign.LEFT;
         this.resultPanel.addChild(nameNode);
@@ -1018,7 +1196,7 @@ export class BattleUI extends Component {
         dmgValNode.setPosition(valX, y + BAR_GAP / 2 + BAR_H / 2, 0);
         const dvlbl = dmgValNode.addComponent(Label);
         dvlbl.string = `${stat.damageDealt} (${stat.dmgPct}%)`;
-        dvlbl.fontSize = 13;
+        dvlbl.fontSize = this.mapFS(13);
         dvlbl.color = DMG_COLOR;
         dvlbl.horizontalAlign = Label.HorizontalAlign.LEFT;
         this.resultPanel.addChild(dmgValNode);
@@ -1032,7 +1210,7 @@ export class BattleUI extends Component {
         tankValNode.setPosition(valX, y - (BAR_GAP / 2 + BAR_H / 2), 0);
         const tvlbl = tankValNode.addComponent(Label);
         tvlbl.string = `${stat.damageTaken} (${stat.tankPct}%)`;
-        tvlbl.fontSize = 13;
+        tvlbl.fontSize = this.mapFS(13);
         tvlbl.color = TANK_COLOR;
         tvlbl.horizontalAlign = Label.HorizontalAlign.LEFT;
         this.resultPanel.addChild(tankValNode);
@@ -1049,9 +1227,8 @@ export class BattleUI extends Component {
     /** 资源图标定义 */
     private readonly RES_ICONS: { key: string; icon: string; color: Color }[] = [
         { key: 'exp',       icon: '📜', color: new Color(100, 220, 140, 255) },
+        { key: 'gold',      icon: '💰', color: new Color(255, 215, 0, 255) },
         { key: 'crystals',  icon: '💎', color: new Color(140, 200, 255, 255) },
-        { key: 'tokens',    icon: '🪙', color: new Color(255, 215, 0, 255) },
-        { key: 'bottleCaps',icon: '🍺', color: new Color(200, 180, 140, 255) },
     ];
 
     /** 在结算面板底部创建横排奖励区域，返回按钮 Y 坐标 */
@@ -1059,7 +1236,18 @@ export class BattleUI extends Component {
         const info = this._lastRewardInfo;
         if (!info) return btnY;
 
-        const totalW = PANEL_W - 40; // 奖励区总宽度（面板宽度 - 左右边距）
+        // 奖励区域根节点（方便刷新时整体移除）
+        const rewardRoot = new Node('RewardSection');
+        const rrut = rewardRoot.addComponent(UITransform);
+        rrut.setContentSize(PANEL_W, 200);
+        rrut.setAnchorPoint(0.5, 0.5);
+        rewardRoot.setPosition(0, 0, 0);
+        this.resultPanel.addChild(rewardRoot);
+        this._statsNodes.push(rewardRoot);
+        this._rewardParent = rewardRoot;
+
+        // 后续节点挂到 rewardRoot 下
+        const totalW = PANEL_W - 40;
 
         // 标题整体上移 30px
         const titleShift = 30;
@@ -1115,6 +1303,7 @@ export class BattleUI extends Component {
             y -= 22;
         }
 
+        this._rewardParent = null;
         return y - 4 - titleShift;
     }
 
@@ -1135,18 +1324,20 @@ export class BattleUI extends Component {
 
     /** 创建奖励区文字 */
     private makeRewardText(text: string, y: number, color: Color, fontSize: number, bold: boolean): Node {
+        const actualSize = this.mapFS(fontSize);
         const n = new Node('RewardTxt');
         const ut = n.addComponent(UITransform);
-        ut.setContentSize(DETAIL_W, fontSize + 4);
+        ut.setContentSize(DETAIL_W, actualSize + 4);
         ut.setAnchorPoint(0.5, 0.5);
         n.setPosition(0, y, 0);
         const l = n.addComponent(Label);
         l.string = text;
-        l.fontSize = fontSize;
+        l.fontSize = actualSize;
         l.isBold = bold;
         l.color = color;
         l.horizontalAlign = Label.HorizontalAlign.CENTER;
-        this.resultPanel.addChild(n);
+        const parent = this._rewardParent || this.resultPanel;
+        parent.addChild(n);
         this._statsNodes.push(n);
         return n;
     }
@@ -1182,7 +1373,7 @@ export class BattleUI extends Component {
         iconNode.setPosition(0, 8, 0);
         const iconLbl = iconNode.addComponent(Label);
         iconLbl.string = icon;
-        iconLbl.fontSize = 16;
+        iconLbl.fontSize = this.mapFS(16);
         iconLbl.horizontalAlign = Label.HorizontalAlign.CENTER;
         card.addChild(iconNode);
 
@@ -1194,17 +1385,20 @@ export class BattleUI extends Component {
         valNode.setPosition(0, -8, 0);
         const valLbl = valNode.addComponent(Label);
         valLbl.string = value;
-        valLbl.fontSize = 14;
+        valLbl.fontSize = this.mapFS(14);
         valLbl.isBold = true;
         valLbl.color = accentColor;
         valLbl.horizontalAlign = Label.HorizontalAlign.CENTER;
         card.addChild(valNode);
 
-        this.resultPanel.addChild(card);
+        this.getRewardParent().addChild(card);
         this._statsNodes.push(card);
     }
 
-    /** 创建掉落物品卡片 */
+    /** 获取当前奖励区域的父节点 */
+    private getRewardParent(): Node {
+        return this._rewardParent || this.resultPanel;
+    }
     private makeDropCard(cx: number, cy: number, w: number, h: number, r: number, name: string, count: number): void {
         const card = new Node('DropCard');
         const cut = card.addComponent(UITransform);
@@ -1235,7 +1429,7 @@ export class BattleUI extends Component {
         nameNode.setPosition(0, 7, 0);
         const nLbl = nameNode.addComponent(Label);
         nLbl.string = name.length > 5 ? name.substring(0, 5) : name;
-        nLbl.fontSize = 12;
+        nLbl.fontSize = this.mapFS(12);
         nLbl.color = Color.WHITE;
         nLbl.horizontalAlign = Label.HorizontalAlign.CENTER;
         card.addChild(nameNode);
@@ -1248,13 +1442,13 @@ export class BattleUI extends Component {
         cntNode.setPosition(0, -8, 0);
         const cLbl = cntNode.addComponent(Label);
         cLbl.string = `×${count}`;
-        cLbl.fontSize = 13;
+        cLbl.fontSize = this.mapFS(13);
         cLbl.isBold = true;
         cLbl.color = this.REWARD_COLOR;
         cLbl.horizontalAlign = Label.HorizontalAlign.CENTER;
         card.addChild(cntNode);
 
-        this.resultPanel.addChild(card);
+        this.getRewardParent().addChild(card);
         this._statsNodes.push(card);
     }
 

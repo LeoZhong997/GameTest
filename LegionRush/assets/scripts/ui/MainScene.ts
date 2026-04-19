@@ -63,7 +63,12 @@ export class MainScene extends Component {
             }
 
             const stagesAsset = await this.loadJson('configs/stages');
-            if (stagesAsset) {
+            const templatesAsset = await this.loadJson('configs/stage-templates');
+            if (templatesAsset) {
+                // 优先使用模板生成 30 关/章，stages.json 作为 override
+                StageManager.instance.loadTemplates(templatesAsset, stagesAsset || null);
+            } else if (stagesAsset) {
+                // 降级：无模板时用旧方式
                 StageManager.instance.loadConfigs(stagesAsset);
             }
 
@@ -72,6 +77,11 @@ export class MainScene extends Component {
                 const synergyConfigs = synergiesAsset as SynergyConfig[];
                 GameConfig.instance.setSynergyConfigs(synergyConfigs);
                 BattleManager.instance.registerSynergies(synergyConfigs);
+            }
+
+            const relicsAsset = await this.loadJson('configs/relics');
+            if (relicsAsset) {
+                GameConfig.instance.setRelicConfigs(relicsAsset as any[]);
             }
 
             GameConfig.instance.setConfigs(unitConfigs, skillConfigs);

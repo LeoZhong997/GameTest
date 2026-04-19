@@ -11,6 +11,7 @@ import { EventBus } from '../core/EventBus';
 import { PlayerManager } from '../systems/PlayerManager';
 import { LevelSystem } from '../systems/LevelSystem';
 import { drawShape, UnitShape } from './UnitView';
+import { GameConfig } from '../core/GameConfig';
 
 const { ccclass } = _decorator;
 
@@ -354,7 +355,7 @@ export class DeploymentUI extends Component {
         txtNode.setPosition(0, 0, 0);
         const txt = txtNode.addComponent(Label);
         txt.string = '确  认';
-        txt.fontSize = 22;
+        txt.fontSize = this.mapFS(22);
         txt.isBold = true;
         txt.color = BTN_TEXT_C;
         txt.horizontalAlign = Label.HorizontalAlign.CENTER;
@@ -419,16 +420,17 @@ export class DeploymentUI extends Component {
     /** 创建 Label 子节点 */
     private addLabel(parent: Node, text: string, fontSize: number, color: Color,
         x: number, y: number, w: number = 0, bold: boolean = false): Node {
+        const actualSize = this.mapFS(fontSize);
         const n = new Node('Lbl');
         if (w > 0) {
             const ut = n.addComponent(UITransform);
-            ut.setContentSize(w, fontSize + 4);
+            ut.setContentSize(w, actualSize + 4);
             ut.setAnchorPoint(0.5, 0.5);
         }
         n.setPosition(x, y, 0);
         const l = n.addComponent(Label);
         l.string = text;
-        l.fontSize = fontSize;
+        l.fontSize = actualSize;
         l.isBold = bold;
         l.color = color;
         if (w > 0) l.horizontalAlign = Label.HorizontalAlign.CENTER;
@@ -669,7 +671,7 @@ export class DeploymentUI extends Component {
                 ph.setPosition(0, 0, 0);
                 const phl = ph.addComponent(Label);
                 phl.string = '+';
-                phl.fontSize = 18;
+                phl.fontSize = this.mapFS(18);
                 phl.color = PLACEHOLDER;
                 phl.horizontalAlign = Label.HorizontalAlign.CENTER;
                 node.addChild(ph);
@@ -795,5 +797,17 @@ export class DeploymentUI extends Component {
             console.warn('[DeploymentUI] 读取布阵失败:', e);
         }
         return null;
+    }
+
+    private mapFS(raw: number): number {
+        const fs = GameConfig.instance.fontSizes;
+        if (!fs) return raw;
+        if (raw >= 44) return fs.hero;
+        if (raw >= 34) return fs.titleLg;
+        if (raw >= 26) return fs.title;
+        if (raw >= 22) return fs.subtitle;
+        if (raw >= 18) return fs.body;
+        if (raw >= 14) return fs.small;
+        return fs.caption;
     }
 }

@@ -32,8 +32,6 @@
         "rewards": {
             "exp": 50,
             "crystals": 10,
-            "tokens": 5,
-            "bottleCaps": 30,
             "items": [
                 {
                     "id": "iron_guard_shard_green",
@@ -47,9 +45,9 @@
                 }
             ],
             "firstClearBonus": {
-                "crystals": 50,
-                "tokens": 20
-            }
+                "crystals": 50
+            },
+            "gold": 45
         }
     },
     "1-2": {
@@ -92,8 +90,6 @@
         "rewards": {
             "exp": 60,
             "crystals": 15,
-            "tokens": 5,
-            "bottleCaps": 40,
             "items": [
                 {
                     "id": "iron_guard_shard_green",
@@ -105,7 +101,8 @@
                     "count": 2,
                     "probability": 0.7
                 }
-            ]
+            ],
+            "gold": 55
         }
     },
     "1-3": {
@@ -155,8 +152,6 @@
         "rewards": {
             "exp": 80,
             "crystals": 20,
-            "tokens": 8,
-            "bottleCaps": 50,
             "items": [
                 {
                     "id": "iron_guard_shard_green",
@@ -173,7 +168,8 @@
                     "count": 2,
                     "probability": 0.7
                 }
-            ]
+            ],
+            "gold": 74
         }
     },
     "1-4": {
@@ -223,8 +219,6 @@
         "rewards": {
             "exp": 100,
             "crystals": 25,
-            "tokens": 10,
-            "bottleCaps": 60,
             "items": [
                 {
                     "id": "iron_guard_shard_green",
@@ -241,7 +235,8 @@
                     "count": 2,
                     "probability": 0.7
                 }
-            ]
+            ],
+            "gold": 90
         }
     },
     "1-5": {
@@ -291,8 +286,6 @@
         "rewards": {
             "exp": 150,
             "crystals": 40,
-            "tokens": 15,
-            "bottleCaps": 100,
             "items": [
                 {
                     "id": "iron_guard_shard_green",
@@ -321,9 +314,9 @@
                 }
             ],
             "firstClearBonus": {
-                "crystals": 100,
-                "tokens": 50
-            }
+                "crystals": 100
+            },
+            "gold": 145
         }
     },
     "1-6": {
@@ -373,8 +366,6 @@
         "rewards": {
             "exp": 120,
             "crystals": 30,
-            "tokens": 12,
-            "bottleCaps": 80,
             "items": [
                 {
                     "id": "iron_guard_shard_green",
@@ -396,7 +387,8 @@
                     "count": 1,
                     "probability": 0.4
                 }
-            ]
+            ],
+            "gold": 116
         }
     },
     "1-7": {
@@ -446,8 +438,6 @@
         "rewards": {
             "exp": 140,
             "crystals": 35,
-            "tokens": 14,
-            "bottleCaps": 90,
             "items": [
                 {
                     "id": "iron_guard_shard_green",
@@ -474,7 +464,8 @@
                     "count": 1,
                     "probability": 0.4
                 }
-            ]
+            ],
+            "gold": 132
         }
     },
     "1-8": {
@@ -524,8 +515,6 @@
         "rewards": {
             "exp": 160,
             "crystals": 40,
-            "tokens": 16,
-            "bottleCaps": 100,
             "items": [
                 {
                     "id": "soul_shard_blue",
@@ -552,7 +541,8 @@
                     "count": 1,
                     "probability": 0.4
                 }
-            ]
+            ],
+            "gold": 148
         }
     },
     "1-9": {
@@ -602,8 +592,6 @@
         "rewards": {
             "exp": 180,
             "crystals": 50,
-            "tokens": 18,
-            "bottleCaps": 120,
             "items": [
                 {
                     "id": "soul_shard_blue",
@@ -625,7 +613,8 @@
                     "count": 1,
                     "probability": 0.4
                 }
-            ]
+            ],
+            "gold": 174
         }
     },
     "1-10": {
@@ -638,73 +627,50 @@
         "enemies": [
             {
                 "configId": "demon_golem",
-                "level": 5,
+                "level": 4,
                 "quality": "blue",
                 "gridRow": 0,
                 "gridCol": 0
             },
             {
                 "configId": "demon_blade",
-                "level": 5,
-                "quality": "blue",
-                "gridRow": 0,
-                "gridCol": 1
-            },
-            {
-                "configId": "shadow_demon",
-                "level": 5,
+                "level": 4,
                 "quality": "blue",
                 "gridRow": 0,
                 "gridCol": 2
             },
             {
                 "configId": "warlock",
-                "level": 5,
-                "quality": "blue",
+                "level": 4,
+                "quality": "green",
                 "gridRow": 1,
                 "gridCol": 0
             },
             {
                 "configId": "nightmare",
-                "level": 6,
-                "quality": "purple",
+                "level": 5,
+                "quality": "blue",
                 "gridRow": 1,
                 "gridCol": 1
             },
             {
                 "configId": "warlock",
-                "level": 5,
-                "quality": "blue",
+                "level": 4,
+                "quality": "green",
                 "gridRow": 1,
                 "gridCol": 2
             },
             {
-                "configId": "blood_moon",
-                "level": 5,
-                "quality": "blue",
-                "gridRow": 2,
-                "gridCol": 0
-            },
-            {
                 "configId": "berserker",
-                "level": 5,
+                "level": 4,
                 "quality": "blue",
                 "gridRow": 2,
                 "gridCol": 1
-            },
-            {
-                "configId": "faceless",
-                "level": 5,
-                "quality": "blue",
-                "gridRow": 2,
-                "gridCol": 2
             }
         ],
         "rewards": {
             "exp": 250,
             "crystals": 80,
-            "tokens": 30,
-            "bottleCaps": 200,
             "items": [
                 {
                     "id": "soul_shard_blue",
@@ -728,9 +694,1506 @@
                 }
             ],
             "firstClearBonus": {
-                "crystals": 200,
-                "tokens": 100
+                "crystals": 200
+            },
+            "gold": 290
+        }
+    },
+    "2-1": {
+        "id": "2-1",
+        "chapter": 2,
+        "stage": 1,
+        "type": "normal",
+        "name": "人族边防",
+        "recommendedLevel": 6,
+        "enemies": [
+            {
+                "configId": "iron_guard",
+                "level": 6,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 0
+            },
+            {
+                "configId": "swordsman",
+                "level": 6,
+                "quality": "blue",
+                "gridRow": 0,
+                "gridCol": 1
+            },
+            {
+                "configId": "mage",
+                "level": 6,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "apothecary",
+                "level": 6,
+                "quality": "blue",
+                "gridRow": 2,
+                "gridCol": 1
+            },
+            {
+                "configId": "shadow_blade",
+                "level": 6,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 2
             }
+        ],
+        "rewards": {
+            "exp": 200,
+            "crystals": 50,
+            "items": [
+                {
+                    "id": "swordsman_shard_blue",
+                    "count": 1,
+                    "probability": 0.5
+                },
+                {
+                    "id": "exp_book_m",
+                    "count": 2,
+                    "probability": 0.6
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 1,
+                    "probability": 0.4
+                }
+            ],
+            "firstClearBonus": {
+                "crystals": 80
+            },
+            "gold": 180
+        }
+    },
+    "2-2": {
+        "id": "2-2",
+        "chapter": 2,
+        "stage": 2,
+        "type": "normal",
+        "name": "兽族猎场",
+        "recommendedLevel": 6,
+        "enemies": [
+            {
+                "configId": "bone_golem",
+                "level": 6,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 0
+            },
+            {
+                "configId": "berserker",
+                "level": 7,
+                "quality": "blue",
+                "gridRow": 0,
+                "gridCol": 1
+            },
+            {
+                "configId": "thunder_shaman",
+                "level": 6,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "witch_doctor",
+                "level": 6,
+                "quality": "blue",
+                "gridRow": 2,
+                "gridCol": 1
+            },
+            {
+                "configId": "blood_moon",
+                "level": 7,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 2
+            }
+        ],
+        "rewards": {
+            "exp": 220,
+            "crystals": 55,
+            "items": [
+                {
+                    "id": "berserker_shard_blue",
+                    "count": 1,
+                    "probability": 0.5
+                },
+                {
+                    "id": "exp_book_m",
+                    "count": 2,
+                    "probability": 0.6
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 1,
+                    "probability": 0.4
+                }
+            ],
+            "gold": 196
+        }
+    },
+    "2-3": {
+        "id": "2-3",
+        "chapter": 2,
+        "stage": 3,
+        "type": "normal",
+        "name": "灵族秘境",
+        "recommendedLevel": 7,
+        "enemies": [
+            {
+                "configId": "treant",
+                "level": 7,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 0
+            },
+            {
+                "configId": "blade_dancer",
+                "level": 7,
+                "quality": "blue",
+                "gridRow": 0,
+                "gridCol": 1
+            },
+            {
+                "configId": "wind_archer",
+                "level": 7,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "moon_singer",
+                "level": 7,
+                "quality": "blue",
+                "gridRow": 2,
+                "gridCol": 1
+            },
+            {
+                "configId": "faceless",
+                "level": 8,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 2
+            }
+        ],
+        "rewards": {
+            "exp": 240,
+            "crystals": 60,
+            "items": [
+                {
+                    "id": "wind_archer_shard_blue",
+                    "count": 1,
+                    "probability": 0.5
+                },
+                {
+                    "id": "exp_book_m",
+                    "count": 2,
+                    "probability": 0.6
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 1,
+                    "probability": 0.4
+                }
+            ],
+            "gold": 212
+        }
+    },
+    "2-4": {
+        "id": "2-4",
+        "chapter": 2,
+        "stage": 4,
+        "type": "normal",
+        "name": "魔族要塞",
+        "recommendedLevel": 7,
+        "enemies": [
+            {
+                "configId": "demon_golem",
+                "level": 7,
+                "quality": "blue",
+                "gridRow": 0,
+                "gridCol": 0
+            },
+            {
+                "configId": "demon_blade",
+                "level": 8,
+                "quality": "blue",
+                "gridRow": 0,
+                "gridCol": 2
+            },
+            {
+                "configId": "shadow_demon",
+                "level": 7,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "warlock",
+                "level": 7,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 0
+            },
+            {
+                "configId": "nightmare",
+                "level": 8,
+                "quality": "blue",
+                "gridRow": 2,
+                "gridCol": 2
+            }
+        ],
+        "rewards": {
+            "exp": 260,
+            "crystals": 65,
+            "items": [
+                {
+                    "id": "nightmare_shard_blue",
+                    "count": 1,
+                    "probability": 0.5
+                },
+                {
+                    "id": "exp_book_m",
+                    "count": 2,
+                    "probability": 0.6
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 1,
+                    "probability": 0.3
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 1,
+                    "probability": 0.5
+                }
+            ],
+            "gold": 228
+        }
+    },
+    "2-5": {
+        "id": "2-5",
+        "chapter": 2,
+        "stage": 5,
+        "type": "miniBoss",
+        "name": "四族先锋",
+        "recommendedLevel": 8,
+        "enemies": [
+            {
+                "configId": "iron_guard",
+                "level": 8,
+                "quality": "blue",
+                "gridRow": 0,
+                "gridCol": 0
+            },
+            {
+                "configId": "bone_golem",
+                "level": 8,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 2
+            },
+            {
+                "configId": "blade_dancer",
+                "level": 8,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 0
+            },
+            {
+                "configId": "nightmare",
+                "level": 9,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "mage",
+                "level": 8,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 2
+            },
+            {
+                "configId": "blood_moon",
+                "level": 8,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 1
+            }
+        ],
+        "rewards": {
+            "exp": 350,
+            "crystals": 90,
+            "items": [
+                {
+                    "id": "soul_shard_blue",
+                    "count": 2,
+                    "probability": 0.6
+                },
+                {
+                    "id": "exp_book_m",
+                    "count": 3,
+                    "probability": 0.5
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 1,
+                    "probability": 0.4
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 2,
+                    "probability": 0.5
+                }
+            ],
+            "firstClearBonus": {
+                "crystals": 150
+            },
+            "gold": 325
+        }
+    },
+    "2-6": {
+        "id": "2-6",
+        "chapter": 2,
+        "stage": 6,
+        "type": "normal",
+        "name": "峡谷伏击",
+        "recommendedLevel": 8,
+        "enemies": [
+            {
+                "configId": "berserker",
+                "level": 9,
+                "quality": "blue",
+                "gridRow": 0,
+                "gridCol": 0
+            },
+            {
+                "configId": "berserker",
+                "level": 8,
+                "quality": "blue",
+                "gridRow": 0,
+                "gridCol": 2
+            },
+            {
+                "configId": "shadow_blade",
+                "level": 9,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "blood_moon",
+                "level": 8,
+                "quality": "blue",
+                "gridRow": 2,
+                "gridCol": 0
+            },
+            {
+                "configId": "faceless",
+                "level": 9,
+                "quality": "blue",
+                "gridRow": 2,
+                "gridCol": 2
+            }
+        ],
+        "rewards": {
+            "exp": 280,
+            "crystals": 70,
+            "items": [
+                {
+                    "id": "shadow_blade_shard_blue",
+                    "count": 1,
+                    "probability": 0.5
+                },
+                {
+                    "id": "exp_book_m",
+                    "count": 2,
+                    "probability": 0.6
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 1,
+                    "probability": 0.4
+                }
+            ],
+            "gold": 244
+        }
+    },
+    "2-7": {
+        "id": "2-7",
+        "chapter": 2,
+        "stage": 7,
+        "type": "normal",
+        "name": "暗夜森林",
+        "recommendedLevel": 9,
+        "enemies": [
+            {
+                "configId": "treant",
+                "level": 9,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 0
+            },
+            {
+                "configId": "wind_archer",
+                "level": 9,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 1
+            },
+            {
+                "configId": "moon_singer",
+                "level": 9,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "blade_dancer",
+                "level": 9,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 2
+            },
+            {
+                "configId": "faceless",
+                "level": 10,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 1
+            }
+        ],
+        "rewards": {
+            "exp": 300,
+            "crystals": 75,
+            "items": [
+                {
+                    "id": "faceless_shard_blue",
+                    "count": 1,
+                    "probability": 0.5
+                },
+                {
+                    "id": "exp_book_m",
+                    "count": 2,
+                    "probability": 0.6
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 1,
+                    "probability": 0.3
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 1,
+                    "probability": 0.5
+                }
+            ],
+            "gold": 260
+        }
+    },
+    "2-8": {
+        "id": "2-8",
+        "chapter": 2,
+        "stage": 8,
+        "type": "normal",
+        "name": "亡灵祭坛",
+        "recommendedLevel": 9,
+        "enemies": [
+            {
+                "configId": "demon_golem",
+                "level": 9,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 0
+            },
+            {
+                "configId": "shadow_demon",
+                "level": 10,
+                "quality": "blue",
+                "gridRow": 0,
+                "gridCol": 2
+            },
+            {
+                "configId": "warlock",
+                "level": 9,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 0
+            },
+            {
+                "configId": "nightmare",
+                "level": 10,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "warlock",
+                "level": 9,
+                "quality": "blue",
+                "gridRow": 1,
+                "gridCol": 2
+            },
+            {
+                "configId": "demon_blade",
+                "level": 10,
+                "quality": "blue",
+                "gridRow": 2,
+                "gridCol": 1
+            }
+        ],
+        "rewards": {
+            "exp": 320,
+            "crystals": 80,
+            "items": [
+                {
+                    "id": "warlock_shard_blue",
+                    "count": 1,
+                    "probability": 0.5
+                },
+                {
+                    "id": "soul_shard_blue",
+                    "count": 2,
+                    "probability": 0.5
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 1,
+                    "probability": 0.4
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 1,
+                    "probability": 0.5
+                }
+            ],
+            "gold": 276
+        }
+    },
+    "2-9": {
+        "id": "2-9",
+        "chapter": 2,
+        "stage": 9,
+        "type": "normal",
+        "name": "血腥走廊",
+        "recommendedLevel": 10,
+        "enemies": [
+            {
+                "configId": "bone_golem",
+                "level": 10,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 0
+            },
+            {
+                "configId": "berserker",
+                "level": 10,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 2
+            },
+            {
+                "configId": "blood_moon",
+                "level": 11,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "witch_doctor",
+                "level": 10,
+                "quality": "blue",
+                "gridRow": 2,
+                "gridCol": 0
+            },
+            {
+                "configId": "thunder_shaman",
+                "level": 10,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 2
+            }
+        ],
+        "rewards": {
+            "exp": 340,
+            "crystals": 85,
+            "items": [
+                {
+                    "id": "soul_shard_blue",
+                    "count": 2,
+                    "probability": 0.6
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 1,
+                    "probability": 0.4
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 2,
+                    "probability": 0.5
+                }
+            ],
+            "gold": 292
+        }
+    },
+    "2-10": {
+        "id": "2-10",
+        "chapter": 2,
+        "stage": 10,
+        "type": "boss",
+        "name": "深渊领主",
+        "recommendedLevel": 10,
+        "enemies": [
+            {
+                "configId": "demon_golem",
+                "level": 10,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 0
+            },
+            {
+                "configId": "demon_blade",
+                "level": 10,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 1
+            },
+            {
+                "configId": "shadow_demon",
+                "level": 11,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 2
+            },
+            {
+                "configId": "nightmare",
+                "level": 11,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 0
+            },
+            {
+                "configId": "warlock",
+                "level": 11,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "blood_moon",
+                "level": 11,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 2
+            },
+            {
+                "configId": "berserker",
+                "level": 10,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 0
+            },
+            {
+                "configId": "faceless",
+                "level": 11,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 1
+            },
+            {
+                "configId": "iron_guard",
+                "level": 10,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 2
+            }
+        ],
+        "rewards": {
+            "exp": 500,
+            "crystals": 150,
+            "items": [
+                {
+                    "id": "soul_shard_blue",
+                    "count": 3,
+                    "probability": 0.7
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 2,
+                    "probability": 0.5
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 2,
+                    "probability": 0.7
+                }
+            ],
+            "firstClearBonus": {
+                "crystals": 300
+            },
+            "gold": 530
+        }
+    },
+    "3-1": {
+        "id": "3-1",
+        "chapter": 3,
+        "stage": 1,
+        "type": "normal",
+        "name": "熔岩前线",
+        "recommendedLevel": 11,
+        "enemies": [
+            {
+                "configId": "demon_golem",
+                "level": 11,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 0
+            },
+            {
+                "configId": "demon_blade",
+                "level": 11,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 1
+            },
+            {
+                "configId": "shadow_demon",
+                "level": 12,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "warlock",
+                "level": 11,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 1
+            },
+            {
+                "configId": "nightmare",
+                "level": 12,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 2
+            }
+        ],
+        "rewards": {
+            "exp": 380,
+            "crystals": 100,
+            "items": [
+                {
+                    "id": "soul_shard_blue",
+                    "count": 2,
+                    "probability": 0.6
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 1,
+                    "probability": 0.5
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 1,
+                    "probability": 0.5
+                }
+            ],
+            "firstClearBonus": {
+                "crystals": 120
+            },
+            "gold": 340
+        }
+    },
+    "3-2": {
+        "id": "3-2",
+        "chapter": 3,
+        "stage": 2,
+        "type": "normal",
+        "name": "暴风海岸",
+        "recommendedLevel": 11,
+        "enemies": [
+            {
+                "configId": "bone_golem",
+                "level": 12,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 0
+            },
+            {
+                "configId": "berserker",
+                "level": 12,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 1
+            },
+            {
+                "configId": "thunder_shaman",
+                "level": 12,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "witch_doctor",
+                "level": 11,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 0
+            },
+            {
+                "configId": "blood_moon",
+                "level": 12,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 2
+            }
+        ],
+        "rewards": {
+            "exp": 400,
+            "crystals": 105,
+            "items": [
+                {
+                    "id": "soul_shard_blue",
+                    "count": 2,
+                    "probability": 0.6
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 1,
+                    "probability": 0.5
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 1,
+                    "probability": 0.5
+                }
+            ],
+            "gold": 356
+        }
+    },
+    "3-3": {
+        "id": "3-3",
+        "chapter": 3,
+        "stage": 3,
+        "type": "normal",
+        "name": "翠灵山谷",
+        "recommendedLevel": 12,
+        "enemies": [
+            {
+                "configId": "treant",
+                "level": 12,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 0
+            },
+            {
+                "configId": "blade_dancer",
+                "level": 13,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 2
+            },
+            {
+                "configId": "wind_archer",
+                "level": 12,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "moon_singer",
+                "level": 12,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 0
+            },
+            {
+                "configId": "faceless",
+                "level": 13,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 2
+            }
+        ],
+        "rewards": {
+            "exp": 420,
+            "crystals": 110,
+            "items": [
+                {
+                    "id": "soul_shard_blue",
+                    "count": 2,
+                    "probability": 0.6
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 2,
+                    "probability": 0.4
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 2,
+                    "probability": 0.4
+                }
+            ],
+            "gold": 372
+        }
+    },
+    "3-4": {
+        "id": "3-4",
+        "chapter": 3,
+        "stage": 4,
+        "type": "normal",
+        "name": "王城外围",
+        "recommendedLevel": 12,
+        "enemies": [
+            {
+                "configId": "iron_guard",
+                "level": 13,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 0
+            },
+            {
+                "configId": "swordsman",
+                "level": 13,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 2
+            },
+            {
+                "configId": "mage",
+                "level": 13,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 0
+            },
+            {
+                "configId": "apothecary",
+                "level": 12,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "shadow_blade",
+                "level": 13,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 2
+            },
+            {
+                "configId": "iron_guard",
+                "level": 12,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 1
+            }
+        ],
+        "rewards": {
+            "exp": 440,
+            "crystals": 115,
+            "items": [
+                {
+                    "id": "soul_shard_blue",
+                    "count": 3,
+                    "probability": 0.5
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 2,
+                    "probability": 0.4
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 2,
+                    "probability": 0.5
+                }
+            ],
+            "gold": 388
+        }
+    },
+    "3-5": {
+        "id": "3-5",
+        "chapter": 3,
+        "stage": 5,
+        "type": "miniBoss",
+        "name": "精英猎杀",
+        "recommendedLevel": 13,
+        "enemies": [
+            {
+                "configId": "iron_guard",
+                "level": 13,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 0
+            },
+            {
+                "configId": "berserker",
+                "level": 14,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 2
+            },
+            {
+                "configId": "wind_archer",
+                "level": 13,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 0
+            },
+            {
+                "configId": "nightmare",
+                "level": 14,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "shadow_blade",
+                "level": 13,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 2
+            },
+            {
+                "configId": "bone_golem",
+                "level": 14,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 0
+            },
+            {
+                "configId": "demon_blade",
+                "level": 13,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 2
+            }
+        ],
+        "rewards": {
+            "exp": 550,
+            "crystals": 140,
+            "items": [
+                {
+                    "id": "soul_shard_blue",
+                    "count": 3,
+                    "probability": 0.6
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 2,
+                    "probability": 0.5
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 3,
+                    "probability": 0.5
+                }
+            ],
+            "firstClearBonus": {
+                "crystals": 200
+            },
+            "gold": 485
+        }
+    },
+    "3-6": {
+        "id": "3-6",
+        "chapter": 3,
+        "stage": 6,
+        "type": "normal",
+        "name": "冰封荒原",
+        "recommendedLevel": 13,
+        "enemies": [
+            {
+                "configId": "treant",
+                "level": 14,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 0
+            },
+            {
+                "configId": "bone_golem",
+                "level": 14,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 2
+            },
+            {
+                "configId": "mage",
+                "level": 14,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "warlock",
+                "level": 14,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 0
+            },
+            {
+                "configId": "blade_dancer",
+                "level": 14,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 2
+            }
+        ],
+        "rewards": {
+            "exp": 460,
+            "crystals": 120,
+            "items": [
+                {
+                    "id": "soul_shard_blue",
+                    "count": 2,
+                    "probability": 0.6
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 2,
+                    "probability": 0.5
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 2,
+                    "probability": 0.5
+                }
+            ],
+            "gold": 404
+        }
+    },
+    "3-7": {
+        "id": "3-7",
+        "chapter": 3,
+        "stage": 7,
+        "type": "normal",
+        "name": "龙骨荒漠",
+        "recommendedLevel": 14,
+        "enemies": [
+            {
+                "configId": "demon_golem",
+                "level": 14,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 0
+            },
+            {
+                "configId": "berserker",
+                "level": 15,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 2
+            },
+            {
+                "configId": "shadow_demon",
+                "level": 14,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 0
+            },
+            {
+                "configId": "blood_moon",
+                "level": 15,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "thunder_shaman",
+                "level": 14,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 2
+            },
+            {
+                "configId": "nightmare",
+                "level": 15,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 1
+            }
+        ],
+        "rewards": {
+            "exp": 480,
+            "crystals": 125,
+            "items": [
+                {
+                    "id": "soul_shard_blue",
+                    "count": 3,
+                    "probability": 0.5
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 2,
+                    "probability": 0.5
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 2,
+                    "probability": 0.5
+                }
+            ],
+            "gold": 420
+        }
+    },
+    "3-8": {
+        "id": "3-8",
+        "chapter": 3,
+        "stage": 8,
+        "type": "normal",
+        "name": "虚空裂隙",
+        "recommendedLevel": 14,
+        "enemies": [
+            {
+                "configId": "nightmare",
+                "level": 15,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 0
+            },
+            {
+                "configId": "faceless",
+                "level": 15,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 2
+            },
+            {
+                "configId": "shadow_blade",
+                "level": 15,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 0
+            },
+            {
+                "configId": "warlock",
+                "level": 15,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "blood_moon",
+                "level": 15,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 2
+            },
+            {
+                "configId": "shadow_demon",
+                "level": 15,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 1
+            }
+        ],
+        "rewards": {
+            "exp": 500,
+            "crystals": 130,
+            "items": [
+                {
+                    "id": "soul_shard_blue",
+                    "count": 3,
+                    "probability": 0.6
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 2,
+                    "probability": 0.5
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 2,
+                    "probability": 0.6
+                }
+            ],
+            "gold": 436
+        }
+    },
+    "3-9": {
+        "id": "3-9",
+        "chapter": 3,
+        "stage": 9,
+        "type": "normal",
+        "name": "终焉之门",
+        "recommendedLevel": 15,
+        "enemies": [
+            {
+                "configId": "demon_golem",
+                "level": 15,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 0
+            },
+            {
+                "configId": "demon_blade",
+                "level": 16,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 1
+            },
+            {
+                "configId": "nightmare",
+                "level": 16,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 2
+            },
+            {
+                "configId": "warlock",
+                "level": 15,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 0
+            },
+            {
+                "configId": "shadow_demon",
+                "level": 16,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "blood_moon",
+                "level": 16,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 2
+            },
+            {
+                "configId": "berserker",
+                "level": 15,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 1
+            }
+        ],
+        "rewards": {
+            "exp": 520,
+            "crystals": 140,
+            "items": [
+                {
+                    "id": "soul_shard_blue",
+                    "count": 3,
+                    "probability": 0.7
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 3,
+                    "probability": 0.5
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 3,
+                    "probability": 0.5
+                }
+            ],
+            "gold": 465
+        }
+    },
+    "3-10": {
+        "id": "3-10",
+        "chapter": 3,
+        "stage": 10,
+        "type": "boss",
+        "name": "混沌之王",
+        "recommendedLevel": 15,
+        "enemies": [
+            {
+                "configId": "iron_guard",
+                "level": 16,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 0
+            },
+            {
+                "configId": "bone_golem",
+                "level": 16,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 1
+            },
+            {
+                "configId": "demon_golem",
+                "level": 16,
+                "quality": "purple",
+                "gridRow": 0,
+                "gridCol": 2
+            },
+            {
+                "configId": "swordsman",
+                "level": 16,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 0
+            },
+            {
+                "configId": "nightmare",
+                "level": 17,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 1
+            },
+            {
+                "configId": "blood_moon",
+                "level": 16,
+                "quality": "purple",
+                "gridRow": 1,
+                "gridCol": 2
+            },
+            {
+                "configId": "wind_archer",
+                "level": 16,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 0
+            },
+            {
+                "configId": "shadow_demon",
+                "level": 17,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 1
+            },
+            {
+                "configId": "berserker",
+                "level": 16,
+                "quality": "purple",
+                "gridRow": 2,
+                "gridCol": 2
+            }
+        ],
+        "rewards": {
+            "exp": 800,
+            "crystals": 200,
+            "items": [
+                {
+                    "id": "soul_shard_blue",
+                    "count": 5,
+                    "probability": 0.8
+                },
+                {
+                    "id": "exp_book_l",
+                    "count": 3,
+                    "probability": 0.6
+                },
+                {
+                    "id": "ascension_scroll",
+                    "count": 3,
+                    "probability": 0.7
+                }
+            ],
+            "firstClearBonus": {
+                "crystals": 500
+            },
+            "gold": 740
         }
     }
 }

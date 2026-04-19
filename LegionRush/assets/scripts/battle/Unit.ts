@@ -111,7 +111,7 @@ export class BattleUnit {
         BattleUnit._skillConfigs = configs;
     }
 
-    constructor(config: UnitConfig, team: TeamSide, level: number = 1, quality: Quality = Quality.GREEN) {
+    constructor(config: UnitConfig, team: TeamSide, level: number = 1, quality: Quality = Quality.GREEN, relicBonus?: Record<string, number>) {
         this.uid = `u${BattleUnit._nextUid++}`;
         this.configId = config.id;
         this.config = config;
@@ -121,6 +121,7 @@ export class BattleUnit {
         this.buffs = new BuffSystem(this);
 
         this.calculateStats();
+        if (relicBonus) this.applyRelicBonuses(relicBonus);
         this.maxEnergy = BattleUnit._constants.energy.maxEnergy;
         this.hp = this.maxHp;
         this.initSkills();
@@ -146,6 +147,15 @@ export class BattleUnit {
 
     private getQualityMultiplier(): number {
         return BattleUnit._constants.qualityMultipliers[this.quality] ?? 1.0;
+    }
+
+    /** 应用圣物加成（百分比，在品质乘数之后叠加） */
+    private applyRelicBonuses(bonuses: Record<string, number>): void {
+        if (bonuses.hp)     this.maxHp = Math.floor(this.maxHp * (1 + bonuses.hp / 100));
+        if (bonuses.atk)    this.atk   = Math.floor(this.atk   * (1 + bonuses.atk / 100));
+        if (bonuses.def)    this.def   = Math.floor(this.def   * (1 + bonuses.def / 100));
+        if (bonuses.atkSpd) this.atkSpd *= (1 + bonuses.atkSpd / 100);
+        this.hp = this.maxHp;
     }
 
     private initSkills(): void {

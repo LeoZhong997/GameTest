@@ -5,7 +5,7 @@
  * 结束后返回主场景
  */
 
-import { _decorator, Component, Node, UITransform, Label, Color, Graphics, Layers } from 'cc';
+import { _decorator, Component, Node, UITransform, Label, Color, Graphics, Layers, sys } from 'cc';
 import { BattleManager, BattleState, BattleConfig, BattleReport } from '../battle/BattleManager';
 import { BattleUnit, TeamSide } from '../battle/Unit';
 import { UnitConfig, Quality, UnitInstanceData } from '../models/UnitData';
@@ -19,8 +19,36 @@ import { ActiveSynergy } from '../models/SynergyData';
 import { PlayerManager } from '../systems/PlayerManager';
 import { LevelSystem } from '../systems/LevelSystem';
 import { GameConfig } from '../core/GameConfig';
+import { RelicSystem } from '../systems/RelicSystem';
 
 const { ccclass } = _decorator;
+
+// 模块级阵型缓存，跨场景实例持久化
+let _globalFormation: Map<string, { gridRow: number; gridCol: number }> = new Map();
+const FORMATION_SAVE_KEY = 'legionrush_formation';
+
+/** 从 localStorage 恢复阵型到模块缓存 */
+function loadFormationCache(): void {
+    if (_globalFormation.size > 0) return; // 已有数据就不覆盖
+    try {
+        const raw = sys.localStorage.getItem(FORMATION_SAVE_KEY);
+        if (raw) {
+            const obj = JSON.parse(raw) as Record<string, { gridRow: number; gridCol: number }>;
+            _globalFormation = new Map(Object.entries(obj));
+            console.log(`[BattleScene] 从 localStorage 恢复阵型: ${_globalFormation.size} 种`);
+        }
+    } catch (_e) { /* ignore */ }
+}
+
+/** 保存阵型到模块缓存 + localStorage */
+function saveFormationCache(formation: Map<string, { gridRow: number; gridCol: number }>): void {
+    _globalFormation = new Map(formation);
+    try {
+        const obj: Record<string, { gridRow: number; gridCol: number }> = {};
+        formation.forEach((v, k) => { obj[k] = v; });
+        sys.localStorage.setItem(FORMATION_SAVE_KEY, JSON.stringify(obj));
+    } catch (_e) { /* ignore */ }
+}
 
 // 替换弹窗用常量
 const RACE_ORDER = ['human', 'beast', 'spirit', 'demon'];
@@ -54,7 +82,7 @@ export class BattleScene extends Component {
     private _selectedStage: StageConfig | null = null;
     private _running: boolean = false;
     private _gridOverlay: Node | null = null;
-    private _savedFormation: Map<string, { gridRow: number; gridCol: number }> = new Map();
+    private _savedFormation: Map<string, { gridRow: number; gridCol: number }> = new Map(); // 本地引用，指向 _globalFormation
     private _currentDeploy: DeployEntry[] = [];
     private _replacePanel: Node | null = null;
     private _synergyDisplayNodes: Node[] = [];
@@ -91,6 +119,10 @@ export class BattleScene extends Component {
 
         // 使用全局配置
         this._unitConfigs = GameConfig.instance.unitConfigs;
+
+        // 恢复阵型缓存
+        loadFormationCache();
+        this._savedFormation = _globalFormation;
 
         EventBus.instance.on('battle:end', this.onBattleEnd, this);
         EventBus.instance.on('battle:restart', this.onRestart, this);
@@ -185,7 +217,15 @@ export class BattleScene extends Component {
             const unitInstance = pm.getUnit(e.unitUid);
             const level = unitInstance ? unitInstance.level : 1;
             const quality = unitInstance ? unitInstance.quality as Quality : Quality.GREEN;
-            return { config: cfg!, level, quality, count: e.count, gridRow: e.gridRow, gridCol: e.gridCol };
+            // 读取圣物加成
+            let relicBonus: Record<string, number> | undefined;
+            if (unitInstance) {
+                const relic = RelicSystem.instance.getRelicEquippedByUnit(unitInstance.uid);
+                if (relic) {
+                    relicBonus = RelicSystem.instance.getStatBonuses(relic);
+                }
+            }
+            return { config: cfg!, level, quality, count: e.count, gridRow: e.gridRow, gridCol: e.gridCol, relicBonus };
         }).filter(u => u.config);
 
         const stage = this._selectedStage;
@@ -262,8 +302,8 @@ export class BattleScene extends Component {
     private onStartRequest(): void {
         if (this._bm.state !== BattleState.PREPARING) return;
 
-        // 保存当前布阵（configId → 格子坐标）
-        this._savedFormation.clear();
+        // 保存当前布阵（configId → 格子坐标）到模块缓存 + localStorage
+        this._savedFormation = new Map();
         const seen = new Set<string>();
         for (const unit of this._bm.leftUnits) {
             if (seen.has(unit.configId)) continue;
@@ -274,6 +314,7 @@ export class BattleScene extends Component {
                 gridCol: cellIdx % 3,
             });
         }
+        saveFormationCache(this._savedFormation);
 
         this._bm.beginBattle();
         this._running = true;
@@ -431,7 +472,7 @@ export class BattleScene extends Component {
             labelUT.setContentSize(80, 20);
             const label = labelNode.addComponent(Label);
             label.string = synergy.config.name;
-            label.fontSize = 13;
+            label.fontSize = this.mapFS(13);
             label.color = new Color(240, 240, 255, 255);
 
             // 效果描述
@@ -442,7 +483,7 @@ export class BattleScene extends Component {
             descUT.setContentSize(90, 16);
             const descLbl = descNode.addComponent(Label);
             descLbl.string = this.describeSynergy(synergy);
-            descLbl.fontSize = 10;
+            descLbl.fontSize = this.mapFS(10);
             descLbl.color = new Color(180, 200, 220, 200);
         }
 
@@ -609,7 +650,7 @@ export class BattleScene extends Component {
         nameNode.setPosition(0, -(style.size / 2 + 16), 0);
         const nameLabel = nameNode.addComponent(Label);
         nameLabel.string = unit.config.name.substring(0, 3);
-        nameLabel.fontSize = 12;
+        nameLabel.fontSize = this.mapFS(12);
         nameLabel.color = new Color(255, 255, 255, 255);
 
         const view = node.addComponent(UnitView);
@@ -695,7 +736,7 @@ export class BattleScene extends Component {
         titleUT.setContentSize(200, 30);
         const titleLbl = titleNode.addComponent(Label);
         titleLbl.string = '替换兵种';
-        titleLbl.fontSize = 22;
+        titleLbl.fontSize = this.mapFS(22);
         titleLbl.color = new Color(255, 255, 255, 255);
 
         // 关闭按钮
@@ -735,7 +776,7 @@ export class BattleScene extends Component {
             raceTitleUT.setContentSize(80, 22);
             const raceLbl = raceTitle.addComponent(Label);
             raceLbl.string = RACE_NAMES[race] || race;
-            raceLbl.fontSize = 16;
+            raceLbl.fontSize = this.mapFS(16);
             raceLbl.color = new Color(180, 200, 255, 220);
             currentY -= 38;
 
@@ -797,7 +838,7 @@ export class BattleScene extends Component {
                 nameUT.setContentSize(cardW - 10, 18);
                 const nameLbl = nameNode.addComponent(Label);
                 nameLbl.string = cfg.name.substring(0, 4);
-                nameLbl.fontSize = 13;
+                nameLbl.fontSize = this.mapFS(13);
                 nameLbl.color = (isDeployed && !isCurrent)
                     ? new Color(100, 100, 100, 255)
                     : new Color(230, 230, 240, 255);
@@ -811,7 +852,7 @@ export class BattleScene extends Component {
                 const infoLbl = infoNode.addComponent(Label);
                 const qName = QUALITY_NAMES[u.quality] || u.quality;
                 infoLbl.string = `Lv${u.level} ${qName}`;
-                infoLbl.fontSize = 11;
+                infoLbl.fontSize = this.mapFS(11);
                 infoLbl.color = (isDeployed && !isCurrent)
                     ? new Color(80, 80, 80, 255)
                     : new Color(qColor.r, qColor.g, qColor.b, 255);
@@ -825,7 +866,7 @@ export class BattleScene extends Component {
                     markUT.setContentSize(30, 14);
                     const markLbl = markNode.addComponent(Label);
                     markLbl.string = '当前';
-                    markLbl.fontSize = 10;
+                    markLbl.fontSize = this.mapFS(10);
                     markLbl.color = new Color(255, 215, 0, 255);
                 } else if (isDeployed) {
                     const markNode = new Node('DeployedMark');
@@ -835,7 +876,7 @@ export class BattleScene extends Component {
                     markUT.setContentSize(36, 14);
                     const markLbl = markNode.addComponent(Label);
                     markLbl.string = '已上阵';
-                    markLbl.fontSize = 10;
+                    markLbl.fontSize = this.mapFS(10);
                     markLbl.color = new Color(100, 100, 100, 255);
                 }
 
@@ -875,7 +916,7 @@ export class BattleScene extends Component {
         cancelLblUT.setContentSize(60, 24);
         const cancelLblC = cancelLbl.addComponent(Label);
         cancelLblC.string = '取消';
-        cancelLblC.fontSize = 16;
+        cancelLblC.fontSize = this.mapFS(16);
         cancelLblC.color = new Color(200, 200, 210, 255);
         cancelBtn.on(Node.EventType.TOUCH_END, () => this.closeReplacePanel());
 
@@ -928,5 +969,17 @@ export class BattleScene extends Component {
             if (view && view.node) view.node.destroy();
         });
         this._unitViews.clear();
+    }
+
+    private mapFS(raw: number): number {
+        const fs = GameConfig.instance.fontSizes;
+        if (!fs) return raw;
+        if (raw >= 44) return fs.hero;
+        if (raw >= 34) return fs.titleLg;
+        if (raw >= 26) return fs.title;
+        if (raw >= 22) return fs.subtitle;
+        if (raw >= 18) return fs.body;
+        if (raw >= 14) return fs.small;
+        return fs.caption;
     }
 }

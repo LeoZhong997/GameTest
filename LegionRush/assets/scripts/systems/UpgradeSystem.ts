@@ -9,6 +9,8 @@ import { UnitInstanceData, Quality } from '../models/UnitData';
 export interface UpgradeCost {
     materialId: string;   // 碎片物品 ID
     count: number;
+    scrollId: string;     // 卷轴物品 ID
+    scrollCount: number;
 }
 
 export interface UpgradeResult {
@@ -32,6 +34,7 @@ export class UpgradeSystem {
     private static _instance: UpgradeSystem = null!;
     private _qualityOrder: string[] = [];
     private _shardUpgradeCount: number = 3;
+    private _scrollCosts: Map<string, number> = new Map();       // quality -> scroll count
     private _synthesisRecipes: Map<string, number> = new Map();  // "green_to_blue" -> count
 
     public static get instance(): UpgradeSystem {
@@ -49,6 +52,11 @@ export class UpgradeSystem {
         }
         if (constants.shardUpgradeCount) {
             this._shardUpgradeCount = constants.shardUpgradeCount;
+        }
+        if (constants.scrollUpgradeCost) {
+            for (const [quality, count] of Object.entries(constants.scrollUpgradeCost) as [string, any][]) {
+                this._scrollCosts.set(quality, count || 0);
+            }
         }
         if (constants.shardSynthesis) {
             for (const [key, val] of Object.entries(constants.shardSynthesis) as [string, any][]) {
@@ -73,13 +81,15 @@ export class UpgradeSystem {
         return next;
     }
 
-    /** 获取升阶消耗（动态：该兵种当前品质碎片 × N） */
+    /** 获取升阶消耗（碎片 + 卷轴） */
     getCost(unit: UnitInstanceData): UpgradeCost | null {
         const next = this.getNextQuality(unit.quality);
         if (!next) return null;
         return {
             materialId: UpgradeSystem.shardId(unit.configId, unit.quality),
             count: this._shardUpgradeCount,
+            scrollId: 'ascension_scroll',
+            scrollCount: this._scrollCosts.get(unit.quality) || 0,
         };
     }
 
@@ -91,15 +101,22 @@ export class UpgradeSystem {
         const cost = this.getCost(unit);
         if (!cost) return { can: false, reason: '无升阶配置' };
 
-        const have = inventory[cost.materialId] || 0;
-        if (have < cost.count) {
-            return { can: false, reason: `碎片不足 (${have}/${cost.count})` };
+        const haveShard = inventory[cost.materialId] || 0;
+        if (haveShard < cost.count) {
+            return { can: false, reason: `碎片不足 (${haveShard}/${cost.count})` };
+        }
+
+        if (cost.scrollCount > 0) {
+            const haveScroll = inventory[cost.scrollId] || 0;
+            if (haveScroll < cost.scrollCount) {
+                return { can: false, reason: `卷轴不足 (${haveScroll}/${cost.scrollCount})` };
+            }
         }
 
         return { can: true, reason: '' };
     }
 
-    /** 执行升阶（扣碎片、改品质） */
+    /** 执行升阶（扣碎片 + 卷轴、改品质） */
     upgrade(unit: UnitInstanceData, inventory: Record<string, number>): UpgradeResult {
         const check = this.canUpgrade(unit, inventory);
         if (!check.can) {
@@ -112,9 +129,13 @@ export class UpgradeSystem {
 
         // 扣除碎片
         inventory[cost.materialId] = (inventory[cost.materialId] || 0) - cost.count;
+        // 扣除卷轴
+        if (cost.scrollCount > 0) {
+            inventory[cost.scrollId] = (inventory[cost.scrollId] || 0) - cost.scrollCount;
+        }
 
         unit.quality = newQuality as Quality;
-        console.log(`[UpgradeSystem] ${unit.configId} 升阶: ${oldQuality} → ${newQuality}`);
+        console.log(`[UpgradeSystem] ${unit.configId} 升阶: ${oldQuality} → ${newQuality} (碎片-${cost.count}, 卷轴-${cost.scrollCount})`);
 
         return { success: true, reason: '', oldQuality, newQuality };
     }

@@ -11,7 +11,7 @@ import { EventBus } from '../core/EventBus';
 import { BattleReport, BattleResult } from '../battle/BattleManager';
 import { LevelSystem } from './LevelSystem';
 import { StageManager } from './StageManager';
-import { StageItemDrop } from '../models/StageData';
+import { StageItemDrop, RewardOption, DropPoolEntry } from '../models/StageData';
 import { GameConfig } from '../core/GameConfig';
 
 const SAVE_KEY = 'player';
@@ -22,6 +22,7 @@ export class PlayerManager {
     private _dirty: boolean = false;
     private _playingChapter: number = 0;
     private _playingStage: number = 0;
+    private _pendingReward: { rewardInfo: any; stage: any } | null = null;
 
     public static get instance(): PlayerManager {
         if (!this._instance) {
@@ -42,10 +43,18 @@ export class PlayerManager {
     /** 初始化：从存档加载或创建默认数据 */
     async init(): Promise<void> {
         const saved = SaveSystem.instance.load<PlayerData>(SAVE_KEY, null as any);
-        if (saved && saved.version === SAVE_VERSION) {
-            this._data = saved;
+        if (saved) {
+            // 版本迁移
+            if (saved.version < SAVE_VERSION) {
+                this.migrateData(saved);
+            }
+            if (saved.version === SAVE_VERSION) {
+                this._data = saved;
             console.log(`[PlayerManager] 存档加载: ${this._data.name}, 关卡 ${this._data.currentChapter}-${this._data.currentStage}, ${Object.keys(this._data.units).length} 个兵种`);
         } else {
+            }
+        }
+        if (!this._data) {
             this._data = createDefaultPlayerData();
             this.save();
             console.log('[PlayerManager] 新存档创建: 赠送 5 个人族兵种');
@@ -67,6 +76,16 @@ export class PlayerManager {
         this._data.lastOnlineTime = Date.now();
         SaveSystem.instance.save(SAVE_KEY, this._data);
         this._dirty = false;
+    }
+
+    /** 存档版本迁移 */
+    private migrateData(data: any): void {
+        if (data.version < 6) {
+            // v5 → v6: 新增圣物系统
+            data.relics = data.relics || {};
+            data.version = 6;
+            console.log('[PlayerManager] 迁移 v5→v6: 新增 relics 字段');
+        }
     }
 
     markDirty(): void {
@@ -156,19 +175,20 @@ export class PlayerManager {
 
     // --- 关卡推进 ---
 
-    advanceStage(): void {
+    /** 推进关卡，传入实际通关的章节/关卡号 */
+    advanceStage(chapter: number, stage: number): void {
         if (!this._data) return;
 
-        // 先把刚打完的关卡标记为最高进度
-        const justCleared = this._data.currentChapter * 100 + this._data.currentStage;
+        // 用实际通关的关卡更新最高进度
+        const justCleared = chapter * 100 + stage;
         const prevHighest = this._data.highestChapter * 100 + this._data.highestStage;
         if (justCleared > prevHighest) {
-            this._data.highestChapter = this._data.currentChapter;
-            this._data.highestStage = this._data.currentStage;
+            this._data.highestChapter = chapter;
+            this._data.highestStage = stage;
         }
 
-        // 推进到下一关（作为当前可玩关卡，不等于已通关）
-        const next = StageManager.instance.getNextStage(this._data.currentChapter, this._data.currentStage);
+        // 推进到下一关（从实际通关的关卡推进）
+        const next = StageManager.instance.getNextStage(chapter, stage);
         if (next) {
             this._data.currentChapter = next.chapter;
             this._data.currentStage = next.stage;
@@ -195,30 +215,38 @@ export class PlayerManager {
 
             const playedValue = playedChapter * 100 + playedStage;
             const highest = this._data.highestChapter * 100 + this._data.highestStage;
+            const isAlreadyCleared = this._data.clearedStages.includes(stage.id);
 
             const rewards = stage.rewards;
             const rewardInfo: any = {
                 stageId: stage.id,
-                exp: rewards.exp,
-                crystals: rewards.crystals,
-                tokens: rewards.tokens,
-                bottleCaps: rewards.bottleCaps,
+                exp: 0,
+                gold: 0,
+                crystals: 0,
                 items: [] as any[],
                 firstClear: false,
                 firstClearBonus: null as any,
+                isReplay: isAlreadyCleared,
             };
 
-            // 首通判定
-            if (!this._data.clearedStages.includes(stage.id)) {
-                rewardInfo.firstClear = true;
-                this._data.clearedStages.push(stage.id);
-                if (rewards.firstClearBonus) {
-                    rewardInfo.firstClearBonus = rewards.firstClearBonus;
-                    this.addCurrency('crystals', rewards.firstClearBonus.crystals || 0);
-                    this.addCurrency('tokens', rewards.firstClearBonus.tokens || 0);
-                    rewardInfo.crystals += rewards.firstClearBonus.crystals || 0;
-                    rewardInfo.tokens += rewards.firstClearBonus.tokens || 0;
-                }
+            // 重玩已通关关卡：不给任何奖励
+            if (isAlreadyCleared) {
+                console.log(`[PlayerManager] 重玩关卡 ${playedChapter}-${playedStage}，无奖励`);
+                EventBus.instance.emit('rewards:distributed', rewardInfo);
+                this.save();
+                return;
+            }
+
+            // 首通奖励
+            rewardInfo.exp = rewards.exp;
+            rewardInfo.gold = rewards.gold;
+            rewardInfo.crystals = rewards.crystals;
+            rewardInfo.firstClear = true;
+            this._data.clearedStages.push(stage.id);
+            if (rewards.firstClearBonus) {
+                rewardInfo.firstClearBonus = rewards.firstClearBonus;
+                this.addCurrency('crystals', rewards.firstClearBonus.crystals || 0);
+                rewardInfo.crystals += rewards.firstClearBonus.crystals || 0;
             }
 
             // 发放经验给所有单位
@@ -231,36 +259,109 @@ export class PlayerManager {
             }
 
             // 发放货币
+            this.addCurrency('gold', rewards.gold);
             this.addCurrency('crystals', rewards.crystals);
-            this.addCurrency('tokens', rewards.tokens);
-            this.addCurrency('bottleCaps', rewards.bottleCaps);
-
-            // 发放物品（按概率掉落）
-            if (rewards.items) {
-                for (const drop of rewards.items) {
-                    if (Math.random() < drop.probability) {
-                        this.addItem(drop.id, drop.count);
-                        rewardInfo.items.push(drop);
-                    }
-                }
-            }
 
             // 推进关卡：打的关超过当前最高进度才推进
             if (playedValue > highest) {
-                this.advanceStage();
+                this.advanceStage(playedChapter, playedStage);
             } else {
                 console.log(`[PlayerManager] 重玩关卡 ${playedChapter}-${playedStage}，不推进进度`);
             }
 
-            console.log(`[PlayerManager] 奖励发放: EXP+${rewards.exp} 氪晶+${rewardInfo.crystals} 筹码+${rewardInfo.tokens} 瓶盖+${rewards.bottleCaps}${rewardInfo.firstClear ? ' (首通)' : ''}`);
-            if (rewardInfo.items.length > 0) {
-                console.log(`[PlayerManager] 物品掉落: ${rewardInfo.items.map((i: any) => `${i.id}x${i.count}`).join(', ')}`);
-            }
+            // ---- 三选一奖励 ----
+            // 从掉落池生成 3 个选项
+            const dropPool = StageManager.instance.getDropPool(stage.chapter, stage.type);
+            if (dropPool && dropPool.length > 0) {
+                const chooseOptions = this.rollDropOptions(dropPool, 3);
+                rewardInfo.chooseOptions = chooseOptions;
 
-            EventBus.instance.emit('rewards:distributed', rewardInfo);
+                // 保存 pending 状态，等待玩家选择
+                this._pendingReward = { rewardInfo, stage };
+
+                console.log(`[PlayerManager] 固定奖励已发放: EXP+${rewards.exp} 💰+${rewardInfo.gold} 💎+${rewardInfo.crystals}${rewardInfo.firstClear ? ' (首通)' : ''}`);
+                console.log(`[PlayerManager] 三选一选项: ${chooseOptions.map((o: RewardOption) => `${o.name}x${o.count}`).join(', ')}`);
+
+                // 发出选择事件（不发 rewards:distributed，等玩家选完再发）
+                EventBus.instance.emit('rewards:choose', {
+                    fixedRewards: {
+                        exp: rewardInfo.exp,
+                        gold: rewardInfo.gold,
+                        crystals: rewardInfo.crystals,
+                        firstClear: rewardInfo.firstClear,
+                        firstClearBonus: rewardInfo.firstClearBonus,
+                    },
+                    chooseOptions,
+                });
+            } else {
+                // 无掉落池：兼容旧 stages.json 手动配置
+                if (rewards.items) {
+                    for (const drop of rewards.items) {
+                        if (Math.random() < drop.probability) {
+                            this.addItem(drop.id, drop.count);
+                            rewardInfo.items.push(drop);
+                        }
+                    }
+                }
+                console.log(`[PlayerManager] 奖励发放: EXP+${rewards.exp} 💰+${rewardInfo.gold} 💎+${rewardInfo.crystals}${rewardInfo.firstClear ? ' (首通)' : ''}`);
+                EventBus.instance.emit('rewards:distributed', rewardInfo);
+            }
         }
 
         this.save();
+    }
+
+    /** 玩家确认选择奖励 */
+    confirmRewardSelection(index: number): void {
+        if (!this._pendingReward) return;
+        const { rewardInfo } = this._pendingReward;
+        const options: RewardOption[] = rewardInfo.chooseOptions;
+        if (index < 0 || index >= options.length) return;
+
+        const chosen = options[index];
+        this.addItem(chosen.itemId, chosen.count);
+        rewardInfo.items = [{ id: chosen.itemId, count: chosen.count }];
+
+        console.log(`[PlayerManager] 玩家选择: ${chosen.name} x${chosen.count}`);
+
+        this._pendingReward = null;
+        EventBus.instance.emit('rewards:distributed', rewardInfo);
+    }
+
+    /** 从掉落池加权随机 N 个不重复选项 */
+    private rollDropOptions(pool: DropPoolEntry[], count: number): RewardOption[] {
+        const results: RewardOption[] = [];
+        const used = new Set<string>();
+
+        for (let i = 0; i < count && used.size < pool.length; i++) {
+            // 过滤已选
+            const available = pool.filter(e => !used.has(e.itemId));
+            if (available.length === 0) break;
+
+            const totalWeight = available.reduce((sum, e) => sum + e.weight, 0);
+            let roll = Math.random() * totalWeight;
+
+            let picked: DropPoolEntry | null = null;
+            for (const entry of available) {
+                roll -= entry.weight;
+                if (roll <= 0) {
+                    picked = entry;
+                    break;
+                }
+            }
+            if (!picked) picked = available[available.length - 1];
+
+            used.add(picked.itemId);
+            const numCount = picked.countMin + Math.floor(Math.random() * (picked.countMax - picked.countMin + 1));
+            results.push({
+                itemId: picked.itemId,
+                name: picked.name,
+                count: numCount,
+                rarity: picked.rarity,
+            });
+        }
+
+        return results;
     }
 
     // --- 离线收益 ---
@@ -292,8 +393,8 @@ export class PlayerManager {
 
         const multiplier = 1 + progress * (offlineConfig.stageMultiplier || 0.15);
         const exp = Math.floor((offlineConfig.baseExpPerHour || 30) * hours * multiplier);
-        const crystals = Math.floor((offlineConfig.baseCrystalsPerHour || 5) * hours * multiplier);
-        const tokens = Math.floor((offlineConfig.baseTokensPerHour || 2) * hours * multiplier);
+        const gold = Math.floor((offlineConfig.baseGoldPerHour || 20) * hours * multiplier);
+        const crystals = Math.floor((offlineConfig.baseCrystalsPerHour || 3) * hours * multiplier);
 
         // 发放经验
         if (exp > 0) {
@@ -303,19 +404,19 @@ export class PlayerManager {
         }
 
         // 发放货币
+        if (gold > 0) this.addCurrency('gold', gold);
         if (crystals > 0) this.addCurrency('crystals', crystals);
-        if (tokens > 0) this.addCurrency('tokens', tokens);
 
         this._data.lastOnlineTime = now;
 
         const info = {
             hours: Math.round(hours * 10) / 10,
             exp,
+            gold,
             crystals,
-            tokens,
         };
 
-        console.log(`[PlayerManager] 离线收益: ${info.hours}小时 EXP+${exp} 氪晶+${crystals} 筹码+${tokens}`);
+        console.log(`[PlayerManager] 离线收益: ${info.hours}小时 EXP+${exp} 金币+${gold} 钻石+${crystals}`);
         EventBus.instance.emit('offline:rewards', info);
 
         this.save();

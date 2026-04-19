@@ -45,7 +45,7 @@ const CARDS: MenuCard[][] = [
     ],
     [
         { id: 'gacha',    label: '召  唤',   icon: '✨', active: true,  scene: 'gacha' },
-        { id: 'slot5', label: '敬请期待', icon: '?', active: false },
+        { id: 'relics',   label: '圣  物',   icon: '🔮', active: true,  scene: 'relic' },
         { id: 'slot6', label: '敬请期待', icon: '?', active: false },
     ],
 ];
@@ -56,6 +56,8 @@ export class MainUI extends Component {
     private _container: Node | null = null;
     private _currencyLabels: Map<string, Label> = new Map();
     private _stageLabel: Label | null = null;
+    private _incomeCrystals: Label | null = null;
+    private _incomeTokens: Label | null = null;
     private _SW: number = 1280;
     private _SH: number = 720;
 
@@ -111,44 +113,65 @@ export class MainUI extends Component {
     private buildTopBar(parent: Node): void {
         const SW = this._SW, SH = this._SH;
         const TB_H = 50;
+        const FS = 16;
+
         const topBar = new Node('TopBar');
         const tut = topBar.addComponent(UITransform);
         tut.setContentSize(SW, TB_H);
         tut.setAnchorPoint(0.5, 0.5);
         topBar.setPosition(0, SH / 2 - TB_H / 2, 0);
-
         this.drawRect(topBar, SW, TB_H, TOPBAR_BG, 0, 0);
 
-        this.addLabel(topBar, '军团冲刺', 24, GOLD, 0, 0, 200, true);
+        /*
+         * ========== TopBar 三区布局 ==========
+         * 总宽 1280（中心原点 x=0）
+         *
+         * 左区 [-640, -240] 宽 400px：关卡(80) + 间隔(20) + 产量(300)
+         * 中区 [-240,  240] 宽 480px：标题居中
+         * 右区 [ 240,  640] 宽 400px：3×货币(各120) + 设置(40)
+         */
 
-        const stageLbl = this.addLabel(topBar, '1-1', 16, WHITE, -SW / 2 + 60, 0, 100, true);
+        // --- 中区：标题（唯一加粗） ---
+        this.addLabel(topBar, '军团冲刺', 22, GOLD, 0, 0, 240, true);
+
+        // --- 左区：关卡 + 产量 ---
+        //  左区中心 x = -440
+        const LEFT_CX = -440;
+        const stageLbl = this.addLabel(topBar, '1-1', FS, WHITE, LEFT_CX - 160 + 40, 0, 80, false);
         this._stageLabel = stageLbl.getComponent(Label);
+        // 产量：跟右侧货币同样的 120px 间距
+        const incomeStartX = LEFT_CX + 40;
+        const icLbl1 = this.addLabel(topBar, '', FS, WHITE, incomeStartX, 0, 110, false);
+        this._incomeCrystals = icLbl1.getComponent(Label);
+        const icLbl2 = this.addLabel(topBar, '', FS, WHITE, incomeStartX + 120, 0, 110, false);
+        this._incomeTokens = icLbl2.getComponent(Label);
 
-        const rightBase = SW / 2 - 20;
+        // --- 右区：货币 + 设置 ---
+        const RIGHT_CX = 440;
+        const settingsBtn = new Node('BtnSettings');
+        const sbut = settingsBtn.addComponent(UITransform);
+        sbut.setContentSize(32, 32);
+        sbut.setAnchorPoint(0.5, 0.5);
+        settingsBtn.setPosition(RIGHT_CX + 180, 0, 0);
+        this.addLabel(settingsBtn, '⚙️', FS, WHITE, 0, 0, 32, false);
+        settingsBtn.on(Node.EventType.TOUCH_END, () => this.showSettings(), this);
+        topBar.addChild(settingsBtn);
+
+        // 2 个货币均分右区
         const currencies = [
-            { id: 'crystals',    icon: '💎' },
-            { id: 'tokens',      icon: '🪙' },
-            { id: 'bottleCaps',  icon: '🍺' },
+            { id: 'gold',     icon: '💰' },
+            { id: 'crystals', icon: '💎' },
         ];
-        let cx = rightBase;
-        for (let i = currencies.length - 1; i >= 0; i--) {
+        const moneySlotW = 160;
+        const moneyStartX = RIGHT_CX - 160 + moneySlotW / 2;
+        for (let i = 0; i < currencies.length; i++) {
             const c = currencies[i];
-            const lbl = this.addLabel(topBar, `${c.icon}0`, 14, GRAY_TEXT, cx - 50, 0, 100, true);
+            const cx = moneyStartX + i * moneySlotW;
+            const lbl = this.addLabel(topBar, `${c.icon}0`, FS, WHITE, cx, 0, moneySlotW, false);
             this._currencyLabels.set(c.id, lbl.getComponent(Label));
-            cx -= 120;
         }
 
         parent.addChild(topBar);
-
-        // 设置按钮（TopBar 右上角）
-        const settingsBtn = new Node('BtnSettings');
-        const sbut = settingsBtn.addComponent(UITransform);
-        sbut.setContentSize(36, 36);
-        sbut.setAnchorPoint(0.5, 0.5);
-        settingsBtn.setPosition(SW / 2 - 30, 0, 0);
-        this.addLabel(settingsBtn, '⚙', 24, WHITE, 0, 0, 36, true);
-        settingsBtn.on(Node.EventType.TOUCH_END, () => this.showSettings(), this);
-        topBar.addChild(settingsBtn);
     }
 
     private buildGrid(parent: Node): void {
@@ -220,10 +243,21 @@ export class MainUI extends Component {
             this._stageLabel.string = `${data.currentChapter}-${data.currentStage}`;
         }
 
+        // 产量显示
+        const constants = GameConfig.instance.constants;
+        const offlineConfig = constants?.offline;
+        if (offlineConfig) {
+            const progress = data.highestChapter * 100 + data.highestStage;
+            const multi = 1 + progress * (offlineConfig.stageMultiplier || 0.15);
+            const goldH = Math.floor((offlineConfig.baseGoldPerHour || 20) * multi);
+            const crystH = Math.floor((offlineConfig.baseCrystalsPerHour || 3) * multi);
+            if (this._incomeCrystals) this._incomeCrystals.string = `💎${crystH}/h`;
+            if (this._incomeTokens) this._incomeTokens.string = `💰${goldH}/h`;
+        }
+
         const currencies = [
-            { id: 'crystals',   icon: '💎' },
-            { id: 'tokens',     icon: '🪙' },
-            { id: 'bottleCaps', icon: '🍺' },
+            { id: 'gold',     icon: '💰' },
+            { id: 'crystals', icon: '💎' },
         ];
         for (const c of currencies) {
             const lbl = this._currencyLabels.get(c.id);
@@ -235,7 +269,7 @@ export class MainUI extends Component {
 
     // ---- Offline rewards popup ----
 
-    private showOfflineRewards(info: { hours: number; exp: number; crystals: number; tokens: number }): void {
+    private showOfflineRewards(info: { hours: number; exp: number; gold: number; crystals: number }): void {
         if (!this._container) return;
         const SW = this._SW, SH = this._SH;
 
@@ -290,8 +324,8 @@ export class MainUI extends Component {
         // 收益明细
         const lines = [
             `经验 +${info.exp}`,
-            `氪晶 +${info.crystals}`,
-            `筹码 +${info.tokens}`,
+            `钻石 +${info.crystals}`,
+            `金币 +${info.gold}`,
         ];
         let infoY = divY - 50;
         for (const line of lines) {
@@ -325,7 +359,7 @@ export class MainUI extends Component {
         btnLbl.setPosition(0, 0, 0);
         const bl = btnLbl.addComponent(Label);
         bl.string = '领  取';
-        bl.fontSize = 18;
+        bl.fontSize = this.mapFS(18);
         bl.isBold = true;
         bl.color = new Color(26, 26, 46, 255);
         bl.horizontalAlign = Label.HorizontalAlign.CENTER;
@@ -401,7 +435,7 @@ export class MainUI extends Component {
             `名字: ${data.name}`,
             `等级: Lv${data.level}`,
             `进度: ${data.highestChapter}-${data.highestStage}`,
-            `氪晶: ${data.crystals}  筹码: ${data.tokens}  瓶盖: ${data.bottleCaps}`,
+            `金币: ${data.gold}  钻石: ${data.crystals}`,
             `兵种: ${Object.keys(data.units).length} 种`,
         ];
         let infoY = divY - 25;
@@ -435,7 +469,7 @@ export class MainUI extends Component {
         resetLbl.setPosition(0, 0, 0);
         const rl = resetLbl.addComponent(Label);
         rl.string = '重置数据';
-        rl.fontSize = 18;
+        rl.fontSize = this.mapFS(18);
         rl.isBold = true;
         rl.color = WHITE;
         rl.horizontalAlign = Label.HorizontalAlign.CENTER;
@@ -489,18 +523,31 @@ export class MainUI extends Component {
         return n;
     }
 
+    private mapFS(raw: number): number {
+        const fs = GameConfig.instance.fontSizes;
+        if (!fs) return raw;
+        if (raw >= 44) return fs.hero;
+        if (raw >= 34) return fs.titleLg;
+        if (raw >= 26) return fs.title;
+        if (raw >= 22) return fs.subtitle;
+        if (raw >= 18) return fs.body;
+        if (raw >= 14) return fs.small;
+        return fs.caption;
+    }
+
     private addLabel(parent: Node, text: string, fontSize: number, color: Color,
         x: number, y: number, w: number = 0, bold: boolean = false): Node {
+        const actualSize = this.mapFS(fontSize);
         const n = new Node('Lbl');
         if (w > 0) {
             const ut = n.addComponent(UITransform);
-            ut.setContentSize(w, fontSize + 4);
+            ut.setContentSize(w, actualSize + 4);
             ut.setAnchorPoint(0.5, 0.5);
         }
         n.setPosition(x, y, 0);
         const l = n.addComponent(Label);
         l.string = text;
-        l.fontSize = fontSize;
+        l.fontSize = actualSize;
         l.isBold = bold;
         l.color = color;
         if (w > 0) l.horizontalAlign = Label.HorizontalAlign.CENTER;

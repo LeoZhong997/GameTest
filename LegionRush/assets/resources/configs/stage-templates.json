@@ -1,0 +1,142 @@
+{
+    "chapters": {
+        "1": {
+            "name": "初征",
+            "baseLevel": 1,
+            "levelPerStage": 0.5,
+            "enemyPool": {
+                "normal": ["iron_guard", "swordsman", "mage", "apothecary", "bone_golem", "berserker", "treant", "blade_dancer", "demon_golem", "demon_blade"],
+                "elite": ["berserker", "thunder_shaman", "witch_doctor", "blood_moon", "blade_dancer", "wind_archer", "shadow_demon", "warlock"],
+                "boss": ["demon_golem", "demon_blade", "shadow_demon", "warlock", "nightmare", "blood_moon", "berserker", "faceless"]
+            },
+            "qualityByStage": {
+                "1_10": "green",
+                "11_20": "blue",
+                "21_30": "blue"
+            },
+            "eliteQualityByStage": {
+                "1_10": "green",
+                "11_20": "blue",
+                "21_30": "purple"
+            },
+            "bossQualityByStage": {
+                "1_10": "blue",
+                "11_20": "blue",
+                "21_30": "purple"
+            },
+            "rewardScale": 1.0,
+            "dropPools": {
+                "normal": [
+                    { "itemId": "iron_guard_shard_green", "weight": 40, "countMin": 1, "countMax": 3, "name": "铁卫绿碎片", "rarity": "common" },
+                    { "itemId": "exp_book_s", "weight": 35, "countMin": 1, "countMax": 3, "name": "初级经验书", "rarity": "common" },
+                    { "itemId": "ascension_scroll", "weight": 15, "countMin": 1, "countMax": 1, "name": "升阶卷轴", "rarity": "rare" },
+                    { "itemId": "swordsman_shard_green", "weight": 10, "countMin": 1, "countMax": 2, "name": "剑客绿碎片", "rarity": "common" }
+                ],
+                "miniBoss": [
+                    { "itemId": "iron_guard_shard_blue", "weight": 30, "countMin": 1, "countMax": 2, "name": "铁卫蓝碎片", "rarity": "rare" },
+                    { "itemId": "exp_book_m", "weight": 30, "countMin": 1, "countMax": 2, "name": "中级经验书", "rarity": "rare" },
+                    { "itemId": "ascension_scroll", "weight": 25, "countMin": 1, "countMax": 2, "name": "升阶卷轴", "rarity": "rare" },
+                    { "itemId": "swordsman_shard_blue", "weight": 15, "countMin": 1, "countMax": 1, "name": "剑客蓝碎片", "rarity": "rare" }
+                ],
+                "boss": [
+                    { "itemId": "iron_guard_shard_blue", "weight": 25, "countMin": 2, "countMax": 3, "name": "铁卫蓝碎片", "rarity": "rare" },
+                    { "itemId": "exp_book_l", "weight": 25, "countMin": 1, "countMax": 2, "name": "高级经验书", "rarity": "epic" },
+                    { "itemId": "ascension_scroll", "weight": 25, "countMin": 2, "countMax": 3, "name": "升阶卷轴", "rarity": "rare" },
+                    { "itemId": "swordsman_shard_blue", "weight": 25, "countMin": 1, "countMax": 2, "name": "剑客蓝碎片", "rarity": "rare" }
+                ]
+            }
+        },
+        "2": {
+            "name": "四方征伐",
+            "baseLevel": 6,
+            "levelPerStage": 0.4,
+            "enemyPool": {
+                "normal": ["iron_guard", "swordsman", "mage", "bone_golem", "berserker", "thunder_shaman", "treant", "wind_archer", "demon_golem", "shadow_demon"],
+                "elite": ["berserker", "blood_moon", "blade_dancer", "faceless", "demon_blade", "nightmare", "shadow_blade", "warlock"],
+                "boss": ["iron_guard", "bone_golem", "demon_golem", "nightmare", "blood_moon", "wind_archer", "shadow_demon", "berserker"]
+            },
+            "qualityByStage": {
+                "1_10": "blue",
+                "11_20": "blue",
+                "21_30": "purple"
+            },
+            "eliteQualityByStage": {
+                "1_10": "blue",
+                "11_20": "purple",
+                "21_30": "purple"
+            },
+            "bossQualityByStage": {
+                "1_10": "purple",
+                "11_20": "purple",
+                "21_30": "purple"
+            },
+            "rewardScale": 1.8,
+            "dropPools": {
+                "normal": [
+                    { "itemId": "berserker_shard_blue", "weight": 35, "countMin": 1, "countMax": 2, "name": "狂战蓝碎片", "rarity": "rare" },
+                    { "itemId": "exp_book_m", "weight": 35, "countMin": 1, "countMax": 3, "name": "中级经验书", "rarity": "rare" },
+                    { "itemId": "ascension_scroll", "weight": 20, "countMin": 1, "countMax": 1, "name": "升阶卷轴", "rarity": "rare" },
+                    { "itemId": "iron_guard_shard_blue", "weight": 10, "countMin": 1, "countMax": 1, "name": "铁卫蓝碎片", "rarity": "rare" }
+                ],
+                "miniBoss": [
+                    { "itemId": "berserker_shard_blue", "weight": 30, "countMin": 1, "countMax": 2, "name": "狂战蓝碎片", "rarity": "rare" },
+                    { "itemId": "exp_book_l", "weight": 30, "countMin": 1, "countMax": 2, "name": "高级经验书", "rarity": "epic" },
+                    { "itemId": "ascension_scroll", "weight": 25, "countMin": 1, "countMax": 2, "name": "升阶卷轴", "rarity": "rare" },
+                    { "itemId": "nightmare_shard_blue", "weight": 15, "countMin": 1, "countMax": 1, "name": "梦魇蓝碎片", "rarity": "rare" }
+                ],
+                "boss": [
+                    { "itemId": "nightmare_shard_blue", "weight": 30, "countMin": 2, "countMax": 3, "name": "梦魇蓝碎片", "rarity": "rare" },
+                    { "itemId": "exp_book_l", "weight": 30, "countMin": 2, "countMax": 3, "name": "高级经验书", "rarity": "epic" },
+                    { "itemId": "ascension_scroll", "weight": 20, "countMin": 2, "countMax": 3, "name": "升阶卷轴", "rarity": "rare" },
+                    { "itemId": "blood_moon_shard_blue", "weight": 20, "countMin": 1, "countMax": 2, "name": "血月蓝碎片", "rarity": "rare" }
+                ]
+            }
+        },
+        "3": {
+            "name": "混沌深渊",
+            "baseLevel": 11,
+            "levelPerStage": 0.35,
+            "enemyPool": {
+                "normal": ["demon_golem", "demon_blade", "shadow_demon", "warlock", "nightmare", "bone_golem", "berserker", "treant", "iron_guard", "mage"],
+                "elite": ["nightmare", "faceless", "shadow_blade", "blood_moon", "warlock", "wind_archer", "blade_dancer", "shadow_demon"],
+                "boss": ["iron_guard", "bone_golem", "demon_golem", "nightmare", "blood_moon", "wind_archer", "shadow_demon", "berserker", "swordsman", "mage"]
+            },
+            "qualityByStage": {
+                "1_10": "purple",
+                "11_20": "purple",
+                "21_30": "purple"
+            },
+            "eliteQualityByStage": {
+                "1_10": "purple",
+                "11_20": "purple",
+                "21_30": "purple"
+            },
+            "bossQualityByStage": {
+                "1_10": "purple",
+                "11_20": "purple",
+                "21_30": "purple"
+            },
+            "rewardScale": 3.0,
+            "dropPools": {
+                "normal": [
+                    { "itemId": "nightmare_shard_blue", "weight": 30, "countMin": 1, "countMax": 2, "name": "梦魇蓝碎片", "rarity": "rare" },
+                    { "itemId": "exp_book_l", "weight": 35, "countMin": 1, "countMax": 2, "name": "高级经验书", "rarity": "epic" },
+                    { "itemId": "ascension_scroll", "weight": 25, "countMin": 1, "countMax": 2, "name": "升阶卷轴", "rarity": "rare" },
+                    { "itemId": "warlock_shard_blue", "weight": 10, "countMin": 1, "countMax": 1, "name": "咒师蓝碎片", "rarity": "rare" }
+                ],
+                "miniBoss": [
+                    { "itemId": "nightmare_shard_blue", "weight": 35, "countMin": 2, "countMax": 3, "name": "梦魇蓝碎片", "rarity": "rare" },
+                    { "itemId": "exp_book_l", "weight": 30, "countMin": 2, "countMax": 3, "name": "高级经验书", "rarity": "epic" },
+                    { "itemId": "ascension_scroll", "weight": 25, "countMin": 2, "countMax": 3, "name": "升阶卷轴", "rarity": "rare" },
+                    { "itemId": "faceless_shard_blue", "weight": 10, "countMin": 1, "countMax": 2, "name": "无面蓝碎片", "rarity": "rare" }
+                ],
+                "boss": [
+                    { "itemId": "nightmare_shard_blue", "weight": 35, "countMin": 3, "countMax": 5, "name": "梦魇蓝碎片", "rarity": "rare" },
+                    { "itemId": "exp_book_l", "weight": 30, "countMin": 2, "countMax": 4, "name": "高级经验书", "rarity": "epic" },
+                    { "itemId": "ascension_scroll", "weight": 20, "countMin": 2, "countMax": 4, "name": "升阶卷轴", "rarity": "rare" },
+                    { "itemId": "shadow_demon_shard_blue", "weight": 15, "countMin": 2, "countMax": 3, "name": "影魔蓝碎片", "rarity": "rare" }
+                ]
+            }
+        }
+    }
+}

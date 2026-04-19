@@ -3,9 +3,10 @@
  */
 
 import { UnitInstanceData, Quality } from './UnitData';
+import { RelicInstance } from './RelicData';
 
 /** 存档版本号（结构变更时递增，用于迁移） */
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 6;
 
 export interface PlayerData {
     version: number;
@@ -15,12 +16,8 @@ export interface PlayerData {
     exp: number;
 
     // 货币
-    crystals: number;          // 氪晶
-    magicCrystals: number;     // 魔晶
-    tokens: number;            // 筹码
-    bottleCaps: number;        // 瓶盖
-    arenaCoins: number;        // 竞技场币
-    relicFragments: number;    // 宝物碎片
+    gold: number;              // 金币（通用货币）
+    crystals: number;          // 钻石（高级货币）
 
     // 推图进度
     currentChapter: number;
@@ -43,6 +40,9 @@ export interface PlayerData {
 
     // 建筑
     buildings: Record<string, number>; // buildingId -> level
+
+    // 圣物实例（uid -> RelicInstance）
+    relics: Record<string, RelicInstance>;
 
     // 时间戳
     createdAt: number;
@@ -78,12 +78,8 @@ export function createDefaultPlayerData(name: string = '魔王'): PlayerData {
         name,
         level: 1,
         exp: 0,
+        gold: 100,
         crystals: 0,
-        magicCrystals: 0,
-        tokens: 10,
-        bottleCaps: 0,
-        arenaCoins: 0,
-        relicFragments: 0,
         currentChapter: 1,
         currentStage: 1,
         highestChapter: 0,
@@ -102,6 +98,7 @@ export function createDefaultPlayerData(name: string = '魔王'): PlayerData {
         lastOnlineTime: now,
         offlineRewardHours: 8,
         buildings: {},
+        relics: {},
         createdAt: now,
         lastSaveTime: now,
     };

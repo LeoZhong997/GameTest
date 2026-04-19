@@ -12,10 +12,10 @@ import { GameConfig } from '../core/GameConfig';
 
 const { ccclass } = _decorator;
 
-const ITEM_W = 160, ITEM_H = 80;
-const ITEM_GAP = 16;
+const ITEM_W = 170, ITEM_H = 90;
+const ITEM_GAP = 14;
 const TAB_W = 90;
-const TAB_GAP = 12;
+const TAB_GAP = 10;
 
 // Colors
 const BG          = new Color(26, 26, 46, 255);
@@ -62,6 +62,7 @@ export class BackpackUI extends Component {
         exp_book_m: { name: '中级经验书', description: '使用后获得 200 经验', rarity: 'rare' },
         exp_book_l: { name: '高级经验书', description: '使用后获得 800 经验', rarity: 'epic' },
         ascension_scroll: { name: '升阶卷轴', description: '用于兵种升阶', rarity: 'rare' },
+        relic_essence: { name: '圣物精华', description: '用于升级圣物', rarity: 'rare' },
     };
 
     /** 碎片物品 ID → 中文名 */
@@ -284,13 +285,13 @@ export class BackpackUI extends Component {
             const bgG = bg.getComponent(Graphics)!;
             bgG.clear();
             bgG.fillColor = isActive ? TAB_ACTIVE : TAB_INACTIVE;
-            bgG.roundRect(-w / 2 + 2, -h / 2 + 2, w - 4, h - 4, 6);
+            bgG.roundRect(-w / 2, -h / 2, w, h, 4);
             bgG.fill();
 
             // 选中时左侧金色竖条
             if (isActive) {
                 bgG.fillColor = TAB_INDICATOR;
-                bgG.rect(-w / 2 + 2, -h / 2 + 8, 3, h - 16);
+                bgG.rect(-w / 2, -h / 2 + 6, 3, h - 12);
                 bgG.fill();
             }
 
@@ -315,18 +316,36 @@ export class BackpackUI extends Component {
             return;
         }
 
+        const tabKey = TAB_DEFS[this._tabIndex].key;
+
         const inventory = PlayerManager.instance.data.inventory || {};
         const allItems = Object.entries(inventory).filter(([_, count]) => count > 0);
 
         // 按标签过滤
-        const tabKey = TAB_DEFS[this._tabIndex].key;
         const filtered = allItems.filter(([itemId]) => {
             const isShard = itemId.includes('_shard_');
             return tabKey === 'shard' ? isShard : !isShard;
         });
 
         if (filtered.length === 0) {
-            const emptyNode = this.addLabel(this._content, EMPTY_TEXTS[tabKey], 16, GRAY_TEXT, 0, 0, 300, true);
+            // 空状态：居中灰色图标 + 文字
+            const iconNode = new Node('EmptyIcon');
+            iconNode.addComponent(UITransform).setContentSize(60, 60);
+            iconNode.getComponent(UITransform)!.setAnchorPoint(0.5, 0.5);
+            iconNode.setPosition(0, 10, 0);
+            const iconG = iconNode.addComponent(Graphics);
+            iconG.strokeColor = new Color(80, 80, 100, 100);
+            iconG.lineWidth = 2;
+            iconG.circle(0, 0, 24);
+            iconG.stroke();
+            iconG.moveTo(-8, 0);
+            iconG.lineTo(8, 0);
+            iconG.stroke();
+            iconG.moveTo(0, -8);
+            iconG.lineTo(0, 8);
+            iconG.stroke();
+            this._content.addChild(iconNode);
+            const emptyNode = this.addLabel(this._content, EMPTY_TEXTS[tabKey], 14, GRAY_TEXT, 0, -30, 300, true);
             emptyNode.layer = Layers.Enum.UI_2D;
             return;
         }
@@ -354,6 +373,8 @@ export class BackpackUI extends Component {
             const name = resolved.name;
             const rarity = resolved.rarity;
             const rColor = RARITY_COLORS[rarity] || GRAY_TEXT;
+            const nameFS = this.mapFS(13);
+            const countFS = this.mapFS(14);
 
             const itemNode = new Node(`Item_${itemId}`);
             const iut = itemNode.addComponent(UITransform);
@@ -361,27 +382,33 @@ export class BackpackUI extends Component {
             iut.setAnchorPoint(0.5, 0.5);
             itemNode.setPosition(cx, cy, 0);
 
-            // Background
+            // Background（品质色淡底 + 边框）
             const bgNode = new Node('ItemBg');
             const bgut = bgNode.addComponent(UITransform);
             bgut.setContentSize(ITEM_W, ITEM_H);
             bgut.setAnchorPoint(0.5, 0.5);
             bgNode.setPosition(0, 0, 0);
             const bg = bgNode.addComponent(Graphics);
-            bg.fillColor = ITEM_BG;
+            bg.fillColor = new Color(rColor.r * 0.06, rColor.g * 0.06, rColor.b * 0.06, 220);
             bg.roundRect(-ITEM_W / 2, -ITEM_H / 2, ITEM_W, ITEM_H, 8);
             bg.fill();
-            bg.strokeColor = rColor;
+            bg.strokeColor = new Color(rColor.r, rColor.g, rColor.b, 140);
             bg.lineWidth = 1;
             bg.roundRect(-ITEM_W / 2, -ITEM_H / 2, ITEM_W, ITEM_H, 8);
             bg.stroke();
+            // 左侧品质色条
+            bg.fillColor = new Color(rColor.r, rColor.g, rColor.b, 160);
+            bg.roundRect(-ITEM_W / 2, -ITEM_H / 2, 4, ITEM_H, 2);
+            bg.fill();
             itemNode.insertChild(bgNode, 0);
 
-            // Name
-            this.addLabel(itemNode, name, 13, WHITE, 0, 10, ITEM_W - 8, true);
+            // Name（居中）
+            const nameY = countFS / 2 + 4;
+            this.addLabel(itemNode, name, 13, WHITE, 0, nameY, ITEM_W - 12, true);
 
-            // Count
-            this.addLabel(itemNode, `×${count}`, 14, GOLD, 0, -12, ITEM_W, true);
+            // Count（居中，金色）
+            const countY = nameY - nameFS - 4;
+            this.addLabel(itemNode, `×${count}`, 14, GOLD, 0, countY, ITEM_W, true);
 
             this._content.addChild(itemNode);
         });
@@ -407,18 +434,31 @@ export class BackpackUI extends Component {
         return n;
     }
 
+    private mapFS(raw: number): number {
+        const fs = GameConfig.instance.fontSizes;
+        if (!fs) return raw;
+        if (raw >= 44) return fs.hero;
+        if (raw >= 34) return fs.titleLg;
+        if (raw >= 26) return fs.title;
+        if (raw >= 22) return fs.subtitle;
+        if (raw >= 18) return fs.body;
+        if (raw >= 14) return fs.small;
+        return fs.caption;
+    }
+
     private addLabel(parent: Node, text: string, fontSize: number, color: Color,
         x: number, y: number, w: number = 0, bold: boolean = false): Node {
+        const actualSize = this.mapFS(fontSize);
         const n = new Node('Lbl');
         if (w > 0) {
             const ut = n.addComponent(UITransform);
-            ut.setContentSize(w, fontSize + 4);
+            ut.setContentSize(w, actualSize + 4);
             ut.setAnchorPoint(0.5, 0.5);
         }
         n.setPosition(x, y, 0);
         const l = n.addComponent(Label);
         l.string = text;
-        l.fontSize = fontSize;
+        l.fontSize = actualSize;
         l.isBold = bold;
         l.color = color;
         if (w > 0) l.horizontalAlign = Label.HorizontalAlign.CENTER;

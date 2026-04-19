@@ -7,6 +7,17 @@
 import { UnitConfig } from '../models/UnitData';
 import { SkillConfig } from '../models/SkillData';
 import { SynergyConfig } from '../models/SynergyData';
+import { RelicConfig } from '../models/RelicData';
+
+export interface FontSizes {
+    hero: number;
+    titleLg: number;
+    title: number;
+    subtitle: number;
+    body: number;
+    small: number;
+    caption: number;
+}
 
 export class GameConfig {
     private static _instance: GameConfig = null!;
@@ -14,6 +25,7 @@ export class GameConfig {
     private _unitConfigs: Map<string, UnitConfig> = new Map();
     private _skillConfigs: Map<string, SkillConfig> = new Map();
     private _synergyConfigs: SynergyConfig[] = [];
+    private _relicConfigs: Map<string, RelicConfig> = new Map();
     private _constants: any = null;
     private _loaded: boolean = false;
 
@@ -40,8 +52,16 @@ export class GameConfig {
         return this._synergyConfigs;
     }
 
+    get relicConfigs(): Map<string, RelicConfig> {
+        return this._relicConfigs;
+    }
+
     get constants(): any {
         return this._constants;
+    }
+
+    get fontSizes(): FontSizes {
+        return this._constants?.fontSizes;
     }
 
     /** 设置配置数据（由主场景调用） */
@@ -61,11 +81,23 @@ export class GameConfig {
         this._synergyConfigs = configs;
     }
 
+    /** 设置圣物配置 */
+    setRelicConfigs(configs: RelicConfig[]): void {
+        this._relicConfigs.clear();
+        for (const c of configs) {
+            this._relicConfigs.set(c.id, c);
+        }
+    }
+
     getUnitConfig(id: string): UnitConfig | undefined {
         return this._unitConfigs.get(id);
     }
 
     getSkillConfig(id: string): SkillConfig | undefined {
         return this._skillConfigs.get(id);
+    }
+
+    getRelicConfig(id: string): RelicConfig | undefined {
+        return this._relicConfigs.get(id);
     }
 }

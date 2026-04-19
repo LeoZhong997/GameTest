@@ -27,8 +27,8 @@ const DEFAULT_RATES: Record<string, number> = {
     purple: 5,
 };
 
-export const GACHA_COST = { bottleCaps: 1, tokens: 2 };
-export const GACHA_TEN_COST = { bottleCaps: 10, tokens: 20 };
+export const GACHA_COST = { gold: 100 };
+export const GACHA_TEN_COST = { gold: 900 };
 
 export class GachaSystem {
     private static _instance: GachaSystem | null = null;

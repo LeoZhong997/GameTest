@@ -33,7 +33,7 @@ export enum BattleResult {
 export interface BattleConfig {
     leftFormation: FormationType;
     rightFormation: FormationType;
-    leftUnits: { config: UnitConfig; level: number; quality: Quality; count: number; gridRow: number; gridCol: number }[];
+    leftUnits: { config: UnitConfig; level: number; quality: Quality; count: number; gridRow: number; gridCol: number; relicBonuses?: Record<string, number> }[];
     rightUnits: { config: UnitConfig; level: number; quality: Quality; count: number; gridRow: number; gridCol: number }[];
     timeLimit: number;
 }
@@ -114,7 +114,7 @@ export class BattleManager {
             const effectiveCount = group.count;
             const positions = Formation.getPositionsForCell(group.gridRow, group.gridCol, effectiveCount, true);
             for (let i = 0; i < effectiveCount; i++) {
-                const unit = new BattleUnit(group.config, TeamSide.LEFT, group.level, group.quality);
+                const unit = new BattleUnit(group.config, TeamSide.LEFT, group.level, group.quality, group.relicBonus);
                 unit.position.set(positions[i]);
                 this._leftUnits.push(unit);
                 this._allUnits.push(unit);
@@ -229,6 +229,7 @@ export class BattleManager {
                     target: unit.target.uid,
                     damage: actual,
                     isCrit,
+                    range: unit.range,
                 });
             }
         }
