@@ -11,6 +11,8 @@ import { UnitConfig, Quality } from '../models/UnitData';
 import { SkillConfig } from '../models/SkillData';
 import { SynergyConfig, ActiveSynergy } from '../models/SynergyData';
 import { SynergySystem } from './SynergySystem';
+import { BattleOrderEffect } from '../models/BattleOrderData';
+import { GameConfig } from '../core/GameConfig';
 import { EventBus } from '../core/EventBus';
 
 /** 战斗状态 */
@@ -36,6 +38,7 @@ export interface BattleConfig {
     leftUnits: { config: UnitConfig; level: number; quality: Quality; count: number; gridRow: number; gridCol: number; relicBonuses?: Record<string, number> }[];
     rightUnits: { config: UnitConfig; level: number; quality: Quality; count: number; gridRow: number; gridCol: number }[];
     timeLimit: number;
+    battleOrderId?: string;
 }
 
 /** 战斗报告 */
@@ -65,6 +68,7 @@ export class BattleManager {
     private _battleTime: number = 0;
     private _timeLimit: number = 30;
     private _battleSpeed: number = 1.0;
+    private _pendingOrders: { effect: BattleOrderEffect; triggered: boolean; triggerDelay: number }[] = [];
 
     public static get instance(): BattleManager {
         if (!this._instance) {
@@ -148,6 +152,24 @@ export class BattleManager {
             this._rightActiveSynergies = rightActives;
         }
 
+        // 缓存军令效果（延迟触发）
+        this._pendingOrders = [];
+        if (config.battleOrderId) {
+            const orderConfig = GameConfig.instance.getBattleOrderConfig(config.battleOrderId);
+            if (orderConfig) {
+                for (const effect of orderConfig.effects) {
+                    this._pendingOrders.push({
+                        effect,
+                        triggered: false,
+                        triggerDelay: effect.triggerDelay || 0,
+                    });
+                }
+                // 立即触发 delay=0 的效果
+                this.triggerPendingOrders(0);
+                console.log(`[BattleManager] 军令「${orderConfig.name}」已加载`);
+            }
+        }
+
         this._state = BattleState.PREPARING;
         console.log(`[BattleManager] 布阵完成: ${this._leftUnits.length} vs ${this._rightUnits.length}`);
     }
@@ -177,6 +199,9 @@ export class BattleManager {
             this.endBattle(BattleResult.DRAW);
             return;
         }
+
+        // 触发延迟军令
+        this.triggerPendingOrders(this._battleTime);
 
         // 更新所有单位
         for (const unit of this._allUnits) {
@@ -340,8 +365,58 @@ export class BattleManager {
         this._battleTime = 0;
         this._activeSynergies = [];
         this._rightActiveSynergies = [];
+        this._pendingOrders = [];
         this._state = BattleState.NONE;
         BattleUnit._onAssistCallback = null;
+    }
+
+    /** 获取军令效果目标单位 */
+    private getOrderTargets(scope: string): BattleUnit[] {
+        switch (scope) {
+            case 'team':
+                return [...this._leftUnits];
+            case 'frontline':
+                return this._leftUnits.filter(u => u.position.y > 0);
+            case 'backline':
+                return this._leftUnits.filter(u => u.position.y <= 0);
+            case 'enemy_backline':
+                return this._rightUnits.filter(u => u.position.y <= 0);
+            case 'melee':
+                return this._leftUnits.filter(u => u.config.role === 'melee');
+            case 'assassin':
+                return this._leftUnits.filter(u => u.config.role === 'assassin');
+            case 'ranged':
+                return this._leftUnits.filter(u => u.config.role === 'ranged');
+            case 'support':
+                return this._leftUnits.filter(u => u.config.role === 'support');
+            default:
+                return [...this._leftUnits];
+        }
+    }
+
+    /** 触发已到时间的延迟军令 */
+    private triggerPendingOrders(currentTime: number): void {
+        for (const pending of this._pendingOrders) {
+            if (!pending.triggered && currentTime >= pending.triggerDelay) {
+                pending.triggered = true;
+                const targets = this.getOrderTargets(pending.effect.scope);
+                for (const unit of targets) {
+                    if (unit.isAlive) {
+                        this.applyOrderEffect(unit, pending.effect);
+                    }
+                }
+            }
+        }
+    }
+
+    /** 应用军令效果到单个单位 */
+    private applyOrderEffect(unit: BattleUnit, effect: BattleOrderEffect): void {
+        const statKey = effect.stat as keyof typeof unit;
+        const current = (unit as any)[statKey];
+        if (typeof current === 'number') {
+            const delta = current * effect.value;
+            (unit as any)[statKey] = current + delta;
+        }
     }
 
     /** 清理资源 */

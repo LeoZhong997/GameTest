@@ -8,6 +8,7 @@ import { UnitConfig } from '../models/UnitData';
 import { SkillConfig } from '../models/SkillData';
 import { SynergyConfig } from '../models/SynergyData';
 import { RelicConfig } from '../models/RelicData';
+import { BattleOrderConfig } from '../models/BattleOrderData';
 
 export interface FontSizes {
     hero: number;
@@ -26,6 +27,7 @@ export class GameConfig {
     private _skillConfigs: Map<string, SkillConfig> = new Map();
     private _synergyConfigs: SynergyConfig[] = [];
     private _relicConfigs: Map<string, RelicConfig> = new Map();
+    private _battleOrderConfigs: Map<string, BattleOrderConfig> = new Map();
     private _constants: any = null;
     private _loaded: boolean = false;
 
@@ -87,6 +89,24 @@ export class GameConfig {
         for (const c of configs) {
             this._relicConfigs.set(c.id, c);
         }
+    }
+
+    /** 设置军令配置 */
+    setBattleOrderConfigs(configs: BattleOrderConfig[]): void {
+        this._battleOrderConfigs.clear();
+        for (const c of configs) {
+            this._battleOrderConfigs.set(c.id, c);
+        }
+    }
+
+    /** 获取军令配置 */
+    getBattleOrderConfig(id: string): BattleOrderConfig | undefined {
+        return this._battleOrderConfigs.get(id);
+    }
+
+    /** 获取所有军令配置 */
+    get allBattleOrderConfigs(): BattleOrderConfig[] {
+        return Array.from(this._battleOrderConfigs.values());
     }
 
     getUnitConfig(id: string): UnitConfig | undefined {

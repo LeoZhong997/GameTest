@@ -318,7 +318,7 @@ export class StageSelectUI extends Component {
         const gridBottomEdge = gridStartY - CARD_H / 2 - (gridTotalH - CARD_H);
         const navY = gridBottomEdge - 30; // 30px 间距后放导航中心
 
-        const chapters = [1, 2, 3];
+        const chapters = [1, 2, 3, 4, 5, 6];
         const btnW = 80, btnH = 34, btnGap = 12;
         const totalNavW = chapters.length * btnW + (chapters.length - 1) * btnGap;
         const startX = -totalNavW / 2 + btnW / 2;

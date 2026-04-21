@@ -42,9 +42,9 @@ const FORMATIONS: { name: string; positions: { row: number; col: number }[] }[] 
 ];
 
 // miniBoss / boss 关卡编号
-const MINIBOSS_STAGES = [5, 15, 25];
-const BOSS_STAGES = [10, 20, 30];
-const STAGES_PER_CHAPTER = 30;
+const MINIBOSS_STAGES = [5, 10, 15];
+const BOSS_STAGES = [20];
+const STAGES_PER_CHAPTER = 20;
 
 export class StageManager {
     private static _instance: StageManager = null!;
@@ -122,7 +122,7 @@ export class StageManager {
         // 敌人数量
         let enemyCount: number;
         if (type === 'boss') {
-            enemyCount = stageNum === 30 ? 9 : 7;
+            enemyCount = stageNum === 20 ? 9 : 7;
         } else if (type === 'miniBoss') {
             enemyCount = 6;
         } else {

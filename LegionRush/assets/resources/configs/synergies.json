@@ -1,42 +1,47 @@
 [
     {
         "race": "human",
-        "name": "人族·坚韧",
+        "name": "壁垒号令",
         "tiers": [
-            { "threshold": 2, "effects": [{ "stat": "def", "value": 10, "scope": "race" }] },
-            { "threshold": 3, "effects": [{ "stat": "def", "value": 20, "scope": "race" }] }
+            { "threshold": 2, "effects": [{ "stat": "def", "value": 12, "scope": "race" }] },
+            { "threshold": 3, "effects": [{ "stat": "def", "value": 20, "scope": "race" }, { "stat": "hp", "value": 10, "scope": "race" }] },
+            { "threshold": 5, "effects": [{ "stat": "def", "value": 28, "scope": "race" }, { "stat": "hp", "value": 16, "scope": "race" }] }
         ]
     },
     {
         "race": "beast",
-        "name": "兽族·狂暴",
+        "name": "血猎狂潮",
         "tiers": [
-            { "threshold": 2, "effects": [{ "stat": "atkSpd", "value": 10, "scope": "race" }] },
-            { "threshold": 3, "effects": [{ "stat": "atk", "value": 15, "scope": "race" }] }
+            { "threshold": 2, "effects": [{ "stat": "atkSpd", "value": 12, "scope": "race" }, { "stat": "spd", "value": 10, "scope": "race" }] },
+            { "threshold": 3, "effects": [{ "stat": "atkSpd", "value": 18, "scope": "race" }, { "stat": "atk", "value": 8, "scope": "race" }] },
+            { "threshold": 5, "effects": [{ "stat": "atkSpd", "value": 25, "scope": "race" }, { "stat": "atk", "value": 12, "scope": "race" }] }
         ]
     },
     {
         "race": "spirit",
-        "name": "灵族·灵体",
+        "name": "月相回响",
         "tiers": [
-            { "threshold": 2, "effects": [{ "stat": "atk", "value": 10, "scope": "race" }] },
-            { "threshold": 3, "effects": [{ "stat": "atk", "value": 20, "scope": "race" }] }
+            { "threshold": 2, "effects": [{ "stat": "atkSpd", "value": 5, "scope": "race" }, { "stat": "atk", "value": 8, "scope": "race" }] },
+            { "threshold": 3, "effects": [{ "stat": "atkSpd", "value": 8, "scope": "race" }, { "stat": "atk", "value": 14, "scope": "race" }] },
+            { "threshold": 5, "effects": [{ "stat": "atkSpd", "value": 12, "scope": "race" }, { "stat": "atk", "value": 20, "scope": "race" }] }
         ]
     },
     {
         "race": "demon",
-        "name": "魔族·腐蚀",
+        "name": "蚀魂盟约",
         "tiers": [
-            { "threshold": 2, "effects": [{ "stat": "atk", "value": -8, "scope": "enemy" }] },
-            { "threshold": 3, "effects": [{ "stat": "atk", "value": -15, "scope": "enemy" }] }
+            { "threshold": 2, "effects": [{ "stat": "atk", "value": 12, "scope": "race" }, { "stat": "atk", "value": -8, "scope": "enemy" }] },
+            { "threshold": 3, "effects": [{ "stat": "atk", "value": 18, "scope": "race" }, { "stat": "atk", "value": -12, "scope": "enemy" }] },
+            { "threshold": 5, "effects": [{ "stat": "atk", "value": 25, "scope": "race" }, { "stat": "atk", "value": -15, "scope": "enemy" }] }
         ]
     },
     {
         "race": "mixed",
-        "name": "混编·联军",
+        "name": "征服联军",
         "tiers": [
-            { "threshold": 3, "effects": [{ "stat": "atk", "value": 5, "scope": "team" }, { "stat": "def", "value": 5, "scope": "team" }] },
-            { "threshold": 4, "effects": [{ "stat": "atk", "value": 12, "scope": "team" }, { "stat": "def", "value": 12, "scope": "team" }] }
+            { "threshold": 3, "effects": [{ "stat": "atk", "value": 6, "scope": "team" }, { "stat": "def", "value": 6, "scope": "team" }] },
+            { "threshold": 4, "effects": [{ "stat": "atk", "value": 10, "scope": "team" }, { "stat": "def", "value": 10, "scope": "team" }] },
+            { "threshold": 5, "effects": [{ "stat": "atk", "value": 14, "scope": "team" }, { "stat": "def", "value": 14, "scope": "team" }] }
         ]
     }
 ]

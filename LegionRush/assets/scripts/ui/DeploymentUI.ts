@@ -12,6 +12,7 @@ import { PlayerManager } from '../systems/PlayerManager';
 import { LevelSystem } from '../systems/LevelSystem';
 import { drawShape, UnitShape } from './UnitView';
 import { GameConfig } from '../core/GameConfig';
+import { RACE_NAMES } from '../core/DisplayNames';
 
 const { ccclass } = _decorator;
 
@@ -48,9 +49,7 @@ const BTN_TEXT_C  = new Color(26, 26, 46, 255);
 const GRAY        = new Color(100, 100, 100, 255);
 const PLACEHOLDER = new Color(255, 255, 255, 64);
 
-const RACE_NAMES: Record<string, string> = {
-    human: '人族', beast: '兽族', spirit: '灵族', demon: '魔族',
-};
+// RACE_NAMES imported from DisplayNames
 const RACE_COLORS: Record<string, Color> = {
     human: new Color(80, 160, 255, 255),
     beast: new Color(200, 120, 50, 255),

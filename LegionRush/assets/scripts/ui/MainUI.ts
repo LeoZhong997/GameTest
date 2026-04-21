@@ -12,6 +12,7 @@ import { GameConfig } from '../core/GameConfig';
 import { SaveSystem } from '../core/SaveSystem';
 import { LevelSystem } from '../systems/LevelSystem';
 import { UpgradeSystem } from '../systems/UpgradeSystem';
+import { SCENE_LABELS, CURRENCY, CURRENCY_ICONS } from '../core/DisplayNames';
 
 const { ccclass } = _decorator;
 
@@ -39,14 +40,14 @@ interface MenuCard {
 
 const CARDS: MenuCard[][] = [
     [
-        { id: 'units',    label: '兵种管理', icon: '⚔', active: true,  scene: 'unit_manage' },
-        { id: 'battle',   label: '进  军',   icon: '🗡', active: true,  scene: 'battle' },
-        { id: 'backpack', label: '背  包',   icon: '🎒', active: true,  scene: 'backpack' },
+        { id: 'units',    label: SCENE_LABELS.units,    icon: '⚔', active: true, scene: 'unit_manage' },
+        { id: 'battle',   label: SCENE_LABELS.battle,   icon: '🗡', active: true, scene: 'battle' },
+        { id: 'backpack', label: SCENE_LABELS.backpack,  icon: '🎒', active: true, scene: 'backpack' },
     ],
     [
-        { id: 'gacha',    label: '召  唤',   icon: '✨', active: true,  scene: 'gacha' },
-        { id: 'relics',   label: '圣  物',   icon: '🔮', active: true,  scene: 'relic' },
-        { id: 'slot6', label: '敬请期待', icon: '?', active: false },
+        { id: 'gacha',    label: SCENE_LABELS.gacha,    icon: '✨', active: true, scene: 'gacha' },
+        { id: 'relics',   label: SCENE_LABELS.relics,   icon: '🔮', active: true, scene: 'relic' },
+        { id: 'dungeon',  label: SCENE_LABELS.dungeon,  icon: '🏰', active: true, scene: 'dungeon' },
     ],
 ];
 
@@ -132,7 +133,7 @@ export class MainUI extends Component {
          */
 
         // --- 中区：标题（唯一加粗） ---
-        this.addLabel(topBar, '军团冲刺', 22, GOLD, 0, 0, 240, true);
+        this.addLabel(topBar, SCENE_LABELS.gameTitle, 22, GOLD, 0, 0, 240, true);
 
         // --- 左区：关卡 + 产量 ---
         //  左区中心 x = -440
@@ -159,8 +160,8 @@ export class MainUI extends Component {
 
         // 2 个货币均分右区
         const currencies = [
-            { id: 'gold',     icon: '💰' },
-            { id: 'crystals', icon: '💎' },
+            { id: 'gold',     icon: CURRENCY_ICONS.gold },
+            { id: 'crystals', icon: CURRENCY_ICONS.crystals },
         ];
         const moneySlotW = 160;
         const moneyStartX = RIGHT_CX - 160 + moneySlotW / 2;
@@ -251,13 +252,13 @@ export class MainUI extends Component {
             const multi = 1 + progress * (offlineConfig.stageMultiplier || 0.15);
             const goldH = Math.floor((offlineConfig.baseGoldPerHour || 20) * multi);
             const crystH = Math.floor((offlineConfig.baseCrystalsPerHour || 3) * multi);
-            if (this._incomeCrystals) this._incomeCrystals.string = `💎${crystH}/h`;
-            if (this._incomeTokens) this._incomeTokens.string = `💰${goldH}/h`;
+            if (this._incomeCrystals) this._incomeCrystals.string = `${CURRENCY_ICONS.crystals}${crystH}/h`;
+            if (this._incomeTokens) this._incomeTokens.string = `${CURRENCY_ICONS.gold}${goldH}/h`;
         }
 
         const currencies = [
-            { id: 'gold',     icon: '💰' },
-            { id: 'crystals', icon: '💎' },
+            { id: 'gold',     icon: CURRENCY_ICONS.gold },
+            { id: 'crystals', icon: CURRENCY_ICONS.crystals },
         ];
         for (const c of currencies) {
             const lbl = this._currencyLabels.get(c.id);
@@ -324,8 +325,8 @@ export class MainUI extends Component {
         // 收益明细
         const lines = [
             `经验 +${info.exp}`,
-            `钻石 +${info.crystals}`,
-            `金币 +${info.gold}`,
+            `${CURRENCY.crystals} +${info.crystals}`,
+            `${CURRENCY.gold} +${info.gold}`,
         ];
         let infoY = divY - 50;
         for (const line of lines) {
@@ -435,7 +436,7 @@ export class MainUI extends Component {
             `名字: ${data.name}`,
             `等级: Lv${data.level}`,
             `进度: ${data.highestChapter}-${data.highestStage}`,
-            `金币: ${data.gold}  钻石: ${data.crystals}`,
+            `${CURRENCY.gold}: ${data.gold}  ${CURRENCY.crystals}: ${data.crystals}`,
             `兵种: ${Object.keys(data.units).length} 种`,
         ];
         let infoY = divY - 25;

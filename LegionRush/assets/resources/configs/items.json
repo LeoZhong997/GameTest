@@ -3,26 +3,26 @@
         "id": "soul_shard_green",
         "name": "翠绿灵魂碎片",
         "type": "material",
-        "description": "基础升品材料，用于绿色→蓝色品质提升",
+        "description": "基础升阶材料，用于绿色→蓝色品质提升",
         "rarity": "common"
     },
     "soul_shard_blue": {
         "id": "soul_shard_blue",
         "name": "蔚蓝灵魂碎片",
         "type": "material",
-        "description": "稀有升品材料，用于蓝色→紫色品质提升",
+        "description": "稀有升阶材料，用于蓝色→紫色品质提升",
         "rarity": "rare"
     },
     "ascension_scroll": {
         "id": "ascension_scroll",
-        "name": "升品卷轴",
+        "name": "升阶令",
         "type": "material",
         "description": "品质提升的必备材料",
         "rarity": "rare"
     },
     "exp_book_s": {
         "id": "exp_book_s",
-        "name": "初级经验书",
+        "name": "初级战训手册",
         "type": "exp_book",
         "description": "使用后获得 50 经验",
         "rarity": "common",
@@ -30,7 +30,7 @@
     },
     "exp_book_m": {
         "id": "exp_book_m",
-        "name": "中级经验书",
+        "name": "中级战训手册",
         "type": "exp_book",
         "description": "使用后获得 200 经验",
         "rarity": "rare",
@@ -38,7 +38,7 @@
     },
     "exp_book_l": {
         "id": "exp_book_l",
-        "name": "高级经验书",
+        "name": "高级战训手册",
         "type": "exp_book",
         "description": "使用后获得 800 经验",
         "rarity": "epic",

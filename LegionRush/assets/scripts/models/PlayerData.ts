@@ -4,9 +4,10 @@
 
 import { UnitInstanceData, Quality } from './UnitData';
 import { RelicInstance } from './RelicData';
+import { DungeonProgress } from './DungeonData';
 
 /** 存档版本号（结构变更时递增，用于迁移） */
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 
 export interface PlayerData {
     version: number;
@@ -43,6 +44,9 @@ export interface PlayerData {
 
     // 圣物实例（uid -> RelicInstance）
     relics: Record<string, RelicInstance>;
+
+    // 副本进度（dungeonType -> DungeonProgress）
+    dungeons: Record<string, DungeonProgress>;
 
     // 时间戳
     createdAt: number;
@@ -99,6 +103,7 @@ export function createDefaultPlayerData(name: string = '魔王'): PlayerData {
         offlineRewardHours: 8,
         buildings: {},
         relics: {},
+        dungeons: {},
         createdAt: now,
         lastSaveTime: now,
     };

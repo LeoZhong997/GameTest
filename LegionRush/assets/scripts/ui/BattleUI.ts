@@ -11,6 +11,7 @@ import { EventBus } from '../core/EventBus';
 import { PlayerManager } from '../systems/PlayerManager';
 import { StageManager } from '../systems/StageManager';
 import { GameConfig } from '../core/GameConfig';
+import { isDungeonBattle } from './BattleScene';
 
 const { ccclass } = _decorator;
 
@@ -130,6 +131,7 @@ export class BattleUI extends Component {
         EventBus.instance.on('battle:end', this.onBattleEnd, this);
         EventBus.instance.on('rewards:distributed', this.onRewardsDistributed, this);
         EventBus.instance.on('rewards:choose', this.onRewardsChoose, this);
+        EventBus.instance.on('dungeon:complete', this.onDungeonComplete, this);
     }
 
     /** 构建结算面板的视觉效果 */
@@ -639,6 +641,7 @@ export class BattleUI extends Component {
         EventBus.instance.off('battle:end', this.onBattleEnd, this);
         EventBus.instance.off('rewards:distributed', this.onRewardsDistributed, this);
         EventBus.instance.off('rewards:choose', this.onRewardsChoose, this);
+        EventBus.instance.off('dungeon:complete', this.onDungeonComplete, this);
     }
 
     private onRewardsDistributed(info: any): void {
@@ -657,6 +660,23 @@ export class BattleUI extends Component {
         setTimeout(() => {
             this.showRewardChooseOverlay(data.chooseOptions);
         }, 600);
+    }
+
+    /** 副本战斗完成（DungeonSystem 发出） */
+    private onDungeonComplete(data: { type: string; layer: number; rewards: any }): void {
+        const items = [...(data.rewards.items || [])];
+        if (data.rewards.relicEssence) {
+            items.push({ id: 'relic_essence', count: data.rewards.relicEssence, probability: 1 });
+        }
+        this._lastRewardInfo = {
+            stageId: `dungeon_${data.type}_${data.layer}`,
+            exp: data.rewards.exp || 0,
+            gold: data.rewards.gold || 0,
+            crystals: data.rewards.crystals || 0,
+            items,
+            firstClear: false,
+            isReplay: false,
+        };
     }
 
     /** 结算面板已显示后，动态刷新奖励区域 */
@@ -860,10 +880,14 @@ export class BattleUI extends Component {
             this.resultLabel.color = theme;
             this.drawPanelBg(theme);
 
-            // 按钮文字：胜利→"下一关"，失败/平局→"再来一局"
+            // 按钮文字：副本→"返回副本"，胜利→"下一关"，失败/平局→"再来一局"
             this._lastResult = report.result;
             if (this._btnTextLabel) {
-                this._btnTextLabel.string = report.result === BattleResult.WIN ? '下 一 关' : '再来一局';
+                if (isDungeonBattle) {
+                    this._btnTextLabel.string = '返回副本';
+                } else {
+                    this._btnTextLabel.string = report.result === BattleResult.WIN ? '下 一 关' : '再来一局';
+                }
             }
         }
 
@@ -954,6 +978,11 @@ export class BattleUI extends Component {
         this._bm.setBattleSpeed(1);
         if (this.btnSpeedLabel) this.btnSpeedLabel.string = '1x';
         if (this.btnPauseLabel) this.btnPauseLabel.string = '⏸';
+
+        if (isDungeonBattle) {
+            EventBus.instance.emit('battle:restart');
+            return;
+        }
 
         if (this._lastResult === BattleResult.WIN) {
             // 胜利 → 进入下一关（回到布阵界面，关卡已由 PlayerManager 推进）
@@ -1049,6 +1078,11 @@ export class BattleUI extends Component {
         backNode.addChild(backTxt);
 
         backNode.on(Node.EventType.TOUCH_END, () => {
+            if (isDungeonBattle) {
+                // 清理副本标记
+                EventBus.instance.emit('battle:restart');
+                return;
+            }
             director.loadScene('battle');
         }, this);
         btnGroup.addChild(backNode);
@@ -1227,8 +1261,8 @@ export class BattleUI extends Component {
     /** 资源图标定义 */
     private readonly RES_ICONS: { key: string; icon: string; color: Color }[] = [
         { key: 'exp',       icon: '📜', color: new Color(100, 220, 140, 255) },
-        { key: 'gold',      icon: '💰', color: new Color(255, 215, 0, 255) },
-        { key: 'crystals',  icon: '💎', color: new Color(140, 200, 255, 255) },
+        { key: 'gold',      icon: '🪙', color: new Color(255, 215, 0, 255) },
+        { key: 'crystals',  icon: '🔮', color: new Color(140, 200, 255, 255) },
     ];
 
     /** 在结算面板底部创建横排奖励区域，返回按钮 Y 坐标 */
@@ -1474,6 +1508,8 @@ export class BattleUI extends Component {
             'exp_book_s': '初级经验书',
             'exp_book_m': '中级经验书',
             'exp_book_l': '高级经验书',
+            'relic_essence': '圣物精华',
+            'ascension_scroll': '升阶卷轴',
         };
         if (itemNames[itemId]) return itemNames[itemId];
 

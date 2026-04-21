@@ -9,12 +9,14 @@ import { director } from 'cc';
 import { UnitConfig } from '../models/UnitData';
 import { SkillConfig } from '../models/SkillData';
 import { SynergyConfig } from '../models/SynergyData';
+import { BattleOrderConfig } from '../models/BattleOrderData';
 import { BattleUnit, GameConstants } from '../battle/Unit';
 import { BattleManager } from '../battle/BattleManager';
 import { LevelSystem } from '../systems/LevelSystem';
 import { UpgradeSystem } from '../systems/UpgradeSystem';
 import { StageManager } from '../systems/StageManager';
 import { PlayerManager } from '../systems/PlayerManager';
+import { DungeonSystem } from '../systems/DungeonSystem';
 import { GameConfig } from '../core/GameConfig';
 import { EventBus } from '../core/EventBus';
 
@@ -43,6 +45,11 @@ export class MainScene extends Component {
                 LevelSystem.instance.init(constantsAsset);
                 UpgradeSystem.instance.init(constantsAsset);
                 GameConfig.instance.setConstants(constantsAsset as any);
+
+                // 初始化副本系统
+                if (constantsAsset.dungeon) {
+                    DungeonSystem.instance.init(constantsAsset.dungeon);
+                }
             }
 
             const unitsAsset = await this.loadJson('configs/units');
@@ -65,7 +72,7 @@ export class MainScene extends Component {
             const stagesAsset = await this.loadJson('configs/stages');
             const templatesAsset = await this.loadJson('configs/stage-templates');
             if (templatesAsset) {
-                // 优先使用模板生成 30 关/章，stages.json 作为 override
+                // 优先使用模板生成 20 关/章，stages.json 作为 override
                 StageManager.instance.loadTemplates(templatesAsset, stagesAsset || null);
             } else if (stagesAsset) {
                 // 降级：无模板时用旧方式
@@ -82,6 +89,13 @@ export class MainScene extends Component {
             const relicsAsset = await this.loadJson('configs/relics');
             if (relicsAsset) {
                 GameConfig.instance.setRelicConfigs(relicsAsset as any[]);
+            }
+
+            const battleOrdersAsset = await this.loadJson('configs/battleOrders');
+            if (battleOrdersAsset) {
+                const orderConfigs = Object.values(battleOrdersAsset) as BattleOrderConfig[];
+                GameConfig.instance.setBattleOrderConfigs(orderConfigs);
+                console.log(`[MainScene] 军令配置加载完成: ${orderConfigs.length} 条`);
             }
 
             GameConfig.instance.setConfigs(unitConfigs, skillConfigs);

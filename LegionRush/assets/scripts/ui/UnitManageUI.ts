@@ -12,8 +12,9 @@ import { UpgradeSystem } from '../systems/UpgradeSystem';
 import { UnitInstanceData, UnitConfig, Quality } from '../models/UnitData';
 import { drawShape, UnitShape } from './UnitView';
 import { RelicSystem } from '../systems/RelicSystem';
-import { STAT_NAMES } from '../models/RelicData';
+import { STAT_NAMES as RELIC_STAT_NAMES } from '../models/RelicData';
 import { GameConfig } from '../core/GameConfig';
+import { RACE_NAMES, QUALITY_SHORT, SCENE_LABELS } from '../core/DisplayNames';
 
 const { ccclass } = _decorator;
 
@@ -36,9 +37,7 @@ const PROGRESS_FG = new Color(80, 200, 140, 255);
 const BACK_TEXT   = new Color(26, 26, 46, 255);
 const DIM        = new Color(80, 80, 100, 255);
 
-const RACE_NAMES: Record<string, string> = {
-    human: '人族', beast: '兽族', spirit: '灵族', demon: '魔族',
-};
+// RACE_NAMES imported from DisplayNames
 const RACE_COLORS: Record<string, Color> = {
     human: new Color(80, 160, 255, 255),
     beast: new Color(200, 120, 50, 255),
@@ -47,10 +46,7 @@ const RACE_COLORS: Record<string, Color> = {
 };
 const RACE_ORDER = ['human', 'beast', 'spirit', 'demon'];
 
-const QUALITY_NAMES: Record<string, string> = {
-    green: '绿', blue: '蓝', purple: '紫', gold: '金',
-    gold1: '金+1', gold2: '金+2', gold3: '金+3',
-};
+const QUALITY_NAMES = QUALITY_SHORT;
 const QUALITY_COLORS: Record<string, Color> = {
     green: new Color(80, 200, 80, 255),
     blue: new Color(80, 160, 255, 255),
@@ -196,7 +192,7 @@ export class UnitManageUI extends Component {
         topBar.addChild(backBtn);
 
         // Title
-        this.addLabel(topBar, '兵种管理', 22, GOLD, 0, 0, 200, true);
+        this.addLabel(topBar, SCENE_LABELS.units, 22, GOLD, 0, 0, 200, true);
 
         parent.addChild(topBar);
     }
@@ -859,12 +855,12 @@ export class UnitManageUI extends Component {
             // 等级（居中）
             this.addLabel(card, `Lv.${relic.level}`, 12, GOLD, 0, cardH / 2 - 40, W, true);
             // 主属性（居中）
-            this.addLabel(card, `${STAT_NAMES[relic.mainStat.stat]} +${mainVal.toFixed(1)}%`, 13,
+            this.addLabel(card, `${RELIC_STAT_NAMES[relic.mainStat.stat]} +${mainVal.toFixed(1)}%`, 13,
                 WHITE, 0, cardH / 2 - 60, W, true);
             // 副属性（居中）
             for (let si = 0; si < relic.subStats.length; si++) {
                 const sub = relic.subStats[si];
-                this.addLabel(card, `${STAT_NAMES[sub.stat]} +${sub.value.toFixed(1)}%`, 11,
+                this.addLabel(card, `${RELIC_STAT_NAMES[sub.stat]} +${sub.value.toFixed(1)}%`, 11,
                     GRAY_TEXT, 0, cardH / 2 - 78 - si * 20, W, true);
             }
 

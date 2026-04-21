@@ -13,6 +13,7 @@ import { Quality } from '../models/UnitData';
 import { UnitShape, drawShape } from './UnitView';
 import { STAT_NAMES } from '../models/RelicData';
 import { GameConfig } from '../core/GameConfig';
+import { QUALITY_FULL, SCENE_LABELS, CURRENCY_ICONS } from '../core/DisplayNames';
 
 const { ccclass } = _decorator;
 
@@ -35,10 +36,10 @@ const QUALITY_COLORS: Record<string, Color> = {
 };
 
 const QUALITY_NAMES: Record<string, string> = {
-    [Quality.GREEN]:  '普通',
-    [Quality.BLUE]:   '稀有',
-    [Quality.PURPLE]: '史诗',
-    [Quality.GOLD]:   '传说',
+    [Quality.GREEN]:  QUALITY_FULL.green,
+    [Quality.BLUE]:   QUALITY_FULL.blue,
+    [Quality.PURPLE]: QUALITY_FULL.purple,
+    [Quality.GOLD]:   QUALITY_FULL.gold,
 };
 
 const ROLE_SHAPES: Record<string, UnitShape> = {
@@ -120,7 +121,7 @@ export class GachaUI extends Component {
         topBar.addChild(backBtn);
 
         // Title
-        this.addLabel(topBar, '召 唤', 24, GOLD, 0, 0, 200, true);
+        this.addLabel(topBar, SCENE_LABELS.gacha, 24, GOLD, 0, 0, 200, true);
 
         // Currency
         const capLbl = this.addLabel(topBar, '🍺 0', 15, WHITE, SW / 2 - 130, 0, 100, true);
@@ -144,7 +145,7 @@ export class GachaUI extends Component {
 
         const modes: { key: 'unit' | 'relic'; label: string }[] = [
             { key: 'unit', label: '兵种' },
-            { key: 'relic', label: '圣物' },
+            { key: 'relic', label: '遗器' },
         ];
 
         this._tabNodes = [];
@@ -207,7 +208,7 @@ export class GachaUI extends Component {
         const isRelic = this._gachaMode === 'relic';
         const singleCost = isRelic ? RelicGachaSystem.instance.getSingleCost() : GACHA_COST.gold;
         const tenCost = isRelic ? RelicGachaSystem.instance.getTenCost() : GACHA_TEN_COST.gold;
-        const currency = isRelic ? '💎' : '💰';
+        const currency = isRelic ? CURRENCY_ICONS.crystals : CURRENCY_ICONS.gold;
 
         // 更新按钮文本（两个 Label：顶行 + 底行）
         if (this._btnSingle) {
@@ -307,14 +308,14 @@ export class GachaUI extends Component {
         const SH = this._SH;
         const btnY = -SH / 2 + 90;
 
-        const btnSingle = this.createPullBtn(`单抽 ×1\n💰${GACHA_COST.gold}`, 220, 68,
+        const btnSingle = this.createPullBtn(`单抽 ×1\n${CURRENCY_ICONS.gold}${GACHA_COST.gold}`, 220, 68,
             new Color(15, 45, 85, 230), new Color(80, 160, 255, 220));
         btnSingle.setPosition(-130, btnY, 0);
         btnSingle.on(Node.EventType.TOUCH_END, this.onSinglePull, this);
         parent.addChild(btnSingle);
         this._btnSingle = btnSingle;
 
-        const btnTen = this.createPullBtn(`十连 ×10\n💰${GACHA_TEN_COST.gold}`, 220, 68,
+        const btnTen = this.createPullBtn(`十连 ×10\n${CURRENCY_ICONS.gold}${GACHA_TEN_COST.gold}`, 220, 68,
             new Color(55, 18, 75, 230), new Color(180, 80, 255, 220));
         btnTen.setPosition(130, btnY, 0);
         btnTen.on(Node.EventType.TOUCH_END, this.onTenPull, this);
@@ -341,8 +342,8 @@ export class GachaUI extends Component {
     private refreshCap(): void {
         if (!PlayerManager.instance.isLoaded) return;
         const data = PlayerManager.instance.data;
-        if (this._capLabel) this._capLabel.string = `💰 ${data.gold}`;
-        if (this._tokenLabel) this._tokenLabel.string = `💎 ${data.crystals}`;
+        if (this._capLabel) this._capLabel.string = `${CURRENCY_ICONS.gold} ${data.gold}`;
+        if (this._tokenLabel) this._tokenLabel.string = `${CURRENCY_ICONS.crystals} ${data.crystals}`;
         this.updateBtnState();
     }
 

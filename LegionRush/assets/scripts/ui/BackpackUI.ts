@@ -9,6 +9,7 @@ import { _decorator, Component, Node, Label, Graphics, UITransform, Color, direc
 import { EventBus } from '../core/EventBus';
 import { PlayerManager } from '../systems/PlayerManager';
 import { GameConfig } from '../core/GameConfig';
+import { SCENE_LABELS } from '../core/DisplayNames';
 
 const { ccclass } = _decorator;
 
@@ -198,7 +199,7 @@ export class BackpackUI extends Component {
         topBar.addChild(backBtn);
 
         // Title
-        this.addLabel(topBar, '背  包', 22, GOLD, 0, 0, 200, true);
+        this.addLabel(topBar, SCENE_LABELS.backpack, 22, GOLD, 0, 0, 200, true);
 
         parent.addChild(topBar);
     }

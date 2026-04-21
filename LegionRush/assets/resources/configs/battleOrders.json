@@ -1,0 +1,53 @@
+{
+    "fortify": {
+        "id": "fortify",
+        "name": "固守令",
+        "description": "前排友军获得生命与防御加成，持续8秒",
+        "icon": "🛡️",
+        "effects": [
+            { "stat": "hp", "value": 0.12, "duration": 8, "scope": "frontline", "triggerDelay": 0 },
+            { "stat": "def", "value": 0.10, "duration": 8, "scope": "frontline", "triggerDelay": 0 }
+        ]
+    },
+    "assault": {
+        "id": "assault",
+        "name": "突进令",
+        "description": "开战3秒后，近战与刺客移速攻击提升，持续10秒",
+        "icon": "⚡",
+        "effects": [
+            { "stat": "spd", "value": 0.20, "duration": 10, "scope": "melee", "triggerDelay": 3 },
+            { "stat": "atk", "value": 0.12, "duration": 10, "scope": "melee", "triggerDelay": 3 },
+            { "stat": "spd", "value": 0.20, "duration": 10, "scope": "assassin", "triggerDelay": 3 },
+            { "stat": "atk", "value": 0.12, "duration": 10, "scope": "assassin", "triggerDelay": 3 }
+        ]
+    },
+    "volley": {
+        "id": "volley",
+        "name": "齐射令",
+        "description": "开战6秒后，远程与辅助攻速提升，持续8秒",
+        "icon": "🏹",
+        "effects": [
+            { "stat": "atkSpd", "value": 0.18, "duration": 8, "scope": "ranged", "triggerDelay": 6 },
+            { "stat": "atkSpd", "value": 0.18, "duration": 8, "scope": "support", "triggerDelay": 6 }
+        ]
+    },
+    "rescue": {
+        "id": "rescue",
+        "name": "急救令",
+        "description": "开战10秒后，全军获得生命回复与减伤，持续5秒",
+        "icon": "💊",
+        "effects": [
+            { "stat": "hp", "value": 0.16, "duration": 5, "scope": "team", "triggerDelay": 10 },
+            { "stat": "def", "value": 0.10, "duration": 5, "scope": "team", "triggerDelay": 10 }
+        ]
+    },
+    "purge": {
+        "id": "purge",
+        "name": "清剿令",
+        "description": "战斗15秒后，全队攻击提升，持续6秒",
+        "icon": "🔥",
+        "effects": [
+            { "stat": "atk", "value": 0.08, "duration": 6, "scope": "team", "triggerDelay": 15 }
+        ]
+    }
+}

@@ -5,8 +5,8 @@
  * 结束后返回主场景
  */
 
-import { _decorator, Component, Node, UITransform, Label, Color, Graphics, Layers, sys } from 'cc';
-import { BattleManager, BattleState, BattleConfig, BattleReport } from '../battle/BattleManager';
+import { _decorator, Component, Node, UITransform, Label, Color, Graphics, Layers, sys, director } from 'cc';
+import { BattleManager, BattleState, BattleConfig, BattleReport, BattleResult } from '../battle/BattleManager';
 import { BattleUnit, TeamSide } from '../battle/Unit';
 import { UnitConfig, Quality, UnitInstanceData } from '../models/UnitData';
 import { StageConfig } from '../models/StageData';
@@ -20,6 +20,8 @@ import { PlayerManager } from '../systems/PlayerManager';
 import { LevelSystem } from '../systems/LevelSystem';
 import { GameConfig } from '../core/GameConfig';
 import { RelicSystem } from '../systems/RelicSystem';
+import { DungeonType } from '../models/DungeonData';
+import { RACE_NAMES, QUALITY_SHORT } from '../core/DisplayNames';
 
 const { ccclass } = _decorator;
 
@@ -51,13 +53,18 @@ function saveFormationCache(formation: Map<string, { gridRow: number; gridCol: n
 }
 
 // 替换弹窗用常量
+// --- 副本战斗跨场景传递 ---
+let _pendingDungeon: { type: string; layer: number; enemies: any[] } | null = null;
+export let isDungeonBattle = false;
+
+export function setDungeonBattlePending(type: string, layer: number, enemies: any[]): void {
+    _pendingDungeon = { type, layer, enemies };
+    isDungeonBattle = true;
+}
+
 const RACE_ORDER = ['human', 'beast', 'spirit', 'demon'];
-const RACE_NAMES: Record<string, string> = { human: '人族', beast: '兽族', spirit: '灵族', demon: '魔族' };
 const QUALITY_ORDER = ['green', 'blue', 'purple', 'gold', 'gold1', 'gold2', 'gold3'];
-const QUALITY_NAMES: Record<string, string> = {
-    green: '绿', blue: '蓝', purple: '紫', gold: '金',
-    gold1: '金+1', gold2: '金+2', gold3: '金+3',
-};
+const QUALITY_NAMES = QUALITY_SHORT;
 const QUALITY_COLORS: Record<string, Color> = {
     green: new Color(80, 200, 80, 255), blue: new Color(80, 160, 255, 255),
     purple: new Color(180, 80, 255, 255), gold: new Color(255, 215, 0, 255),
@@ -86,6 +93,9 @@ export class BattleScene extends Component {
     private _currentDeploy: DeployEntry[] = [];
     private _replacePanel: Node | null = null;
     private _synergyDisplayNodes: Node[] = [];
+    private _dungeonContext: { type: DungeonType; layer: number } | null = null;
+    private _selectedOrderId: string | null = null;
+    private _orderBarNode: Node | null = null;
 
     onLoad() {
         this.battleField = this.node.getChildByName('BattleField')!;
@@ -133,7 +143,72 @@ export class BattleScene extends Component {
     }
 
     start() {
-        // 不再自动发 deployment:ready，等玩家在 StageSelectUI 中选关
+        // start() 在所有 onLoad() 之后执行，此时 StageSelectUI 已创建完毕
+        if (_pendingDungeon) {
+            const data = _pendingDungeon;
+            _pendingDungeon = null;
+            this.startDungeonBattle(data);
+        }
+    }
+
+    /** 副本战斗开始（从 dungeon 场景传入） */
+    private startDungeonBattle(data: { type: string; layer: number; enemies: any[] }): void {
+        this._dungeonContext = { type: data.type as DungeonType, layer: data.layer };
+        isDungeonBattle = true;
+
+        // 标记为副本战斗，跳过 PlayerManager 关卡逻辑
+        PlayerManager.instance.setDungeonBattle(true);
+
+        console.log(`[BattleScene] 副本战斗: ${data.type} 第${data.layer}层`);
+
+        // 隐藏关卡选择
+        const stageSelectNode = this.uiRoot.getChildByName('StageSelectContainer');
+        if (stageSelectNode) stageSelectNode.active = false;
+
+        // 构建蓝方（玩家自动布阵）
+        const deployData = this.buildAutoDeploy();
+        const pm = PlayerManager.instance;
+
+        const leftUnits = deployData.map(e => {
+            const cfg = this._unitConfigs.get(e.configId);
+            const unitInstance = pm.getUnit(e.unitUid);
+            const level = unitInstance ? unitInstance.level : 1;
+            const quality = unitInstance ? unitInstance.quality as Quality : Quality.GREEN;
+            let relicBonus: Record<string, number> | undefined;
+            if (unitInstance) {
+                const relic = RelicSystem.instance.getRelicEquippedByUnit(unitInstance.uid);
+                if (relic) relicBonus = RelicSystem.instance.getStatBonuses(relic);
+            }
+            return { config: cfg!, level, quality, count: e.count, gridRow: e.gridRow, gridCol: e.gridCol, relicBonus };
+        }).filter(u => u.config);
+
+        // 构建红方（副本敌人）
+        const rightUnits = data.enemies.map((enemy: any) => {
+            const cfg = this._unitConfigs.get(enemy.configId);
+            if (!cfg) return null;
+            return {
+                config: cfg,
+                level: enemy.level,
+                quality: enemy.quality as Quality,
+                count: LevelSystem.instance.getDeployCount(enemy.level),
+                gridRow: enemy.gridRow,
+                gridCol: enemy.gridCol,
+            };
+        }).filter(Boolean);
+
+        const config: BattleConfig = {
+            leftFormation: FormationType.DEFAULT,
+            rightFormation: FormationType.DEFAULT,
+            leftUnits,
+            rightUnits,
+            timeLimit: 180,
+            battleOrderId: this._selectedOrderId || undefined,
+        };
+
+        this._bm.prepareBattle(config);
+        this.createUnitViews();
+        this.buildOrderBar();
+        console.log(`[BattleScene] 副本布阵完成: ${leftUnits.length} vs ${rightUnits.length}`);
     }
 
     /** 玩家选择了关卡 → 自动布阵直接开战 */
@@ -273,10 +348,12 @@ export class BattleScene extends Component {
             leftUnits,
             rightUnits,
             timeLimit: 180,
+            battleOrderId: this._selectedOrderId || undefined,
         };
 
         this._bm.prepareBattle(config);
         this.createUnitViews();
+        this.buildOrderBar();
 
         // 不自动开战，等玩家点"开战"按钮
         console.log(`[BattleScene] 布阵完成: ${leftUnits.length} vs ${rightUnits.length}，等待玩家开战`);
@@ -295,8 +372,21 @@ export class BattleScene extends Component {
         EventBus.instance.off('battle:start_request', this.onStartRequest, this);
     }
 
-    private onBattleEnd(_report: BattleReport): void {
+    private onBattleEnd(report: BattleReport): void {
         this._running = false;
+
+        if (this._dungeonContext) {
+            const totalLeft = this._bm.leftUnits.length;
+            EventBus.instance.emit('dungeon:battle_end', {
+                type: this._dungeonContext.type,
+                layer: this._dungeonContext.layer,
+                result: report.result === BattleResult.WIN ? 'win' : 'lose',
+                report: {
+                    leftSurvivors: report.leftSurvivors,
+                    totalLeft,
+                },
+            });
+        }
     }
 
     private onStartRequest(): void {
@@ -322,12 +412,23 @@ export class BattleScene extends Component {
         if (this._gridOverlay) this._gridOverlay.active = false;
         // 隐藏羁绊显示
         this._synergyDisplayNodes.forEach(n => { if (n) n.active = false; });
+        // 隐藏军令栏
+        if (this._orderBarNode) this._orderBarNode.active = false;
         console.log(`[BattleScene] 战斗开始: ${this._bm.allUnits.length} 个单位, 保存阵型: ${this._savedFormation.size} 种`);
     }
 
     private onRestart(): void {
         this.clearUnitViews();
         this._running = false;
+
+        if (this._dungeonContext) {
+            isDungeonBattle = false;
+            this._dungeonContext = null;
+            PlayerManager.instance.setDungeonBattle(false);
+            director.loadScene('dungeon');
+            return;
+        }
+
         // 回到关卡选择界面
         const container = this.uiRoot.getChildByName('StageSelectContainer');
         if (container) container.active = true;
@@ -525,6 +626,128 @@ export class BattleScene extends Component {
             case 'hp':     return '生命';
             default:       return stat;
         }
+    }
+
+    // --- 军令选择栏 ---
+
+    private buildOrderBar(): void {
+        // 清除旧的
+        if (this._orderBarNode) {
+            this._orderBarNode.destroy();
+            this._orderBarNode = null;
+        }
+
+        const orders = GameConfig.instance.allBattleOrderConfigs;
+        if (orders.length === 0) return;
+
+        const SW = 1280;
+        const barH = 48;
+        const btnW = 90, btnGap = 10;
+        const totalW = orders.length * btnW + (orders.length - 1) * btnGap + 60; // +60 for label
+        const bar = new Node('OrderBar');
+        const but = bar.addComponent(UITransform);
+        but.setContentSize(totalW, barH);
+        but.setAnchorPoint(0.5, 0.5);
+        bar.setPosition(0, -this._SH / 2 + 120, 0);
+
+        // 标签
+        this.addLabelFS(bar, '军令:', 14, new Color(160, 160, 180, 255), -totalW / 2 + 25, 0, 50, false);
+
+        const startX = -totalW / 2 + 60 + btnW / 2;
+        for (let i = 0; i < orders.length; i++) {
+            const order = orders[i];
+            const btn = new Node(`Order_${order.id}`);
+            const ut = btn.addComponent(UITransform);
+            ut.setContentSize(btnW, 36);
+            ut.setAnchorPoint(0.5, 0.5);
+            btn.setPosition(startX + i * (btnW + btnGap), 0, 0);
+
+            const bg = new Node('Bg');
+            const bgut = bg.addComponent(UITransform);
+            bgut.setContentSize(btnW, 36);
+            bgut.setAnchorPoint(0.5, 0.5);
+            bg.setPosition(0, 0, 0);
+            const g = bg.addComponent(Graphics);
+            g.fillColor = new Color(15, 52, 96, 200);
+            g.roundRect(-btnW / 2, -18, btnW, 36, 8);
+            g.fill();
+            g.strokeColor = new Color(74, 144, 217, 180);
+            g.lineWidth = 1;
+            g.roundRect(-btnW / 2, -18, btnW, 36, 8);
+            g.stroke();
+            btn.insertChild(bg, 0);
+
+            this.addLabelFS(btn, `${order.icon}${order.name}`, 12, Color.WHITE, 0, 0, btnW - 4, true);
+
+            btn.on(Node.EventType.TOUCH_END, () => {
+                this._selectedOrderId = this._selectedOrderId === order.id ? null : order.id;
+                // 更新高亮
+                this.updateOrderBarHighlight();
+            }, this);
+
+            bar.addChild(btn);
+        }
+
+        this.uiRoot.addChild(bar);
+        this._orderBarNode = bar;
+
+        // layer
+        const setLayer = (n: Node) => { n.layer = Layers.Enum.UI_2D; n.children.forEach(setLayer); };
+        setLayer(bar);
+
+        this.updateOrderBarHighlight();
+    }
+
+    private updateOrderBarHighlight(): void {
+        if (!this._orderBarNode) return;
+        const orders = GameConfig.instance.allBattleOrderConfigs;
+        let btnIdx = 0;
+        this._orderBarNode.children.forEach(child => {
+            if (!child.name.startsWith('Order_')) return;
+            const orderId = orders[btnIdx]?.id;
+            const isSelected = orderId === this._selectedOrderId;
+
+            // 更新背景高亮
+            const bg = child.getChildByName('Bg');
+            if (bg) {
+                const g = bg.getComponent(Graphics);
+                if (g) {
+                    const btnW = 90;
+                    g.clear();
+                    g.fillColor = isSelected ? new Color(255, 215, 0, 40) : new Color(15, 52, 96, 200);
+                    g.roundRect(-btnW / 2, -18, btnW, 36, 8);
+                    g.fill();
+                    g.strokeColor = isSelected ? new Color(255, 215, 0, 255) : new Color(74, 144, 217, 180);
+                    g.lineWidth = isSelected ? 2 : 1;
+                    g.roundRect(-btnW / 2, -18, btnW, 36, 8);
+                    g.stroke();
+                }
+            }
+            btnIdx++;
+        });
+    }
+
+    private addLabelFS(parent: Node, text: string, fontSize: number, color: Color,
+        x: number, y: number, w: number, bold: boolean): Node {
+        const actualSize = GameConfig.instance.fontSizes ?
+            (fontSize >= 22 ? GameConfig.instance.fontSizes.subtitle :
+             fontSize >= 18 ? GameConfig.instance.fontSizes.body :
+             fontSize >= 14 ? GameConfig.instance.fontSizes.small : GameConfig.instance.fontSizes.caption) : fontSize;
+        const n = new Node('Lbl');
+        if (w > 0) {
+            const ut = n.addComponent(UITransform);
+            ut.setContentSize(w, actualSize + 4);
+            ut.setAnchorPoint(0.5, 0.5);
+        }
+        n.setPosition(x, y, 0);
+        const l = n.addComponent(Label);
+        l.string = text;
+        l.fontSize = actualSize;
+        l.isBold = bold;
+        l.color = color;
+        if (w > 0) l.horizontalAlign = Label.HorizontalAlign.CENTER;
+        parent.addChild(n);
+        return n;
     }
 
     // --- 单位视图：纯代码创建 ---

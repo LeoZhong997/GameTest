@@ -1,18 +1,18 @@
 [
-    { "id": "tactical_manual", "name": "战术手册", "race": "human", "role": null, "description": "人族通用圣物，强化学习与适应性" },
-    { "id": "blood_rage_mark", "name": "血怒徽记", "race": "beast", "role": null, "description": "兽族通用圣物，激发狂野本能" },
-    { "id": "elemental_harmony", "name": "元素和谐", "race": "spirit", "role": null, "description": "灵族通用圣物，增强元素亲和力" },
-    { "id": "soul_pact", "name": "灵魂契约", "race": "demon", "role": null, "description": "魔族通用圣物，强化灵魂汲取" },
+    { "id": "tactical_manual", "name": "战术手册", "race": "human", "role": null, "description": "铁誓庭专属遗器，强化防御与生命" },
+    { "id": "blood_rage_mark", "name": "血怒徽记", "race": "beast", "role": null, "description": "荒鬃部专属遗器，激发攻击与攻速" },
+    { "id": "elemental_harmony", "name": "元素和谐", "race": "spirit", "role": null, "description": "月枝会专属遗器，增强攻击与攻速" },
+    { "id": "soul_pact", "name": "灵魂契约", "race": "demon", "role": null, "description": "深烬廷专属遗器，强化攻击与生命" },
 
-    { "id": "taunt_mask", "name": "嘲讽面具", "race": null, "role": "tank", "description": "坦克圣物，强化防御姿态" },
-    { "id": "berserker_bracer", "name": "狂战护腕", "race": null, "role": "melee", "description": "近战圣物，增强冲锋爆发力" },
-    { "id": "focus_scope", "name": "专注瞄准镜", "race": null, "role": "ranged", "description": "远程圣物，提升精准打击" },
-    { "id": "salvation_bell", "name": "救赎之铃", "race": null, "role": "support", "description": "辅助圣物，强化治疗与庇护" },
-    { "id": "shadow_cloak", "name": "影舞披风", "race": null, "role": "assassin", "description": "刺客圣物，增强暗影潜行" },
+    { "id": "taunt_mask", "name": "嘲讽面具", "race": null, "role": "tank", "description": "重甲遗器，强化防御姿态" },
+    { "id": "berserker_bracer", "name": "狂战护腕", "race": null, "role": "melee", "description": "近战遗器，增强冲锋爆发力" },
+    { "id": "focus_scope", "name": "专注瞄准镜", "race": null, "role": "ranged", "description": "远程遗器，提升精准打击" },
+    { "id": "salvation_bell", "name": "救赎之铃", "race": null, "role": "support", "description": "辅助遗器，强化治疗与庇护" },
+    { "id": "shadow_cloak", "name": "影舞披风", "race": null, "role": "assassin", "description": "刺客遗器，增强暗影潜行" },
 
-    { "id": "war_banner", "name": "战旗", "race": null, "role": null, "description": "通用圣物，提升全军战意" },
-    { "id": "life_crystal", "name": "生命水晶", "race": null, "role": null, "description": "通用圣物，增强生命韧性" },
-    { "id": "iron_wall", "name": "铁壁符", "race": null, "role": null, "description": "通用圣物，加固防御屏障" },
-    { "id": "swift_seal", "name": "迅捷印记", "race": null, "role": null, "description": "通用圣物，提升攻击节奏" },
-    { "id": "chaos_core", "name": "混沌核心", "race": null, "role": null, "description": "通用圣物，蕴含混沌之力" }
+    { "id": "war_banner", "name": "战旗", "race": null, "role": null, "description": "通用遗器，提升全军战意" },
+    { "id": "life_crystal", "name": "生命水晶", "race": null, "role": null, "description": "通用遗器，增强生命韧性" },
+    { "id": "iron_wall", "name": "铁壁符", "race": null, "role": null, "description": "通用遗器，加固防御屏障" },
+    { "id": "swift_seal", "name": "迅捷印记", "race": null, "role": null, "description": "通用遗器，提升攻击节奏" },
+    { "id": "chaos_core", "name": "混沌核心", "race": null, "role": null, "description": "通用遗器，蕴含混沌之力" }
 ]

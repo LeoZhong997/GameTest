@@ -23,6 +23,7 @@ export class PlayerManager {
     private _playingChapter: number = 0;
     private _playingStage: number = 0;
     private _pendingReward: { rewardInfo: any; stage: any } | null = null;
+    private _isDungeonBattle: boolean = false;
 
     public static get instance(): PlayerManager {
         if (!this._instance) {
@@ -85,6 +86,12 @@ export class PlayerManager {
             data.relics = data.relics || {};
             data.version = 6;
             console.log('[PlayerManager] 迁移 v5→v6: 新增 relics 字段');
+        }
+        if (data.version < 7) {
+            // v6 → v7: 新增副本进度
+            data.dungeons = data.dungeons || {};
+            data.version = 7;
+            console.log('[PlayerManager] 迁移 v6→v7: 新增 dungeons 字段');
         }
     }
 
@@ -173,6 +180,11 @@ export class PlayerManager {
         this._playingStage = stage;
     }
 
+    /** 标记当前是否为副本战斗（跳过关卡逻辑） */
+    setDungeonBattle(flag: boolean): void {
+        this._isDungeonBattle = flag;
+    }
+
     // --- 关卡推进 ---
 
     /** 推进关卡，传入实际通关的章节/关卡号 */
@@ -202,6 +214,9 @@ export class PlayerManager {
 
     private onBattleEnd(report: BattleReport): void {
         if (!this._data) return;
+
+        // 副本战斗由 DungeonSystem 独立处理，跳过关卡逻辑
+        if (this._isDungeonBattle) return;
 
         if (report.result === BattleResult.WIN) {
             // 获取实际打的关卡配置
@@ -279,7 +294,7 @@ export class PlayerManager {
                 // 保存 pending 状态，等待玩家选择
                 this._pendingReward = { rewardInfo, stage };
 
-                console.log(`[PlayerManager] 固定奖励已发放: EXP+${rewards.exp} 💰+${rewardInfo.gold} 💎+${rewardInfo.crystals}${rewardInfo.firstClear ? ' (首通)' : ''}`);
+                console.log(`[PlayerManager] 固定奖励已发放: EXP+${rewards.exp} 🪙+${rewardInfo.gold} 🔮+${rewardInfo.crystals}${rewardInfo.firstClear ? ' (首通)' : ''}`);
                 console.log(`[PlayerManager] 三选一选项: ${chooseOptions.map((o: RewardOption) => `${o.name}x${o.count}`).join(', ')}`);
 
                 // 发出选择事件（不发 rewards:distributed，等玩家选完再发）
@@ -303,7 +318,7 @@ export class PlayerManager {
                         }
                     }
                 }
-                console.log(`[PlayerManager] 奖励发放: EXP+${rewards.exp} 💰+${rewardInfo.gold} 💎+${rewardInfo.crystals}${rewardInfo.firstClear ? ' (首通)' : ''}`);
+                console.log(`[PlayerManager] 奖励发放: EXP+${rewards.exp} 🪙+${rewardInfo.gold} 🔮+${rewardInfo.crystals}${rewardInfo.firstClear ? ' (首通)' : ''}`);
                 EventBus.instance.emit('rewards:distributed', rewardInfo);
             }
         }

@@ -11,6 +11,7 @@ import { GameConfig } from '../core/GameConfig';
 import { RelicSystem } from '../systems/RelicSystem';
 import { RelicInstance, RelicConfig, RelicStatType, STAT_NAMES } from '../models/RelicData';
 import { UnitInstanceData } from '../models/UnitData';
+import { RACE_NAMES as DN_RACE_NAMES, ROLE_NAMES as DN_ROLE_NAMES, QUALITY_FULL, QUALITY_SHORT, SCENE_LABELS, CURRENCY_ICONS } from '../core/DisplayNames';
 
 const { ccclass } = _decorator;
 
@@ -21,9 +22,9 @@ const CARD_W = 180, CARD_H = 180;
 const CARD_GAP = 14;
 const COLS = 4;
 
-// Race / Role 中文映射
-const RACE_NAMES: Record<string, string> = { human: '人族', beast: '兽族', spirit: '灵族', demon: '魔族' };
-const ROLE_NAMES: Record<string, string> = { tank: '坦克', melee: '近战', ranged: '远程', support: '辅助', assassin: '刺客' };
+// Race / Role 中文映射 — imported from DisplayNames
+const RACE_NAMES = DN_RACE_NAMES;
+const ROLE_NAMES = DN_ROLE_NAMES;
 
 // Colors
 const BG = new Color(26, 26, 46, 255);
@@ -42,14 +43,14 @@ const QUALITY_COLORS: Record<string, Color> = {
     purple: new Color(180, 80, 255, 255),
     gold: new Color(255, 215, 0, 255),
 };
-const QUALITY_NAMES: Record<string, string> = { green: '普通', blue: '稀有', purple: '史诗', gold: '传说' };
+const QUALITY_NAMES = QUALITY_FULL;
 
 const TAB_DEFS = [
     { key: 'all', label: '全部' },
-    { key: 'human', label: '人族' },
-    { key: 'beast', label: '兽族' },
-    { key: 'spirit', label: '灵族' },
-    { key: 'demon', label: '魔族' },
+    { key: 'human', label: DN_RACE_NAMES.human },
+    { key: 'beast', label: DN_RACE_NAMES.beast },
+    { key: 'spirit', label: DN_RACE_NAMES.spirit },
+    { key: 'demon', label: DN_RACE_NAMES.demon },
     { key: 'universal', label: '通用' },
     { key: 'unequipped', label: '未装备' },
 ];
@@ -168,11 +169,11 @@ export class RelicUI extends Component {
         topBar.addChild(backBtn);
 
         // 标题
-        this.addLabel(topBar, '圣  物', 22, GOLD, 0, 0, 200, true);
+        this.addLabel(topBar, SCENE_LABELS.relics, 22, GOLD, 0, 0, 200, true);
 
         // 金币数量
         const goldCount = PlayerManager.instance.isLoaded ? PlayerManager.instance.data.gold : 0;
-        this.addLabel(topBar, `💰${goldCount}`, 14, new Color(255, 215, 0, 255), SW / 2 - 180, 0, 100, true);
+        this.addLabel(topBar, `${CURRENCY_ICONS.gold}${goldCount}`, 14, new Color(255, 215, 0, 255), SW / 2 - 180, 0, 100, true);
 
         // 精华数量
         const essenceCount = PlayerManager.instance.isLoaded ? PlayerManager.instance.getItemCount('relic_essence') : 0;
@@ -757,8 +758,8 @@ export class RelicUI extends Component {
         const labels = topBar.children.filter(c => c.getComponent(Label));
         for (const lblNode of labels) {
             const lbl = lblNode.getComponent(Label)!;
-            if (lbl.string.includes('💰')) {
-                lbl.string = `💰${PlayerManager.instance.data.gold}`;
+            if (lbl.string.includes(CURRENCY_ICONS.gold)) {
+                lbl.string = `${CURRENCY_ICONS.gold}${PlayerManager.instance.data.gold}`;
             } else if (lbl.string.startsWith('精华')) {
                 lbl.string = `精华: ${PlayerManager.instance.getItemCount('relic_essence')}`;
             }
